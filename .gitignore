@@ -1,0 +1,31 @@
+# vscode workspace conf
+.vscode/
+
+# CMake builds
+CMakeFiles/
+
+# general build directories
+build*/
+BUILD_*/
+
+# c-like build intermediate files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+
+# vivado generations
+*.jou
+*.log
+vivado*.str
+*.cache/
+*.gen/
+*.hw/
+.Xil/
+**/ip/xilinx/*/*
+**/ip/xilinx/*/*/
+!**/ip/xilinx/*/*.xci
