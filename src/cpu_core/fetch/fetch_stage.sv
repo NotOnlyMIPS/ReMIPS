@@ -11,7 +11,9 @@ module fetch_stage (
     output fs_to_valid,
 
     input  pfs_to_fs_bus_t  pfs_to_fs_bus,
-    output fs_to_ds_bus_t   fs_to_ds_bus
+    input  icache_to_fetch_bus_t icache_to_fetch_bus,
+    output fetch_to_decode_bus_t fetch_to_decode_bus1,
+    output fetch_to_decode_bus_t fetch_to_decode_bus2
 
 );
 
@@ -89,48 +91,55 @@ always_ff @ (posedge clk) begin
     if(reset) begin
         inst_num <= '0;
     end else begin
-        inst_num <= inst_num - (fs_to_ds_send_num & {4{fs_to_valid}}) + (pfs_send_num & {4{icache_data_ok}});
+        inst_num <= inst_num - (fs_to_ds_send_num & {4{fs_to_valid}}) + (pfs_send_num & {4{icache_to_fetch_bus.icache_data_ok}});
     end
 
     if(reset) begin
         inst_queue_end <= '1;
-    end else if(icache_data_ok) begin
+    end else if(icache_to_fetch_bus.icache_data_ok) begin
         inst_queue_end <= inst_queue_end + pfs_send_num;
     end
 
     if(reset) begin
         fs_inst <= '0;
     end else begin
-        if(icache_data_ok) begin
+        if(icache_to_fetch_bus.icache_data_ok) begin
             case(pfs_send_num)
                 3'd1:begin
-                    fs_inst[inst_queue_end + 1] <= icache_read_data[127:96];
+                    fs_inst[inst_queue_end + 1] <= icache_to_fetch_bus.data[127:96];
                 end
                 3'd2:begin
-                    fs_inst[inst_queue_end + 1] <= icache_read_data[ 95:64];
-                    fs_inst[inst_queue_end + 2] <= icache_read_data[127:96];
+                    fs_inst[inst_queue_end + 1] <= icache_to_fetch_bus.data[ 95:64];
+                    fs_inst[inst_queue_end + 2] <= icache_to_fetch_bus.data[127:96];
                 end
                 3'd3:begin
-                    fs_inst[inst_queue_end + 1] <= icache_read_data[ 63:32];
-                    fs_inst[inst_queue_end + 2] <= icache_read_data[ 95:64];
-                    fs_inst[inst_queue_end + 3] <= icache_read_data[127:96];
+                    fs_inst[inst_queue_end + 1] <= icache_to_fetch_bus.data[ 63:32];
+                    fs_inst[inst_queue_end + 2] <= icache_to_fetch_bus.data[ 95:64];
+                    fs_inst[inst_queue_end + 3] <= icache_to_fetch_bus.data[127:96];
                 end
                 default:begin
-                    fs_inst[inst_queue_end + 1] <= icache_read_data[ 31: 0];
-                    fs_inst[inst_queue_end + 2] <= icache_read_data[ 63:32];
-                    fs_inst[inst_queue_end + 3] <= icache_read_data[ 95:64];
-                    fs_inst[inst_queue_end + 4] <= icache_read_data[127:96];
+                    fs_inst[inst_queue_end + 1] <= icache_to_fetch_bus.data[ 31: 0];
+                    fs_inst[inst_queue_end + 2] <= icache_to_fetch_bus.data[ 63:32];
+                    fs_inst[inst_queue_end + 3] <= icache_to_fetch_bus.data[ 95:64];
+                    fs_inst[inst_queue_end + 4] <= icache_to_fetch_bus.data[127:96];
                 end
             endcase
         end
     end
 end
 
+assign fetch_to_decode_bus1 = {
+    (fs_to_ds_send_num >= 1),
+    fs_inst_ready_1.inst,
+    fs_inst_ready_1.pc,
+    '0
+};
 
-// to ID
-assign fs_to_ds_bus = { fs_to_ds_inst,
-                        pfs_to_fs_bus_r.pc,
-                        exception
-                      };
+assign fetch_to_decode_bus1 = {
+    (fs_to_ds_send_num >= 2),
+    fs_inst_ready_2.inst,
+    fs_inst_ready_2.pc,
+    '0
+};
 
 endmodule
