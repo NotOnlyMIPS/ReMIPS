@@ -1,76 +1,69 @@
 `include "../cpu.svh"
 
 module store_buffer #(
-    parameter DATA_WIDTH    = 32,
     parameter STORE_GROUP   = 8
 )(
-    input  logic            clk_g,
+    input  logic            clk,
     input  logic            reset,
     input  logic            flush,
 
     input  logic            valid,
     input  logic            wr,
-    input  logic            is_commit,
     input  logic [3:0]      buffer_we,
+    input  logic [3:0]      rf_we,
     input  virt_t           data_addr,
-    input  uint32_t         op_wdata,
+    input  uint32_t         mem_wdata,
 
-    output virt_t           data_vaddr,
+    // lookup
+    output logic            data_exist,
+    output logic [3:0]      data_wstrb,
     output uint32_t         data_result,
-    output logic            data_exist
+    output logic            data_wstrb_match,
+
+    // commit store
+    input  logic            commit_store_valid,
+    output logic [3:0]      commit_store_wstrb,
+    output virt_t           commit_store_addr,
+    output uint32_t         commit_store_data
 );
 
-st_buffer_t  st_buffer;
+st_buffer_t  store_buffer[STORE_GROUP-1:0];
 
-uint32_t st_buffer_data;
+uint32_t store_buffer_data;
+logic [2:0] store_buffer_head, store_buffer_tail;
 logic [3:0] data_id;
 logic exist;
 
 //write store_buffer
-always_ff @( posedge clk_g ) begin : store_buffer_write
+always_ff @( posedge clk ) begin : store_buffer_write
     if( reset || flush ) begin
-        st_buffer <= '0 ;
-    end else if( valid & wr & !st_buffer.valid[st_buffer.tail]) begin
-            st_buffer.addr_table[st_buffer.tail][DATA_WIDTH-1:0]      <= data_addr;
-            st_buffer.valid     [st_buffer.tail]                      <= 1'b1   ;
-            unique case ( buffer_we )
-                4'h1 : begin
-                    st_buffer.data_table[st_buffer.tail][7:0]               <= op_wdata[7:0]   ;
-                end   
-                4'h2 : begin   
-                    st_buffer.data_table[st_buffer.tail][15:8]              <= op_wdata[15:8]  ;
-                end  
-                4'h3 : begin  
-                    st_buffer.data_table[st_buffer.tail][15:0]              <= op_wdata[15:0]  ;
-                end 
-                4'h4 : begin  
-                    st_buffer.data_table[st_buffer.tail][23:16]             <= op_wdata[23:16] ;
-                end 
-                4'h7 : begin 
-                    st_buffer.data_table[st_buffer.tail][23:0]              <= op_wdata[23:0]  ;
-                end 
-                4'h8 : begin 
-                    st_buffer.data_table[st_buffer.tail][31:24]             <= op_wdata[31:24] ;
-                end 
-                4'hc : begin 
-                    st_buffer.data_table[st_buffer.tail][31:16]             <= op_wdata[31:16] ;
-                end 
-                4'he : begin 
-                    st_buffer.data_table[st_buffer.tail][31:8]              <= op_wdata[31:8]  ;
-                end 
-                4'hf : begin 
-                    st_buffer.data_table[st_buffer.tail][31:0]              <= op_wdata[31:0]  ;
-                end
-                default : begin
-                    st_buffer.data_table                                    <= '0              ;
-                end
-            endcase
-            st_buffer.tail                                                  <= (st_buffer.tail + 1'b1) % STORE_GROUP ;
-            if( is_commit ) begin
-                st_buffer.head                                              <= (st_buffer.head + 1'b1) % STORE_GROUP ;
-            end
-    end else if( is_commit ) begin
-                st_buffer.head                                              <= (st_buffer.head + 1'b1) % STORE_GROUP ;
+        for(int i = 0; i < STORE_GROUP; i++)begin
+            store_buffer[i].valid <= '0;
+        end
+        store_buffer_tail <= '0;
+    end 
+    else if( valid & wr & !store_buffer[store_buffer_tail].valid) begin
+        store_buffer[store_buffer_tail].valid <= 1'b1   ;
+        store_buffer[store_buffer_tail].addr  <= data_addr;
+        store_buffer[store_buffer_tail].wstrb <= buffer_we;
+
+        if(buffer_we[0])
+            store_buffer[store_buffer_tail].data[7:0]   <= mem_wdata[ 7: 0];
+        if(buffer_we[1])
+            store_buffer[store_buffer_tail].data[15:8]  <= mem_wdata[15: 8];
+        if(buffer_we[2])
+            store_buffer[store_buffer_tail].data[23:16] <= mem_wdata[23:16];
+        if(buffer_we[3])
+            store_buffer[store_buffer_tail].data[31:24] <= mem_wdata[31:24];
+
+        store_buffer_tail <= (store_buffer_tail + 1'b1);
+    end 
+
+    if(reset || flush) begin
+        store_buffer_head <= '0;
+    end
+    else if( commit_store_valid ) begin
+        store_buffer_head <= (store_buffer_head + 1'b1);
     end
 end
 
@@ -79,8 +72,8 @@ always_comb begin : look_for_data_if_exist
     exist = 1'b0                         ;
     data_id = '0                         ;
     if( valid & !wr )begin
-        for (int i = st_buffer.tail-1; i != st_buffer.head ; i-- )begin
-            if( data_addr == st_buffer.addr_table[i])begin
+        for (int i = store_buffer_tail-1; i != store_buffer_head ; i-- )begin
+            if( data_addr == store_buffer[i].addr)begin
                 exist = 1'b1             ;
                 data_id = i              ;
                 break                    ;
@@ -91,14 +84,18 @@ end
 
 assign data_exist = exist ;
 
-always_comb begin : load_from_st_buffer
-if( valid & !wr & exist )begin 
-    st_buffer_data =st_buffer.data_table[data_id];
+always_comb begin
+    if( valid & !wr & exist )begin 
+        data_wstrb        = store_buffer[data_id].wstrb;
+        store_buffer_data = store_buffer[data_id].data;
+        data_wstrb_match  = store_buffer[data_id].wstrb == rf_we;
+        data_result       = store_buffer_data;
+    end
 
-    data_result = st_buffer_data;
-    
-    data_vaddr  = st_buffer.addr_table[data_id]                                       ;
-
+    if( commit_store_valid )begin
+        commit_store_wstrb = store_buffer[store_buffer_head].wstrb;
+        commit_store_addr  = store_buffer[store_buffer_head].addr;
+        commit_store_data  = store_buffer[store_buffer_head].data;
     end
 end
 

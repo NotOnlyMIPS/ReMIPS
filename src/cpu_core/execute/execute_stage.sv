@@ -24,6 +24,10 @@ module execute_stage(
     input  issue_to_execute_bus_t issue_to_execute_bus1,
     input  issue_to_execute_bus_t issue_to_execute_bus2,
 
+    // commit store
+    input  logic commit_store_valid,
+    output logic commit_store_ready,
+
     // commit
     output execute_to_commit_bus_t execute_to_commit_bus1,
     output execute_to_commit_bus_t execute_to_commit_bus2
@@ -111,9 +115,10 @@ alu alu1 (
     .flush,
 
     .issue_to_alu_valid(issue_to_alu1_valid),
+    .alu_allowin       (alu1_allowin       ),
 
     .cs_allowin        (alu1_to_cs_allowin ),
-    .alu_to_valid,
+    .alu_to_valid      (alu1_to_valid      ),
 
     .issue_inst         (issue_to_execute_bus1),
     .alu_bypass_bus     (alu1_bypass_bus      ),
@@ -127,6 +132,7 @@ mul_div_unit mul_div_unit_u (
     .flush,
 
     .issue_to_mul_div_valid(issue_to_mul_div_valid),
+    .mul_div_allowin       (mul_div_allowin       ),
 
     .cs_allowin            (mul_div_to_cs_allowin ),
     .mul_div_to_valid,
@@ -145,6 +151,7 @@ bru bru_u (
     .flush,
 
     .issue_to_bru_valid(issue_to_bru_valid),
+    .bru_allowin       (bru_allowin       ),
 
     .cs_allowin        (bru_to_cs_allowin ),
     .bru_to_valid,
@@ -161,9 +168,10 @@ alu alu2 (
     .flush,
 
     .issue_to_alu_valid(issue_to_alu2_valid),
+    .alu_allowin       (alu2_allowin       ),
 
     .cs_allowin        (alu2_to_cs_allowin ),
-    .alu_to_valid,
+    .alu_to_valid      (alu2_to_valid      ),
 
     .issue_inst         (issue_to_execute_bus2),
     .alu_bypass_bus     (alu2_bypass_bus      ),
@@ -178,11 +186,27 @@ agu agu_u (
     .flush,
 
     .issue_to_agu_valid(issue_to_agu_valid),
+    .agu_allowin       (agu_allowin       ),
 
     .cs_allowin        (agu_to_cs_allowin ),
     .agu_to_valid,
 
     .issue_inst         (issue_to_execute_bus2),
+    
+    // commit store
+    .commit_store_valid,
+    .commit_store_ready,
+
+    // DBus
+    .dcache_req,
+    .dcache_wr,
+    .dcache_wstrb,
+    .dcache_addr,
+    .dcache_wdata,
+    .dcache_rdata,
+    .dcache_addr_ok,
+    .dcache_data_ok,
+
     .agu_to_commit_bus
 );
 

@@ -30,7 +30,7 @@ reg_addr_t phy_dest1, phy_dest2;
 uint32_t src1_value, src2_value, hi, lo;
 exception_t exception;
 
-assign mul_div_allowin = cs_allowin && mul_div_readygo || !mul_div_valid;
+assign mul_div_allowin  = cs_allowin && mul_div_readygo || !mul_div_valid;
 assign mul_div_to_valid = mul_div_valid && mul_div_readygo;
 
 always_ff @(posedge clk) begin

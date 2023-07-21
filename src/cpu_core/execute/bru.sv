@@ -100,7 +100,7 @@ assign br_taken = (    inst_beq  &&  rs_eq_rt
 
 assign target_jump   = inst_j;
 assign target_jump_r = inst_jr;
-assign target_branch = inst.branch_type == Branch_Branch;
+assign target_branch = inst.branch_type == Branch_Cond;
 assign br_target = {32{target_jump  }} & inst.jump_target |
                    {32{target_jump_r}} & rs_value         |
                    {32{target_branch}} & inst.branch_target;
@@ -120,7 +120,7 @@ assign verify_result = {1'b0,
                         br_taken,
                         inst_pc};
 
-assign bru_bypass_bus = { bru_valid&inst.rf_we, phy_dest, inst_pc+8};
+assign bru_bypass_bus = { {4{bru_valid&inst.rf_we}}, phy_dest, inst_pc+8};
 
 assign bru_to_commit_bus = { bru_valid,
                              inst_pc,

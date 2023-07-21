@@ -138,7 +138,7 @@ assign and_result = alu_src1 & alu_src2;
 assign or_result  = alu_src1 | alu_src2;
 assign nor_result = ~or_result;
 assign xor_result = alu_src1 ^ alu_src2;
-assign lui_result = {alu_src2[15:0], 16'b0};
+assign lui_result = {inst.imm, 16'b0};
 
 // SLL result
 assign sll_result = alu_src2 << alu_src1[4:0];
@@ -161,7 +161,7 @@ assign alu_result = ({32{op_add|op_addu|op_sub|op_subu}} & add_sub_result)
                   | ({32{op_srl|op_sra                }} & sr_result);
 
 // bypass
-assign alu_bypass_bus = {inst.rf_we&alu_valid, phy_dest, alu_result};
+assign alu_bypass_bus = {{4{inst.rf_we&alu_valid}}, phy_dest, alu_result};
 
 assign alu_to_commit_bus.vali = alu_valid;
 // assign alu_to_commit_bus.pc   = inst_pc;
