@@ -22,7 +22,7 @@
 `define T       2'b11  //taken
 
 //MMU
-`define CPU_MMU_ENABLED 1
+`define CPU_MMU_ENABLED 0
 
 // TLB
 `define TLB_ENTRIES_NUM 16
@@ -101,6 +101,10 @@ typedef enum logic [6:0] {
     OP_BEQ, OP_BNE,
     OP_BLTZ, OP_BGEZ, OP_BLEZ, OP_BGTZ,
     OP_BLTZAL, OP_BGEZAL,
+    /* branch likely */
+    OP_BEQL, OP_BNEL,
+    OP_BLTZL, OP_BGEZL, OP_BLEZL, OP_BGTZL,
+    OP_BLTZALL, OP_BGEZALL,
     /* jump */
     OP_J, OP_JAL,
     OP_JR, OP_JALR,
@@ -112,6 +116,7 @@ typedef enum logic [6:0] {
     OP_SYSCALL, OP_BREAK,
     /* trap */
     OP_TGE, OP_TGEU, OP_TLT, OP_TLTU, OP_TEQ, OP_TNE,
+    OP_TGEI, OP_TGEIU, OP_TLTI, OP_TLTIU, OP_TEQI, OP_TNEI,
     /* privileged instructions */
     OP_CACHE, OP_ERET, OP_MFC0, OP_MTC0,
     OP_TLBP, OP_TLBR, OP_TLBWI, OP_TLBWR, OP_WAIT
@@ -138,14 +143,6 @@ typedef enum logic [6:0] {
     /* invalid */
 } operation_t;
 
-// branch type
-typedef enum logic [1:0] { 
-    Branch_None,
-    Branch_Jump,
-    Branch_Cond,
-    Branch_Return,
-    Branch_Call
-} branch_type_t;
 
 //Cache
 typedef enum logic [2:0] {
@@ -179,17 +176,26 @@ typedef struct packed {
 } exception_t;
 
 // BPU
+typedef enum logic [2:0] { 
+    Branch_None,
+    Branch_Jump,
+    Branch_Cond,
+    Branch_Return,
+    Branch_Call
+} branch_type_t;
+
 typedef struct packed {
     logic [31:10]   tag;
-    logic [2:0]     br_type;
+    branch_type_t   br_type;
     logic [1:0]     count;
     virt_t          target;
 } BHT_entry_t;
 
 typedef struct packed {
     logic          valid;
+    logic          br_op;
     logic          br_taken;
-    BHT_entry_t    entry;
+    virt_t         target;
 } predict_result_t;
 
 
@@ -225,6 +231,7 @@ typedef struct packed {
     reg_addr_t phy_dest;
     reg_addr_t old_dest;
 
+    logic is_mul_div_op;
     logic is_br_op;
     logic is_store_op;
 
@@ -240,14 +247,13 @@ typedef struct packed {
     logic       valid;
     virt_t      pc;
 
-    BHT_entry_t bpu_entry;
-
     exception_t exception;
 } prefetch_to_fetch_bus_t;
 
 typedef struct packed {
     logic          valid;
     logic          br_taken;
+    virt_t         br_target;
     BHT_entry_t    entry;
 
     logic          is_correction;
@@ -266,7 +272,9 @@ typedef struct packed {
     uint32_t           inst;
     virt_t             pc;
 
-    BHT_entry_t  bpu_entry;
+    logic       br_taken;
+    BHT_entry_t bpu_entry;
+
     exception_t  exception;
 } fetch_queue_entry_t;
 
@@ -275,7 +283,9 @@ typedef struct packed {
     uint32_t           inst;
     virt_t             pc;
 
-    BHT_entry_t  bpu_entry;
+    logic       br_taken;
+    BHT_entry_t bpu_entry;
+
     exception_t  exception;
 } fetch_to_decode_bus_t;
 
@@ -310,12 +320,9 @@ typedef struct packed {
     logic       rf_we;
     reg_addr_t  dest;
     uint16_t    imm;
+    logic[25:0] jidx;
 
     branch_type_t   branch_type;
-    virt_t          branch_target;
-    virt_t          jump_target;
-    
-    predict_result_t predict_result;
 
     CacheCodeType cache_op;
 } decoded_inst_t;
@@ -325,7 +332,11 @@ typedef struct packed {
     virt_t         pc;
     logic          is_store_op;
     decoded_inst_t inst;
-    exception_t    exception;
+
+    logic       br_taken;
+    BHT_entry_t bpu_entry;
+
+    exception_t      exception;
 } decode_to_map_bus_t;
 
 typedef struct packed {
@@ -335,7 +346,7 @@ typedef struct packed {
 
 typedef struct packed {
     reg_addr_t speculative_state;
-    reg_addr_t commit_state;
+    // reg_addr_t commit_state;
 } free_list_entry_t;
 
 typedef struct packed {
@@ -346,7 +357,6 @@ typedef struct packed {
     reg_addr_t phy_src1;
     reg_addr_t phy_src2;
     reg_addr_t phy_dest;
-    reg_addr_t old_dest;
     decoded_inst_t inst;
 
     logic [3:0] rob_entry_num;
@@ -355,6 +365,9 @@ typedef struct packed {
     logic       pre_store_ready;
     logic [3:0] pre_store;
     logic [3:0] store_num;
+
+    logic       br_taken;
+    BHT_entry_t bpu_entry;
 
     exception_t exception;
 } decode_to_issue_bus_t;
@@ -378,6 +391,9 @@ typedef struct packed {
     logic [3:0] pre_store;
     logic [3:0] store_num;
 
+    logic       br_taken;
+    BHT_entry_t bpu_entry;
+
     exception_t exception;
 } issue_entry_t;
 
@@ -397,6 +413,12 @@ typedef struct packed {
 
     logic [3:0] rob_entry_num;
 
+    logic is_store_op;
+    logic [3:0] store_num;
+
+    logic       br_taken;
+    BHT_entry_t bpu_entry;
+
     exception_t exception;
 } select_to_issue_bus_t;
 
@@ -411,13 +433,15 @@ typedef struct packed {
     virt_t        pc;
     
     reg_addr_t     phy_dest;
-    reg_addr_t     old_dest;
     decoded_inst_t inst;
 
     uint32_t   src1_value;
     uint32_t   src2_value;
 
     logic [3:0] rob_entry_num;
+
+    logic       br_taken;
+    BHT_entry_t bpu_entry;
 
     exception_t exception;
 } issue_to_execute_bus_t;
@@ -426,6 +450,7 @@ typedef struct packed {
 typedef struct packed {
     logic        valid;
     logic [ 3:0] wstrb;
+    logic [ 2:0] size;
     logic [31:0] addr;
     logic [31:0] data;
 } st_buffer_t;
@@ -451,17 +476,16 @@ typedef struct packed {
     logic [3:0] rf_we;
     reg_addr_t  dest;
     uint32_t    result;
-    logic [3:0] store_num;
 } writeback_to_rf_bus_t;
 
 typedef struct packed {
     // logic valid;
-    logic dest;
+    reg_addr_t dest;
 } writeback_to_busytable_bus_t;
 
 typedef struct packed {
-    logic valid;
-    logic rob_entry_num;
+    logic       valid;
+    logic [3:0] rob_entry_num;
 
     logic is_store_op;
 

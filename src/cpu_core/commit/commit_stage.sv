@@ -7,7 +7,12 @@ module commit_stage (
     output logic flush,
     output flush_src_t flush_src,
 
-    input  logic es_to_valid,
+`ifdef GOLDEN_TRACE
+    output commit_to_debug_bus_t commit_to_debug_bus1,
+    output commit_to_debug_bus_t commit_to_debug_bus2,
+`endif
+
+    input  logic ds_to_rob_valid,
     output logic cs_allowin,
     output logic rob_empty,
 
@@ -17,14 +22,10 @@ module commit_stage (
     output logic [3:0] rob_tail_o,
 
     // execute
-    input  execute_to_commit_bus_t execute_bus1,
-    input  execute_to_commit_bus_t execute_bus2,
+    input  execute_to_commit_bus_t execute_to_commit_bus1,
+    input  execute_to_commit_bus_t execute_to_commit_bus2,
     input  logic commit_store_ready,
     output logic commit_store_valid,
-
-    // bypass
-    output bypass_bus_t writeback_bypass_bus1,
-    output bypass_bus_t writeback_bypass_bus2,
 
     // busytable
     output writeback_to_busytable_bus_t writeback_to_busytable_bus1,
@@ -41,55 +42,87 @@ module commit_stage (
     output writeback_to_rf_bus_t writeback_to_rf_bus1,
     output writeback_to_rf_bus_t writeback_to_rf_bus2
 
+
 );
 
 parameter ROB_ENTRY_NUM = 16;
+
+// flush
+logic flush_r;
+logic commit_flush;
 
 // writeback
 execute_to_commit_bus_t writeback_inst1, writeback_inst2;
 writeback_to_commit_bus_t writeback_to_commit_bus1, writeback_to_commit_bus2;
 
 always_ff @(posedge clk) begin
-    if(reset || flush) begin
+    if(reset || flush || commit_flush) begin
         writeback_inst1 <= '0;
         writeback_inst2 <= '0;
     end else begin
-        writeback_inst1 <= execute_bus1;
-        writeback_inst2 <= execute_bus2;
+        writeback_inst1 <= execute_to_commit_bus1;
+        writeback_inst2 <= execute_to_commit_bus2;
     end
 end
 
-assign writeback_to_busytable_bus1 = { {6{execute_bus1.valid & execute_bus1.rf_we}} & execute_bus1.phy_dest};
-assign writeback_to_busytable_bus2 = { {6{execute_bus2.valid & execute_bus2.rf_we}} & execute_bus2.phy_dest};
+// writeback to busytable
+assign writeback_to_busytable_bus1 = { {6{execute_to_commit_bus1.valid && execute_to_commit_bus1.rf_we}} & execute_to_commit_bus1.phy_dest};
+assign writeback_to_busytable_bus2 = { {6{execute_to_commit_bus2.valid && execute_to_commit_bus2.rf_we}} & execute_to_commit_bus2.phy_dest};
 
-assign writeback_to_rf_bus1 = { {4{writeback_inst1.valid}} & writeback_inst1.rf_we,
-                                writeback_inst1.phy_dest,
-                                writeback_inst1.result};
-assign writeback_to_rf_bus2 = { {4{writeback_inst2.valid}} & writeback_inst2.rf_we,
-                                writeback_inst2.phy_dest,
-                                writeback_inst2.result};
+// writeback to regfile
+// inst1
+assign writeback_to_rf_bus1.valid  = writeback_inst1.valid;
+assign writeback_to_rf_bus1.rf_we  = {4{writeback_inst1.valid}} & writeback_inst1.rf_we;
+assign writeback_to_rf_bus1.dest   = writeback_inst1.phy_dest;
+assign writeback_to_rf_bus1.result = writeback_inst1.result;
 
-assign writeback_to_commit_bus1 = { writeback_inst1.valid,
-                                    writeback_inst1.rob_entry_num,
-                                    writeback_inst1.verify_result,
-                                    writeback_inst1.exception};
-assign writeback_to_commit_bus2 = { writeback_inst2.valid,
-                                    writeback_inst2.rob_entry_num,
-                                    writeback_inst2.verify_result,
-                                    writeback_inst2.exception};
+// inst2
+assign writeback_to_rf_bus2.valid  = writeback_inst2.valid;
+assign writeback_to_rf_bus2.rf_we  = {4{writeback_inst2.valid}} & writeback_inst2.rf_we;
+assign writeback_to_rf_bus2.dest   = writeback_inst2.phy_dest;
+assign writeback_to_rf_bus2.result = writeback_inst2.result;
+
+// writeback to commit
+// inst1
+assign writeback_to_commit_bus1.valid = writeback_inst1.valid;
+assign writeback_to_commit_bus1.rob_entry_num = writeback_inst1.rob_entry_num;
+
+assign writeback_to_commit_bus1.is_store_op = writeback_inst1.is_store_op;
+
+assign writeback_to_commit_bus1.verify_result = writeback_inst1.verify_result;
+assign writeback_to_commit_bus1.exception     = writeback_inst1.exception;
+
+// inst2
+assign writeback_to_commit_bus2.valid = writeback_inst2.valid;
+assign writeback_to_commit_bus2.rob_entry_num = writeback_inst2.rob_entry_num;
+
+assign writeback_to_commit_bus2.is_store_op = writeback_inst2.is_store_op;
+
+assign writeback_to_commit_bus2.verify_result = writeback_inst2.verify_result;
+assign writeback_to_commit_bus2.exception     = writeback_inst2.exception;
 
 // commit
 rob_entry_t rob[ROB_ENTRY_NUM-1:0];
 logic [3:0] rob_head, rob_tail;
+logic [3:0] rob_head_next, rob_tail_next;
 logic [4:0] rob_num;
 logic commit_inst1_valid, commit_inst2_valid;
+logic map_to_rob_bus1_valid, map_to_rob_bus2_valid;
+
+logic miss_predict;
+logic wait_1bd, wait_2bd;
+
+assign map_to_rob_bus1_valid = map_to_rob_bus1.state == Inst_Wait;
+assign map_to_rob_bus2_valid = map_to_rob_bus2.state == Inst_Wait;
 
 assign cs_allowin = rob_num < ROB_ENTRY_NUM-1;
 assign rob_empty  = rob_num == 0;
 assign rob_tail_o = rob_tail;
+assign rob_head_next = rob_head+1;
+assign rob_tail_next = rob_tail+1;
 
 always_ff @(posedge clk) begin
-    if(reset || flush) begin
+    if(reset || flush || commit_flush) begin
         for(int i=0; i<ROB_ENTRY_NUM; i++) begin
             rob[i] <= '0;
         end
@@ -98,22 +131,19 @@ always_ff @(posedge clk) begin
         if(commit_inst1_valid) begin
             rob[rob_head  ].state <= Inst_Invalid;
         end
-        else if(commit_store_ready) begin
-            rob[rob_head].state <= Inst_Complete;
+        else if(commit_store_ready && rob[rob_head].state == Store_Wait) begin
+            rob[rob_head  ].state <= Inst_Complete;
         end
         if(commit_inst2_valid) begin
-            rob[rob_head+1].state <= Inst_Invalid;
+            rob[rob_head_next].state <= Inst_Invalid;
+        end
+        else if(commit_store_ready && rob[rob_head].state != Store_Wait && rob[rob_head_next].state == Store_Wait) begin
+            rob[rob_head_next].state <= Inst_Complete;
         end
 
-        if(map_to_rob_bus1.state && map_to_rob_bus2.state) begin
-            rob[rob_tail]   <= map_to_rob_bus1;
-            rob[rob_tail+1] <= map_to_rob_bus2;
-        end
-        else if(map_to_rob_bus1.state) begin
-            rob[rob_tail] <= map_to_rob_bus1;
-        end
-        else if(map_to_rob_bus2.state) begin
-            rob[rob_tail] <= map_to_rob_bus2;
+        if(ds_to_rob_valid && cs_allowin) begin
+            rob[rob_tail     ]   <= map_to_rob_bus1;
+            rob[rob_tail_next]   <= map_to_rob_bus2;
         end
 
         if(writeback_to_commit_bus1.valid) begin
@@ -128,44 +158,86 @@ always_ff @(posedge clk) begin
         end
     end
 
-    if(reset || flush) begin
+    if(reset || flush || commit_flush) begin
         rob_head <= '0;
         rob_tail <= '0;
         rob_num  <= '0;
     end
     else begin
         rob_head <= rob_head + commit_inst1_valid + commit_inst2_valid;
-        rob_tail <= rob_tail + writeback_to_commit_bus1.valid + writeback_to_commit_bus2.valid;
-        rob_num  <= rob_num  + commit_inst1_valid + commit_inst2_valid
-                            - writeback_to_commit_bus1.valid - writeback_to_commit_bus2.valid;
+
+        if(cs_allowin && ds_to_rob_valid) begin
+            rob_tail <= rob_tail + map_to_rob_bus1_valid + map_to_rob_bus2_valid;
+        end
+
+        rob_num  <= rob_num + {4'b0, map_to_rob_bus1_valid && cs_allowin} + {4'b0, map_to_rob_bus2_valid && cs_allowin}
+                            - {4'b0, commit_inst1_valid} - {4'b0, commit_inst2_valid};
     end
+
+    if(reset || flush) begin
+        flush_r <= 1'b0;
+    end
+    else if(miss_predict) begin
+        flush_r <= 1'b1;
+    end
+
+    if(reset || commit_flush) begin
+        wait_1bd <= 1'b0;
+        wait_2bd <= 1'b0;
+    end
+    else if(miss_predict && !flush_r) begin
+        if(rob[rob_head_next].is_mul_div_op)
+            wait_2bd <= 1'b1;
+        else
+            wait_1bd <= 1'b1;
+    end
+
+    if(reset || commit_flush)
+        bpu_verify_result <= 'b0;
+    else if(miss_predict && !flush_r)
+        bpu_verify_result <= rob[rob_head].verify_result;
 end
 
-assign flush = rob[rob_head].state == Inst_Complete 
-            && (rob[rob_head].exception.ex || !rob[rob_head].verify_result.predict_sucess);
+assign flush = flush_r && !wait_1bd && !wait_2bd;
+assign commit_flush = (wait_1bd || wait_2bd) && rob[rob_head].state == Inst_Complete;
+
+assign miss_predict = commit_inst1_valid && (!rob[rob_head].verify_result.predict_sucess && rob[rob_head].is_br_op);
 assign flush_src.miss_predict    = rob[rob_head].state == Inst_Complete && rob[rob_head].is_br_op && !rob[rob_head].verify_result.predict_sucess;
+assign flush_src.eret            = 1'b0;
 assign flush_src.exception       = rob[rob_head].state == Inst_Complete && rob[rob_head].exception.ex;
 assign flush_src.privileged_inst = 1'b0;
 
 always_comb begin
-    commit_inst1_valid = rob[rob_head  ].state == Inst_Complete && !rob[rob_head].exception.ex;
-    commit_inst2_valid = rob[rob_head+1].state == Inst_Complete;
-    if(rob[rob_head+1].is_br_op || rob[rob_head+1].is_store_op
-    || rob[rob_head+1].exception.ex)
+    commit_inst1_valid = rob[rob_head     ].state == Inst_Complete;
+    commit_inst2_valid = rob[rob_head_next].state == Inst_Complete && commit_inst1_valid;
+    if(rob[rob_head].is_br_op && rob[rob_head_next].state != Inst_Complete)
+        commit_inst1_valid = 1'b0;
+    if(rob[rob_head_next].is_br_op || rob[rob_head_next].is_store_op
+    || rob[rob_head_next].exception.ex
+    || miss_predict || wait_1bd) begin
         commit_inst2_valid = 1'b0;
+    end
 end
 
-assign bpu_verify_result = rob[rob_head].verify_result;
+assign commit_store_valid = rob[rob_head].state == Store_Wait || rob[rob_head_next].state == Store_Wait;
 
-assign commit_store_valid = rob[rob_head].state == Store_Wait && !rob[rob_head].exception.ex;
-
-assign commit_to_rat_bus1 = { commit_inst1_valid && rob[rob_head  ].rf_we,
+assign commit_to_rat_bus1 = { commit_inst1_valid && rob[rob_head].rf_we,
                               rob[rob_head  ].dest,
                               rob[rob_head  ].phy_dest,
                               rob[rob_head  ].old_dest};
-assign commit_to_rat_bus2 = { commit_inst2_valid && rob[rob_head+1].rf_we,
-                              rob[rob_head+1].dest,
-                              rob[rob_head+1].phy_dest,
-                              rob[rob_head+1].old_dest};
+assign commit_to_rat_bus2 = { commit_inst2_valid && rob[rob_head_next].rf_we,
+                              rob[rob_head_next].dest,
+                              rob[rob_head_next].phy_dest,
+                              rob[rob_head_next].old_dest};
+
+`ifdef GOLDEN_TRACE
+
+assign commit_to_debug_bus1.valid         = commit_inst1_valid && rob[rob_head].dest != `REG_HI && rob[rob_head].dest != `REG_LO;
+assign commit_to_debug_bus1.rob_entry_num = rob_head;
+
+assign commit_to_debug_bus2.valid         = commit_inst2_valid && rob[rob_head_next].dest != `REG_HI && rob[rob_head_next].dest != `REG_LO;
+assign commit_to_debug_bus2.rob_entry_num = rob_head_next;
+
+`endif
 
 endmodule

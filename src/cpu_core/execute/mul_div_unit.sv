@@ -24,6 +24,7 @@ module mul_div_unit (
 
 logic mul_div_valid;
 logic mul_div_readygo;
+logic [3:0] rob_entry_num1, rob_entry_num2;
 
 decoded_inst_t inst1, inst2;
 reg_addr_t phy_dest1, phy_dest2;
@@ -44,6 +45,8 @@ always_ff @(posedge clk) begin
         lo          <= 'b0;
         phy_dest1   <= 'b0;
         phy_dest2   <= 'b0;
+        rob_entry_num1 <= 'b0;
+        rob_entry_num2 <= 'b0;
     end
     else if(mul_div_allowin) begin
         mul_div_valid <= issue_to_mul_div_valid;
@@ -53,6 +56,10 @@ always_ff @(posedge clk) begin
         src2_value    <= issue_inst1.src2_value;
         hi            <= issue_inst2.src1_value;
         lo            <= issue_inst2.src2_value;
+        phy_dest1     <= issue_inst1.phy_dest;
+        phy_dest2     <= issue_inst2.phy_dest;
+        rob_entry_num1 <= issue_inst1.rob_entry_num;
+        rob_entry_num2 <= issue_inst2.rob_entry_num;
     end
 end
 
@@ -60,10 +67,6 @@ wire        op_div  ;
 wire        op_divu ;
 wire        op_mult ;
 wire        op_multu;
-wire        op_mthi ;
-wire        op_mtlo ;
-wire        op_mfhi ;
-wire        op_mflo ;
 wire        op_mul  ;
 wire        op_madd ;
 wire        op_maddu;
@@ -115,6 +118,7 @@ always_ff @(posedge clk) begin
             2'd0:       mul_count <= mul_op ? 2'd1 : 2'd0;
             2'd1, 2'd2: mul_count <= mul_count + 2'd1;
             2'd3:       mul_count <= cs_allowin ? 2'd0 : 2'd3;
+            default:    mul_count <= 2'd0;
         endcase
     end
 end
@@ -196,20 +200,37 @@ assign mul_div_readygo = (op_div || op_divu) && (div_state == 2'd2)
 
 uint64_t hi_lo_result;
 
-assign hi_lo_result = ({32{op_div           }} & div_res )
-                    | ({32{op_divu          }} & divu_res)
-                    | ({32{mul_op           }} & mul_res );
+assign hi_lo_result = ({64{op_div           }} & div_res )
+                    | ({64{op_divu          }} & divu_res)
+                    | ({64{mul_op           }} & mul_res );
 
-assign mul_div_to_commit_bus1.valid = mul_div_valid;
+// inst1
+assign mul_div_to_commit_bus1.valid = mul_div_to_valid;
+assign mul_div_to_commit_bus1.rob_entry_num = rob_entry_num1;
+
 assign mul_div_to_commit_bus1.rf_we    = {4{inst1.rf_we}};
 assign mul_div_to_commit_bus1.phy_dest = phy_dest1;
 assign mul_div_to_commit_bus1.result   = mul_op ? hi_lo_result[63:32] : hi_lo_result[31: 0];
-assign mul_div_to_commit_bus1.exception = exception;
 
-assign mul_div_to_commit_bus2.valid = mul_div_valid;
+assign mul_div_to_commit_bus1.is_store_op   = 1'b0;
+
+assign mul_div_to_commit_bus1.verify_result = '0;
+
+assign mul_div_to_commit_bus1.exception     = '0;
+
+
+// inst2
+assign mul_div_to_commit_bus2.valid = mul_div_to_valid;
+assign mul_div_to_commit_bus2.rob_entry_num = rob_entry_num2;
+
 assign mul_div_to_commit_bus2.rf_we    = {4{inst2.rf_we}};
 assign mul_div_to_commit_bus2.phy_dest = phy_dest2;
 assign mul_div_to_commit_bus2.result   = mul_op ? hi_lo_result[31: 0] : hi_lo_result[63:32];
-assign mul_div_to_commit_bus2.exception = exception;
+
+assign mul_div_to_commit_bus2.is_store_op   = 1'b0;
+
+assign mul_div_to_commit_bus2.verify_result = '0;
+
+assign mul_div_to_commit_bus2.exception     = '0;
 
 endmodule

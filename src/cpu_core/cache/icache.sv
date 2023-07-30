@@ -35,7 +35,7 @@ module icache #(
     input  logic [127:0]   ret_data
 
 );
-localparam int unsigned BYTES_WORD     = 4;
+localparam int unsigned BYTES_WORD     = 8;
 localparam int unsigned INDEX_WIDTH    = $clog2(GROUP_NUM) ;
 localparam int unsigned OFFSET_WIDTH   = $clog2(LINE_WORD_NUM*BYTES_WORD);
 localparam int unsigned TAG_WIDTH      = 32-INDEX_WIDTH-OFFSET_WIDTH ;
@@ -82,7 +82,6 @@ state_t  state,state_next;
 logic [63:0] uncache_rdata;
 
 index_t read_addr, tagv_addr;//读ram地址
-index_t write_addr;
 
 tagv_t                 tagv_rdata[ASSOC_NUM-1:0];//tag的读数据
 tagv_t                 tagv_wdata;//tag的写数据
@@ -104,7 +103,6 @@ logic [ASSOC_NUM-1:0]                                         hit;
 logic                                                         cache_hit;
 
 logic [ASSOC_NUM-1:0]                                         pipe_hit;
-logic                                                         pipe_cache_hit;
 tagv_t [ASSOC_NUM-1:0]                                        pipe_tagv_rdata;
 logic                                                         pipe_wr;
 
@@ -178,6 +176,7 @@ generate;
         );
         for (genvar j=0; j<LINE_WORD_NUM; ++j) begin
         simple_port_ram #(
+            .DATA_WIDTH(DATA_WIDTH),
             .SIZE(GROUP_NUM)
         )mem_data(
             .clk(clk_g),
@@ -221,7 +220,7 @@ endgenerate
 //选择出某一路的某个字数据
 generate;
     for(genvar i = 0;i < ASSOC_NUM; i++) begin
-        assign data_rdata_sel[i] = data_rdata[i][req_buffer.offset[OFFSET_WIDTH-1:2]];
+        assign data_rdata_sel[i] = data_rdata[i][req_buffer.offset[OFFSET_WIDTH-1:3]];
     end
 endgenerate
 
@@ -286,7 +285,7 @@ end
 //uncache的数据
 always_ff @( posedge clk_g ) begin : uncache_rdata_blockName
     if (ret_valid && req_buffer.is_cache == 1'b0) begin
-        uncache_rdata <= ret_data[127:64];
+        uncache_rdata <= {ret_data[127:96], ret_data[95:64]};
     end
 end
 
@@ -311,7 +310,6 @@ always_ff @(posedge clk_g) begin : pipe_hitblockName
 end
 
 //将请求打入req_buffer
-logic  req_buffer_en_r;
 
 always_ff @( posedge clk_g ) begin : req_buffer_block
     if( !resetn )begin

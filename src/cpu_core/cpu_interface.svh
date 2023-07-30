@@ -11,7 +11,7 @@ interface CPU_ICache_Interface();
 	logic [ 7:0] index;
 	logic [19:0] tag;
 	logic 		 data_ok;
-	uint32_t	 rdata;
+	uint64_t	 rdata;
 	// Cache Instruction
 	CacheType    cache_type;
 	logic        cache_valid;

@@ -80,6 +80,99 @@ always_comb begin
                 default:   operation = OP_INVALID;
             endcase
             end
+            6'b000001: begin // REGIMM
+            unique case(rt)
+                5'b00000: operation = OP_BLTZ;
+                5'b00001: operation = OP_BGEZ;
+                5'b00010: operation = OP_BLTZL;
+                5'b00011: operation = OP_BGEZL;
+                5'b01000: operation = OP_TGEI;
+                5'b01001: operation = OP_TGEIU;
+                5'b01010: operation = OP_TLTI;
+                5'b01011: operation = OP_TLTIU;
+                5'b01100: operation = OP_TEQI;
+                5'b01110: operation = OP_TNEI;
+                5'b10000: operation = OP_BLTZAL;
+                5'b10001: operation = OP_BGEZAL;
+                5'b10010: operation = OP_BLTZALL;
+                5'b10011: operation = OP_BGEZALL;
+                default:  operation = OP_INVALID;
+            endcase
+            end
+            /* Jump */
+            6'b000010: operation = OP_J;
+            6'b000011: operation = OP_JAL;
+            /* Branch */
+            6'b000100: operation = OP_BEQ;
+            6'b000101: operation = OP_BNE;
+            6'b000110: operation = OP_BLEZ;
+            6'b000111: operation = OP_BGTZ;
+            /* Arithmetic */
+            6'b001000: operation = OP_ADDI;
+            6'b001001: operation = OP_ADDIU;
+            6'b001010: operation = OP_SLTI;
+            6'b001011: operation = OP_SLTIU;
+            6'b001100: operation = OP_ANDI;
+            6'b001101: operation = OP_ORI;
+            6'b001110: operation = OP_XORI;
+            /* set */
+            6'b001111: operation = OP_LUI;
+            /* CP0 */
+            6'b010000: begin
+            unique case(rs)
+                5'b00000: operation = OP_MFC0;
+                5'b00100: operation = OP_MTC0;
+                5'b10???, 5'b11???: begin // CO
+                unique case(func)
+                    6'b000000: operation = OP_TLBR;
+                    6'b000001: operation = OP_TLBWI;
+                    6'b000010: operation = OP_TLBWR;
+                    6'b000100: operation = OP_TLBP;
+                    6'b001000: operation = OP_ERET;
+                    6'b010000: operation = OP_WAIT;
+                    default:   operation = OP_INVALID;
+                endcase
+                end
+                default:  operation = OP_INVALID;
+            endcase
+            end
+            /* Branch Likely */
+            6'b010100: operation = OP_BEQL;
+            6'b010101: operation = OP_BNEL;
+            6'b010110: operation = OP_BLEZL;
+            6'b010111: operation = OP_BGTZL;
+            6'b011100: begin // SPECIAL2
+            unique case(func)
+                /* multiplication and division */
+                6'b000010: operation = OP_MADD;
+                6'b000011: operation = OP_MADDU;
+                6'b000100: operation = OP_MUL;
+                6'b000110: operation = OP_MSUB;
+                6'b000111: operation = OP_MSUBU;
+                /* count bits */
+                6'b001000: operation = OP_CLZ;
+                6'b001001: operation = OP_CLO;
+                /* invalid */
+                default:   operation = OP_INVALID;
+            endcase
+            end
+            /* Load */
+            6'b100000: operation = OP_LB;
+            6'b100001: operation = OP_LH;
+            6'b100010: operation = OP_LWL;
+            6'b100011: operation = OP_LW;
+            6'b100100: operation = OP_LBU;
+            6'b100101: operation = OP_LHU;
+            6'b100110: operation = OP_LWR;
+            /* Store */
+            6'b101000: operation = OP_SB;
+            6'b101001: operation = OP_SH;
+            6'b101010: operation = OP_SWL;
+            6'b101011: operation = OP_SW;
+            6'b101110: operation = OP_SWR;
+            /* Cache */
+            6'b101111: operation = OP_CACHE;
+            default:   operation = OP_INVALID;
         endcase
     end
 end

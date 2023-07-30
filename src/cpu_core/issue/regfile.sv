@@ -6,9 +6,13 @@ module regfile(
     // read
     input  reg_addr_t inst1_raddr1,
     input  reg_addr_t inst1_raddr2,
+    output uint32_t   inst1_rdata1,
+    output uint32_t   inst1_rdata2,
 
     input  reg_addr_t inst2_raddr1,
     input  reg_addr_t inst2_raddr2,
+    output uint32_t   inst2_rdata1,
+    output uint32_t   inst2_rdata2,
 
     // write
     input  logic[3:0] inst1_we,

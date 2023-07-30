@@ -32,8 +32,8 @@ module decode_stage (
     output decode_to_issue_bus_t decode_to_issue_bus1,
     output decode_to_issue_bus_t decode_to_issue_bus2,
 
-    input  logic commit_store_ready,
-    input  logic [3:0] rob_tail,
+    input  logic select_store_ready,
+    input  logic [3:0] rob_tail_o,
     output rob_entry_t map_to_rob_bus1,
     output rob_entry_t map_to_rob_bus2
 
@@ -51,7 +51,7 @@ logic map_stage_allowin;
 
 /* decode stage */
 
-fs_to_ds_bus_t decode_inst1, decode_inst2;
+fetch_to_decode_bus_t decode_inst1, decode_inst2;
 decoded_inst_t decode_inst1_d, decode_inst2_d;
 exception_t    decode_inst1_ex, decode_inst2_ex;
 
@@ -65,7 +65,7 @@ assign ds_allowin            = decode_stage_ready_go && map_stage_allowin && (!d
 assign decode_to_map_valid   = decode_stage_valid    && decode_stage_ready_go;
 
 always_ff @(posedge clk) begin
-    if(reset) begin
+    if(reset || flush) begin
         decode_stage_valid <= 1'b0;
         decode_inst1 <= '0;
         decode_inst2 <= '0;
@@ -94,16 +94,16 @@ decoded_inst_t sel_decode_inst1, sel_decode_inst2;
 operation_t sel_inst1_op, sel_inst2_op;
 virt_t  sel_inst1_pc, sel_inst2_pc;
 
-inst_decoder inst_decoder1 (
+inst_decoder u_inst_decoder1 (
     .valid(decode_inst1.valid),
     .inst (decode_inst1.inst),
-    .op   (inst1_op)
+    .operation   (inst1_op)
 );
 
-inst_decoder inst_decoder2 (
+inst_decoder u_inst_decoder2 (
     .valid(decode_inst2.valid),
     .inst (decode_inst2.inst),
-    .op   (inst2_op)
+    .operation   (inst2_op)
 );
 
 control_signal inst_control1 (
@@ -161,13 +161,17 @@ always_comb begin
     decode_to_map_bus1.valid = decode_inst1.valid;
     decode_to_map_bus1.inst  = decode_inst1_d;
     decode_to_map_bus1.pc    = decode_inst1.pc;
-    decode_to_map_bus1.is_store_op = inst1_is_store_op;
-    decode_to_map_bus1.exception   = 'b0;
+    decode_to_map_bus1.is_store_op    = inst1_is_store_op;
+    decode_to_map_bus1.br_taken       = decode_inst1.br_taken;
+    decode_to_map_bus1.bpu_entry      = decode_inst1.bpu_entry;
+    decode_to_map_bus1.exception      = 'b0;
     decode_to_map_bus2.valid = decode_inst2.valid;
     decode_to_map_bus2.inst  = decode_inst2_d;
     decode_to_map_bus2.pc    = decode_inst2.pc;
-    decode_to_map_bus2.is_store_op = inst2_is_store_op;
-    decode_to_map_bus2.exception   = 'b0;
+    decode_to_map_bus2.is_store_op    = inst2_is_store_op;
+    decode_to_map_bus2.br_taken       = decode_inst2.br_taken;
+    decode_to_map_bus2.bpu_entry      = decode_inst2.bpu_entry;
+    decode_to_map_bus2.exception      = 'b0;
 
     if(decode_wait_1cycle_r) begin
         if(inst2_mul_div_op) begin
@@ -175,6 +179,7 @@ always_comb begin
             sel_inst1_op     = inst2_op;
             sel_inst1_pc     = decode_inst2.pc;
             decode_to_map_bus1.valid = decode_inst2.valid;
+            decode_to_map_bus1.pc    = decode_inst2.pc;
         end
         else begin
             decode_to_map_bus1.valid = 1'b0;
@@ -186,6 +191,7 @@ always_comb begin
             sel_inst2_op     = inst1_op;
             sel_inst2_pc     = decode_inst1.pc;
             decode_to_map_bus2.valid = decode_inst1.valid;
+            decode_to_map_bus2.pc    = decode_inst1.pc;
         end
         else begin
             decode_to_map_bus2.valid = 1'b0;
@@ -196,16 +202,16 @@ end
 
 /* map stage */
 
-map_to_ds_bus_t map_inst1, map_inst2;
+decode_to_map_bus_t map_inst1, map_inst2;
 logic  free_list_empty, map_done;
-logic [2:0] store_head, store_tail;
+logic [3:0] store_head, store_tail;
 
 assign map_stage_ready_go = !free_list_empty;
 assign map_stage_allowin  = map_stage_ready_go && is_allowin && cs_allowin || !map_stage_valid;
 assign ds_to_is_valid     = map_stage_valid && map_stage_ready_go && cs_allowin;
 assign ds_to_rob_valid    = map_stage_valid && map_stage_ready_go && is_allowin;
 
-assign map_done           = map_stage_allowin && decode_to_map_valid;
+assign map_done           = map_stage_allowin && ds_to_is_valid && ds_to_rob_valid;
 
 always_ff @(posedge clk) begin
     if(reset || flush) begin
@@ -225,32 +231,33 @@ always_ff @(posedge clk) begin
         store_tail <= '0;
     end
     else begin
-        store_tail <= store_tail + map_inst1.valid&&map_inst1.is_store_op
-                                 + map_inst2.valid&&map_inst2.is_store_op;
-        store_head <= store_head + commit_store_ready;
+        if(map_done) begin
+            store_tail <= store_tail + (map_inst1.valid&&map_inst1.is_store_op)
+                                     + (map_inst2.valid&&map_inst2.is_store_op);
+        end
+
+        store_head <= store_head + select_store_ready;
     end
 
 end
 
 // correlation check
-logic src1_raw_hazard, scr2_raw_hazard, dest_waw_hazard;
-reg_addr_t inst1_src1, inst1_src2, inst1_dest;
-reg_addr_t inst2_src1, inst2_src2, inst2_dest;
+logic src1_raw_hazard, src2_raw_hazard, dest_waw_hazard;
 reg_addr_t inst1_phy_src1, inst1_phy_src2, inst1_phy_dest;
 reg_addr_t inst2_phy_src1, inst2_phy_src2, inst2_phy_dest;
 reg_addr_t inst1_old_dest, inst2_old_dest;
 
 always_comb begin
     src1_raw_hazard = 0;
-    scr2_raw_hazard = 0;
+    src2_raw_hazard = 0;
     dest_waw_hazard = 0;
     if(map_stage_valid) begin
         if(map_inst1.valid && map_inst2.valid) begin
-            if(map_inst2.use_src1 && map_inst1.inst.rf_we && map_inst2.inst.src1 == map_inst1.inst.dest) begin
+            if(map_inst2.inst.use_src1 && map_inst1.inst.rf_we && map_inst2.inst.src1 == map_inst1.inst.dest) begin
                 src1_raw_hazard = 1;
             end
-            if(map_inst2.use_src2 && map_inst1.inst.rf_we && map_inst2.inst.src2 == map_inst1.inst.dest) begin
-                scr2_raw_hazard = 1;
+            if(map_inst2.inst.use_src2 && map_inst1.inst.rf_we && map_inst2.inst.src2 == map_inst1.inst.dest) begin
+                src2_raw_hazard = 1;
             end
             if(map_inst1.inst.rf_we && map_inst2.inst.rf_we && map_inst1.inst.dest == map_inst2.inst.dest) begin
                 dest_waw_hazard = 1;
@@ -269,7 +276,7 @@ RAT rat (
 
     // speculative rat
     .src1_raw_hazard,
-    .scr2_raw_hazard,
+    .src2_raw_hazard,
     .dest_waw_hazard,
 
     .inst1_rf_we(map_inst1.valid && map_inst1.inst.rf_we),
@@ -304,6 +311,7 @@ RAT rat (
 
 );
 
+
 // busy table
 logic inst1_src1_ready, inst1_src2_ready;
 logic inst2_src1_ready, inst2_src2_ready;
@@ -320,7 +328,7 @@ busy_table busy_table_u (
     .inst2_src2(inst2_phy_src2),
 
     .src1_raw_hazard,
-    .scr2_raw_hazard,
+    .src2_raw_hazard,
 
     .inst1_src1_ready,
     .inst1_src2_ready,
@@ -329,96 +337,73 @@ busy_table busy_table_u (
 
     // map
     .map_inst1_rf_we(map_inst1.valid && map_inst1.inst.rf_we),
-    .map_inst1_dest (map_inst1.inst.dest),
+    .map_inst1_dest (inst1_phy_dest),
     .map_inst2_rf_we(map_inst2.valid && map_inst2.inst.rf_we),
-    .map_inst2_dest (map_inst2.inst.dest),
+    .map_inst2_dest (inst2_phy_dest),
 
     // select
     .sel_inst1_dest (select_to_busy_table_bus1.dest ),
     .sel_inst2_dest (select_to_busy_table_bus2.dest ),
     
     // writeback
-    .wb_inst1_dest  (writeback_to_busy_table_bus1.dest),
-    .wb_inst2_dest  (writeback_to_busy_table_bus2.dest)
+    .wb_inst1_dest  (writeback_to_busytable_bus1.dest),
+    .wb_inst2_dest  (writeback_to_busytable_bus2.dest)
 
 );
 
+// inst dispatch
+inst_dispatch inst_dispatch_u (
+    .ds_to_is_valid,
+    .ds_to_rob_valid,
 
-// decode to issue
-// inst1
-assign decode_to_issue_bus1.valid = map_inst1.valid;
-assign decode_to_issue_bus1.pc    = map_inst1.pc;
+    .rob_tail_o,
 
-assign decode_to_issue_bus1.src1_ready = inst1_src1_ready;
-assign decode_to_issue_bus1.src2_ready = inst1_src2_ready;
-assign decode_to_issue_bus1.phy_src1   = inst1_phy_src1;
-assign decode_to_issue_bus1.phy_src2   = inst1_phy_src2;
-assign decode_to_issue_bus1.phy_dest   = inst1_phy_dest;
-assign decode_to_issue_bus1.old_dest   = inst1_old_dest;
-assign decode_to_issue_bus1.inst       = map_inst1.inst;
+    .store_head,
+    .store_tail,
 
-assign decode_to_issue_bus1.rob_entry_num = rob_tail;
+    .inst1_valid(map_inst1.valid),
+    .inst1_pc   (map_inst1.pc   ),
+    .inst1_inst (map_inst1.inst ),
 
-assign decode_to_issue_bus1.is_store_op     = map_inst1.is_store_op;
-assign decode_to_issue_bus1.pre_store_ready = store_head == store_tail;
-assign decode_to_issue_bus1.pre_store       = store_tail-1;
-assign decode_to_issue_bus1.store_num       = store_tail;
+    .inst2_valid(map_inst2.valid),
+    .inst2_pc   (map_inst2.pc   ),
+    .inst2_inst (map_inst2.inst ),
 
-assign decode_to_issue_bus1.exception = map_inst1.exception;
+    // decode to issue
+    // inst1
+    .inst1_src1_ready,
+    .inst1_src2_ready,
+    .inst1_phy_src1,
+    .inst1_phy_src2,
+    .inst1_phy_dest,
 
-// inst2
-assign decode_to_issue_bus2.valid = map_inst2.valid;
-assign decode_to_issue_bus2.pc    = map_inst2.pc;
+    .inst1_is_store_op(map_inst1.is_store_op),
 
-assign decode_to_issue_bus2.src1_ready = inst2_src1_ready;
-assign decode_to_issue_bus2.src2_ready = inst2_src2_ready;
-assign decode_to_issue_bus2.phy_src1   = inst2_phy_src1;
-assign decode_to_issue_bus2.phy_src2   = inst2_phy_src2;
-assign decode_to_issue_bus2.phy_dest   = inst2_phy_dest;
-assign decode_to_issue_bus2.old_dest   = inst2_old_dest;
-assign decode_to_issue_bus2.inst       = map_inst2.inst;
+    .inst1_br_taken (map_inst1.br_taken ),
+    .inst1_bpu_entry(map_inst1.bpu_entry),
 
-assign decode_to_issue_bus2.rob_entry_num = map_inst1.valid ? rob_tail + 1 : rob_tail;
+    .decode_to_issue_bus1,
 
-assign decode_to_issue_bus2.is_store_op     = map_inst2.is_store_op;
-assign decode_to_issue_bus2.pre_store_ready = (store_head == store_tail) && !(map_inst1.valid&&map_inst1.is_store_op);
-assign decode_to_issue_bus2.pre_store       = map_inst1.valid&&map_inst1.is_store_op ? store_tail : store_tail-1;
-assign decode_to_issue_bus2.store_num       = map_inst1.valid&&map_inst1.is_store_op ? store_tail+1 : store_tail;
+    // inst2
+    .inst2_src1_ready,
+    .inst2_src2_ready,
+    .inst2_phy_src1,
+    .inst2_phy_src2,
+    .inst2_phy_dest,
 
-assign decode_to_issue_bus2.exception = map_inst2.exception;
+    .inst2_is_store_op(map_inst2.is_store_op),
 
-// map to rob
-// inst1
-assign map_to_rob_bus1.state = map_inst1.valid ? Inst_Wait : Inst_Invalid;
-assign map_to_rob_bus1.pc    = map_inst1.pc;
+    .inst2_br_taken (map_inst2.br_taken ),
+    .inst2_bpu_entry(map_inst2.bpu_entry),
 
-assign map_to_rob_bus1.rf_we = map_inst1.inst.rf_we;
-assign map_to_rob_bus1.dest  = map_inst1.inst.rf_we ? inst1_phy_dest : 0;
-assign map_to_rob_bus1.phy_dest = inst1_phy_dest;
-assign map_to_rob_bus1.old_dest = inst1_old_dest;
+    .decode_to_issue_bus2,
 
-assign map_to_rob_bus1.is_br_op    = map_inst1.inst.is_br_op;
-assign map_to_rob_bus1.is_store_op = map_inst1.is_store_op;
+    // issue to rob
+    .inst1_old_dest,
+    .map_to_rob_bus1,
 
-assign map_to_rob_bus1.verify_result = '0;
-
-assign map_to_rob_bus1.exception = map_inst1.exception;
-
-// inst2
-assign map_to_rob_bus2.state = map_inst2.valid ? Inst_Wait : Inst_Invalid;
-assign map_to_rob_bus2.pc    = map_inst2.pc;
-
-assign map_to_rob_bus2.rf_we = map_inst2.inst.rf_we;
-assign map_to_rob_bus2.dest  = map_inst2.inst.rf_we ? inst2_phy_dest : 0;
-assign map_to_rob_bus2.phy_dest = inst2_phy_dest;
-assign map_to_rob_bus2.old_dest = inst2_old_dest;
-
-assign map_to_rob_bus2.is_br_op    = map_inst2.inst.is_br_op;
-assign map_to_rob_bus2.is_store_op = map_inst2.is_store_op;
-
-assign map_to_rob_bus2.verify_result = '0;
-
-assign map_to_rob_bus2.exception = map_inst2.exception;
-
+    .inst2_old_dest,
+    .map_to_rob_bus2
+);
 
 endmodule

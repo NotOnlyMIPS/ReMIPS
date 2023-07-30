@@ -22,6 +22,7 @@ module alu(
 
 // control code
 logic alu_valid;
+logic [3:0] rob_entry_num;
 
 decoded_inst_t inst;
 reg_addr_t phy_dest;
@@ -37,19 +38,17 @@ always_ff @(posedge clk) begin
         alu_valid  <= 1'b0;
         inst       <= 'b0;
         phy_dest   <= 'b0;
-        // old_dest   <= 'b0;
         src1_value <= 'b0;
         src2_value <= 'b0;
-        // inst_pc    <= 'b0;
+        rob_entry_num <= 'b0;
     end
     else if(alu_allowin) begin
         alu_valid  <= issue_to_alu_valid;
         inst       <= issue_inst.inst;
         phy_dest   <= issue_inst.phy_dest;
-        // old_dest   <= issue_inst.old_dest;
         src1_value <= issue_inst.src1_value;
         src2_value <= issue_inst.src2_value;
-        // inst_pc    <= issue_inst.pc;
+        rob_entry_num <= issue_inst.rob_entry_num;
     end
 end
 
@@ -68,8 +67,21 @@ logic op_srl;   //逻辑右移
 logic op_sra;   //算术右移
 logic op_lui;   //立即数置于高半部分
 
+logic op_clz;
+logic op_clo;
+
+logic op_movn;
+logic op_movz;
+
+logic op_mfhi;
+logic op_mflo;
+logic op_mtlo;
+logic op_mthi;
+
 uint32_t alu_src1;
 uint32_t alu_src2;
+
+uint32_t alu_result;
 
 assign alu_src1 = inst.src1_is_sa  ? {27'b0, inst.imm[10:6]} :
                                      src1_value;
@@ -92,6 +104,16 @@ assign op_srl  = inst.operation == OP_SRL;
 assign op_sra  = inst.operation == OP_SRA;
 assign op_lui  = inst.operation == OP_LUI;
 
+assign op_clz  = inst.operation == OP_CLZ;
+assign op_clo  = inst.operation == OP_CLO;
+
+assign op_movn = inst.operation == OP_MOVN;
+assign op_movz = inst.operation == OP_MOVZ;
+
+assign op_mfhi = inst.operation == OP_MFHI;
+assign op_mflo = inst.operation == OP_MFLO;
+assign op_mtlo = inst.operation == OP_MTLO;
+assign op_mthi = inst.operation == OP_MTHI;
 
 uint32_t add_sub_result;
 uint32_t slt_result;
@@ -149,31 +171,32 @@ assign sr64_result = {{32{op_sra & alu_src2[31]}}, alu_src2[31:0]} >> alu_src1[4
 assign sr_result   = sr64_result[31:0]; //最高有效位由30改为31
 
 // final result mux
-assign alu_result = ({32{op_add|op_addu|op_sub|op_subu}} & add_sub_result)
-                  | ({32{op_slt                       }} & slt_result)
-                  | ({32{op_sltu                      }} & sltu_result)
-                  | ({32{op_and                       }} & and_result)
-                  | ({32{op_nor                       }} & nor_result)
-                  | ({32{op_or                        }} & or_result)
-                  | ({32{op_xor                       }} & xor_result)
-                  | ({32{op_lui                       }} & lui_result)
-                  | ({32{op_sll                       }} & sll_result)
-                  | ({32{op_srl|op_sra                }} & sr_result);
+assign alu_result = ({32{op_add|op_addu|op_sub|op_subu  }} & add_sub_result)
+                  | ({32{op_slt                         }} & slt_result)
+                  | ({32{op_sltu                        }} & sltu_result)
+                  | ({32{op_and                         }} & and_result)
+                  | ({32{op_nor                         }} & nor_result)
+                  | ({32{op_or                          }} & or_result)
+                  | ({32{op_xor                         }} & xor_result)
+                  | ({32{op_lui                         }} & lui_result)
+                  | ({32{op_sll                         }} & sll_result)
+                  | ({32{op_srl|op_sra                  }} & sr_result)
+                  | ({32{op_mfhi|op_mflo|op_mthi|op_mtlo}} & src1_value);
 
 // bypass
 assign alu_bypass_bus = {{4{inst.rf_we&alu_valid}}, phy_dest, alu_result};
 
-assign alu_to_commit_bus.vali = alu_valid;
-// assign alu_to_commit_bus.pc   = inst_pc;
+assign alu_to_commit_bus.valid = alu_valid;
+assign alu_to_commit_bus.rob_entry_num = rob_entry_num;
 
 assign alu_to_commit_bus.rf_we    = {4{inst.rf_we}};
-// assign alu_to_commit_bus.dest     = inst.dest;
 assign alu_to_commit_bus.phy_dest = phy_dest;
-// assign alu_to_commit_bus.old_dest = old_dest;
 assign alu_to_commit_bus.result   = alu_result;
+
+assign alu_to_commit_bus.is_store_op = 1'b0;
 
 assign alu_to_commit_bus.verify_result = 'b0;
 
-assign alu_to_commit_bus.exception = alu_ex;
+assign alu_to_commit_bus.exception = '0;
 
 endmodule

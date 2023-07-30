@@ -9,6 +9,8 @@
 `default_nettype wire
 `timescale 1ns / 1ps
 
+// golden trace
+`define _GOLDEN_TRACE
 
 typedef logic [  7:0] uint8_t;
 typedef logic [ 15:0] uint16_t;
@@ -17,6 +19,24 @@ typedef logic [ 63:0] uint64_t;
 typedef logic [127:0] uint128_t;
 typedef uint32_t      virt_t;
 typedef uint32_t      phys_t;
+
+// Debug
+`ifdef GOLDEN_TRACE
+typedef struct packed {
+    logic       valid;
+    virt_t      pc;
+    logic [3:0] wstrb;
+    reg_addr_t  dest;
+    reg_addr_t  phy_dest;
+    uint32_t    wdata;
+} debug_bus_t;
+
+typedef struct packed {
+    logic       valid;
+    logic [3:0] rob_entry_num;
+} commit_to_debug_bus_t;
+`endif
+
 
 //! AXI接口
 typedef struct packed {

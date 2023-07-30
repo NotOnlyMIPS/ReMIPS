@@ -1,6 +1,6 @@
 `include "../cpu.svh"
 
-module inst_decoder(
+module control_signal(
     input   logic           valid,
     input   virt_t          pc,
     input   operation_t     operation,
@@ -32,12 +32,6 @@ assign func = inst[ 5: 0];
 assign imm  = inst[15: 0];
 assign jidx = inst[25: 0];
 
-virt_t next_pc;
-
-assign next_pc = pc + 4;
-assign inst_d.jump_target = {next_pc[31:28], jidx, 2'b0};
-assign inst_d.branch_target = next_pc + {{14{imm[15]}}, imm, 2'b0 };
-
 assign exception_d = 'b0;
 
 always_comb begin
@@ -47,6 +41,9 @@ always_comb begin
     inst_d.dest = rd;
     inst_d.sel  = sel;
     inst_d.imm  = imm;
+    inst_d.jidx = jidx;
+
+    is_store_op = 1'b0;
 
     // operation
     unique case(operation) 
@@ -125,7 +122,7 @@ always_comb begin
     endcase
 
     // FU
-    unique case(operation)
+    case(operation)
         /* arithmetic */
         OP_ADD, OP_ADDU, OP_SUB, OP_SUBU,
         OP_ADDI, OP_ADDIU, OP_SUBI, OP_SUBIU,
@@ -144,8 +141,8 @@ always_comb begin
         OP_MOVN, OP_MOVZ,
         /* HI/LO move */
         OP_MFHI, OP_MFLO, OP_MTHI, OP_MTLO: begin
-            inst_d.is_alu1_op =  pc[0];
-            inst_d.is_alu2_op = ~pc[0];
+            inst_d.is_alu1_op = !is_inst2;
+            inst_d.is_alu2_op =  is_inst2;
         end
         /* multiplication and division */
         OP_MULT, OP_MULTU, OP_DIV, OP_DIVU,
@@ -180,13 +177,14 @@ always_comb begin
     endcase
 
     // src choose
-    unique case(operation) 
+    case(operation) 
         OP_ADD, OP_ADDU, OP_SUB, OP_SUBU, 
         OP_SLT, OP_SLTU, OP_AND, OP_OR, OP_XOR, OP_NOR, 
         OP_SLLV, OP_SRLV, OP_SRAV, 
         OP_MOVN, OP_MOVZ,
         OP_MULT, OP_MULTU, OP_DIV, OP_DIVU, OP_MUL,
         OP_BEQ, OP_BNE,
+        OP_LWL, OP_LWR,
         OP_SB, OP_SH, OP_SWL, OP_SW, OP_SWR: begin
             inst_d.use_src1 = 1'b1;
             inst_d.use_src2 = 1'b1;
@@ -207,7 +205,7 @@ always_comb begin
         OP_JR, OP_JALR,
         OP_BLTZ, OP_BGEZ, OP_BLEZ, OP_BGTZ,
         OP_BLTZAL, OP_BGEZAL,
-        OP_LB, OP_LH, OP_LWL, OP_LW, OP_LBU, OP_LHU, OP_LWR
+        OP_LB, OP_LH, OP_LW, OP_LBU, OP_LHU
         : begin
             inst_d.use_src1 = 1'b1;
         end
@@ -222,11 +220,10 @@ always_comb begin
         end
     endcase
 
-    unique case(operation) 
+    case(operation) 
         OP_SLL, OP_SRL, OP_SRA: inst_d.src1_is_sa = 1'b1;
-        OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU: inst_d.src1_is_hi = 1'b1;
     endcase
-    unique case(operation)
+    case(operation)
         OP_ADDI, OP_ADDIU, OP_SLTI, OP_SLTIU: begin
             inst_d.src2_is_simm = 1'b1;
         end
@@ -236,7 +233,7 @@ always_comb begin
     endcase
 
     // dest choose
-    unique case(operation) 
+    case(operation) 
         OP_ADD, OP_ADDU, OP_SUB, OP_SUBU,
         OP_SLT, OP_SLTU,
         OP_AND, OP_OR, OP_XOR, OP_NOR,
@@ -245,7 +242,7 @@ always_comb begin
         OP_MFHI, OP_MFLO,
         OP_MOVN, OP_MOVZ,
         OP_JALR: begin
-            inst_d.rf_we = 1'b1;
+            inst_d.rf_we = rd != 0;
             inst_d.dest = rd;
         end
         OP_ADDI, OP_ADDIU, OP_SUBI, OP_SUBIU,
@@ -256,7 +253,7 @@ always_comb begin
         OP_CLO, OP_CLZ,
         OP_LB, OP_LH, OP_LWL, OP_LW, OP_LBU, OP_LHU, OP_LWR
         : begin
-            inst_d.rf_we = 1'b1;
+            inst_d.rf_we = rt != 0;
             inst_d.dest = rt;
         end
         OP_MTHI:begin
@@ -270,7 +267,7 @@ always_comb begin
         OP_MULT, OP_MULTU, OP_DIV, OP_DIVU,
         OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU: begin
             inst_d.rf_we = 1'b1;
-            inst_d.dest  = is_inst2 ? `REG_HI : `REG_LO;
+            inst_d.dest  = is_inst2 ? `REG_LO : `REG_HI;
         end
         OP_MUL: begin
             inst_d.rf_we = !is_inst2;

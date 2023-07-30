@@ -1,20 +1,31 @@
 `include "../cpu.svh"
 
 module execute_stage(
-    input clk,
-    input reset,
+    input  clk,
+    input  reset,
 
-    input flush,
+    input  flush,
 
-    output logic es_to_valid,
-
-    input  logic is_to_valid,
     output logic alu1_allowin,
     output logic alu2_allowin,
     output logic mul_div_allowin,
     output logic bru_allowin,
     output logic agu_allowin,
     output logic sp_allowin,
+
+    // DCache
+    output logic       dcache_req,
+    output logic       dcache_wr,
+    output logic [3:0] dcache_wstrb,
+    output logic [2:0] dcache_size,
+    output uint32_t    dcache_addr,
+    output uint32_t    dcache_wdata,
+    input  logic       dcache_addr_ok,
+    input  logic       dcache_data_ok,
+    input  uint32_t    dcache_rdata,
+
+    // MMU
+    output virt_t      data_vaddr,
 
     // bypass
     output bypass_bus_t alu1_bypass_bus,
@@ -33,19 +44,6 @@ module execute_stage(
     output execute_to_commit_bus_t execute_to_commit_bus2
 );
 
-// pipeline registers
-logic es_valid;
-logic es_allowin;
-
-assign es_allowin = (alu1_allowin || alu2_allowin || mul_div_allowin || bru_allowin || agu_allowin || sp_allowin);
-
-always_ff @(posedge clk) begin
-    if(reset || flush) begin
-        es_valid <= 1'b0;
-    end else if(es_allowin) begin
-        es_valid <= es_to_valid;
-    end
-end
 
 // issue to FU
 logic issue_to_mul_div_valid;
@@ -57,9 +55,9 @@ logic issue_to_sp_valid;
 
 assign issue_to_mul_div_valid = issue_to_execute_bus1.valid && issue_to_execute_bus1.inst.is_mul_div_op;
 assign issue_to_alu1_valid    = issue_to_execute_bus1.valid && issue_to_execute_bus1.inst.is_alu1_op;
-assign issue_to_bru_valid     = issue_to_execute_bus1.valid && issue_to_execute_bus1.inst.is_bru_op;
+assign issue_to_bru_valid     = issue_to_execute_bus1.valid && issue_to_execute_bus1.inst.is_br_op;
 assign issue_to_alu2_valid    = issue_to_execute_bus2.valid && issue_to_execute_bus2.inst.is_alu2_op;
-assign issue_to_agu_valid     = issue_to_execute_bus2.valid && issue_to_execute_bus2.inst.is_agu_op;
+assign issue_to_agu_valid     = issue_to_execute_bus2.valid && issue_to_execute_bus2.inst.is_load_store_op;
 assign issue_to_sp_valid      = issue_to_execute_bus2.valid && issue_to_execute_bus2.inst.is_sp_op;
 
 // cs_allowin
@@ -77,13 +75,13 @@ logic bru_to_valid;
 logic agu_to_valid;
 logic sp_to_valid;
 
-assign alu1_to_cs_allowin    = !mul_div_to_valid;
-assign bru_to_cs_allowin     = !mul_div_to_valid;
-assign mul_div_to_cs_allowin = mul_div_to_valid;
+assign alu1_to_cs_allowin    = 1'b1;
+assign bru_to_cs_allowin     = 1'b1;
+assign mul_div_to_cs_allowin = !alu1_to_valid && !bru_to_valid && !alu2_to_valid && !agu_to_valid && !sp_to_valid;
 
-assign alu2_to_cs_allowin    = !mul_div_to_valid && !agu_to_valid;
-assign agu_to_cs_allowin     = !mul_div_to_valid;
-assign sp_to_cs_allowin      = !mul_div_to_valid;
+assign alu2_to_cs_allowin    = 1'b1;
+assign agu_to_cs_allowin     = !alu2_to_valid && !sp_to_valid;
+assign sp_to_cs_allowin      = 1'b1;
 
 // commit
 execute_to_commit_bus_t alu1_to_commit_bus;
@@ -98,13 +96,13 @@ always_comb begin
     execute_to_commit_bus1 = 'b0;
     execute_to_commit_bus2 = 'b0;
 
-    if(mul_div_to_valid) begin
-        execute_to_commit_bus1 = mul_div_to_commit_bus1;
-        execute_to_commit_bus2 = mul_div_to_commit_bus2;
+    if(!mul_div_to_cs_allowin)begin
+        execute_to_commit_bus1 = alu1_to_valid ? alu1_to_commit_bus : bru_to_commit_bus;
+        execute_to_commit_bus2 = alu2_to_valid ? alu2_to_commit_bus : agu_to_commit_bus;
     end
     else begin
-        execute_to_commit_bus1 = alu1_to_valid ? alu1_to_commit_bus : bru_to_commit_bus;
-        execute_to_commit_bus1 = agu_to_valid  ? agu_to_commit_bus  : alu2_to_commit_bus;
+        execute_to_commit_bus1 = mul_div_to_commit_bus1;
+        execute_to_commit_bus2 = mul_div_to_commit_bus2;
     end
 end
 
@@ -197,10 +195,14 @@ agu agu_u (
     .commit_store_valid,
     .commit_store_ready,
 
+    // mmu
+    .data_vaddr,
+
     // DBus
     .dcache_req,
     .dcache_wr,
     .dcache_wstrb,
+    .dcache_size,
     .dcache_addr,
     .dcache_wdata,
     .dcache_rdata,
@@ -212,6 +214,8 @@ agu agu_u (
 
 
 // special unit
+// assign sp_allowin  = 1'b0;
+assign sp_to_valid = 1'b0;
 
 
 endmodule
