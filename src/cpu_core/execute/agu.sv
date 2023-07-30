@@ -37,8 +37,8 @@ module agu (
 // stage
 typedef enum logic [2:0] { 
     AGU_addr,
-    AGU_lookup,
-    AGU_lookup_done,
+    AGU_store,
+    AGU_store_done,
     AGU_request,
     AGU_response,
     AGU_done
@@ -63,6 +63,9 @@ operation_t op;
 
 logic [3:0] rob_entry_num;
 
+logic [3:0] store_num;
+logic [3:0] pre_store;
+
 // lookup
 virt_t mem_addr;
 logic [3:0] mem_we, rf_we;
@@ -70,14 +73,14 @@ logic mem_wr;
 uint32_t mem_wdata, mem_rdata;
 logic [2:0] load_size, store_size;
 
-logic       data_cancel;
-logic       data_exist;
-logic       data_wstrb_match;
+logic data_cancel;
+logic load_wait;
+// logic       data_exist;
+// logic       data_wstrb_match;
 // logic [3:0] data_wstrb, data_wstrb_r;
-uint32_t    data_result;
+// uint32_t    data_result;
 
 // storebuffer
-logic store_buffer_empty;
 logic select_store;
 Storebuffer_Req_State_t storebuffer_req_state;
 logic [3:0] storebuffer_req_wstrb, storebuffer_req_wstrb_r;
@@ -88,9 +91,8 @@ uint32_t storebuffer_req_data, storebuffer_req_data_r;
 // writeback
 uint32_t agu_result;
 
-
-assign agu_readygo = (agu_stage == AGU_lookup || agu_stage == AGU_lookup_done ) && (mem_wr || !mem_wr && data_exist && data_wstrb_match)
-                  || agu_stage == AGU_response && dcache_data_ok || agu_stage == AGU_done;
+assign agu_readygo = (agu_stage == AGU_store || agu_stage == AGU_store_done ) && (mem_wr)
+                  ||  agu_stage == AGU_done;
 assign agu_allowin = !agu_valid || agu_readygo && cs_allowin;
 assign agu_to_valid = agu_valid && agu_readygo;
 
@@ -107,17 +109,16 @@ always_ff @(posedge clk) begin
     end
     else begin
         case(agu_stage) 
-            AGU_addr:        agu_stage <= agu_valid   ? AGU_lookup : AGU_addr;
-            AGU_lookup:      agu_stage <= agu_readygo ? (cs_allowin ? AGU_addr : AGU_lookup_done) : AGU_request;
-            AGU_lookup_done: agu_stage <= cs_allowin  ? AGU_addr : AGU_lookup_done;
+            AGU_addr:        agu_stage <= agu_valid   ? AGU_store : AGU_addr;
+            AGU_store:       agu_stage <= agu_readygo ? (cs_allowin ? AGU_addr : AGU_store_done) : AGU_request;
+            AGU_store_done:  agu_stage <= cs_allowin  ? AGU_addr : AGU_store_done;
             AGU_request:     agu_stage <= !select_store && dcache_addr_ok && !data_cancel ? AGU_response : AGU_request;
-            AGU_response:    agu_stage <= dcache_data_ok ? (cs_allowin ? AGU_addr : AGU_done) : AGU_response;
+            AGU_response:    agu_stage <= dcache_data_ok && !data_cancel ? AGU_done : AGU_response;
             AGU_done :       agu_stage <= cs_allowin ? AGU_addr : AGU_done;
             default:         agu_stage <= AGU_addr;
         endcase
     end
 end
-
 
 always_ff @(posedge clk) begin
     if(reset || flush) begin
@@ -127,6 +128,8 @@ always_ff @(posedge clk) begin
         imm_value <= 32'h0;
         op        <= OP_NOP;
         rob_entry_num <= '0;
+        store_num     <= '0;
+        pre_store     <= '0;
     end
     else if(agu_allowin) begin
         phy_dest  <= issue_inst.phy_dest;
@@ -135,10 +138,12 @@ always_ff @(posedge clk) begin
         imm_value <= { {16{issue_inst.inst.imm[15]}}, issue_inst.inst.imm };
         op        <= issue_inst.inst.operation;
         rob_entry_num <= issue_inst.rob_entry_num;
+        store_num     <= issue_inst.store_num;
+        pre_store     <= issue_inst.pre_store;
     end
 end
 
-// look up
+// store
 logic        op_sb ;
 logic        op_sh ;
 logic        op_sw ;
@@ -210,20 +215,22 @@ store_buffer store_buffer_u (
 
     .flush,
 
-    .store_buffer_empty,
+    .pre_store,
+    .load_wait,
 
-    .valid      (agu_stage == AGU_lookup),
+    .valid      (agu_stage == AGU_store),
     .wr         (mem_wr),
     .buffer_we  (mem_we),
     .buffer_size(store_size),
-    .rf_we      (rf_we ),
+    // .rf_we      (rf_we ),
     .data_addr  (mem_addr),
     .mem_wdata  (mem_wdata),
+    .store_num,
 
-    .data_exist,
-    .data_wstrb_match,
+    // .data_exist,
+    // .data_wstrb_match,
     // .data_wstrb,
-    .data_result,
+    // .data_result,
 
     .commit_store_valid (commit_store_valid && storebuffer_req_state == Store_Req_Idle),
     .commit_store_wstrb (storebuffer_req_wstrb),
@@ -237,8 +244,8 @@ store_buffer store_buffer_u (
 assign data_vaddr   = dcache_addr;
 
 assign commit_store_ready = storebuffer_req_state == Store_Req_Done;
-assign select_store = !store_buffer_empty || storebuffer_req_state == Store_Req_Addr;
-assign dcache_req   = agu_stage == AGU_request || storebuffer_req_state == Store_Req_Addr;
+assign select_store = load_wait || storebuffer_req_state == Store_Req_Addr;
+assign dcache_req   = agu_stage == AGU_request && !select_store || storebuffer_req_state == Store_Req_Addr && select_store;
 assign dcache_wr    = select_store;
 assign dcache_wstrb = storebuffer_req_wstrb_r;
 assign dcache_size  = select_store ? storebuffer_req_size_r : load_size;
@@ -268,7 +275,7 @@ always_ff @(posedge clk) begin
                     storebuffer_req_state <= Store_Req_Data;
             end
             Store_Req_Data: begin
-                if(dcache_data_ok)
+                if(dcache_data_ok && !data_cancel)
                     storebuffer_req_state <= Store_Req_Done;
             end
             Store_Req_Done: begin
@@ -278,19 +285,6 @@ always_ff @(posedge clk) begin
         endcase
     end
 
-    // if(reset || flush) begin
-    //     data_result_r <= 'b0;
-    //     data_wstrb_r  <= 'b0;
-    // end
-    // else if(data_exist && !data_wstrb_match) begin
-    //     data_result_r <= data_result;
-    //     data_wstrb_r  <= data_wstrb;
-    // end
-    // else begin
-    //     data_result_r <= 'b0;
-    //     data_wstrb_r  <= 'b0;
-    // end
-
     if(reset || data_cancel && dcache_data_ok) begin
         data_cancel <= 1'b0;
     end
@@ -299,38 +293,35 @@ always_ff @(posedge clk) begin
                   || dcache_addr_ok)) begin
         data_cancel <= 1'b1;
     end
+
+    if(reset || flush) begin
+        mem_rdata <= 'b0;
+    end
+    else if(agu_stage == AGU_response && dcache_data_ok && !data_cancel) begin
+        mem_rdata <= dcache_rdata;
+    end
 end
 
 
 // to writeback
-assign rf_we =  op_lwl   ?  mem_addr[1] ? mem_addr[0] ? 4'hf : 4'he :
-                                          mem_addr[0] ? 4'hc : 4'h8 :
-                op_lwr   ?  mem_addr[1] ? mem_addr[0] ? 4'h1 : 4'h3 :
-                                          mem_addr[0] ? 4'h7 : 4'hf :
-                        {4{op_lb | op_lbu | op_lh | op_lhu | op_lw}};
+assign rf_we = {4{op_lb | op_lbu | op_lh | op_lhu | op_lw | op_lwl | op_lwr}};
 
 always_comb begin
-    // mem_rdata[ 7: 0] = data_wstrb_r[0] ? data_result_r[ 7: 0] : dcache_rdata[ 7: 0];
-    // mem_rdata[15: 8] = data_wstrb_r[1] ? data_result_r[15: 8] : dcache_rdata[15: 8];
-    // mem_rdata[23:16] = data_wstrb_r[2] ? data_result_r[23:16] : dcache_rdata[23:16];
-    // mem_rdata[31:24] = data_wstrb_r[3] ? data_result_r[31:24] : dcache_rdata[31:24];
-    mem_rdata = dcache_rdata;
-
     agu_result = rt_value;
-    if((agu_stage == AGU_lookup || agu_stage == AGU_lookup_done) && data_exist && data_wstrb_match) begin
-        agu_result = (op_lb ) ? mem_addr[1] ? mem_addr[0] ? {{24{data_result[31]}}, data_result[31:24]} : {{24{data_result[23]}}, data_result[23:16]}:
-                                              mem_addr[0] ? {{24{data_result[15]}}, data_result[15: 8]} : {{24{data_result[ 7]}}, data_result[ 7: 0]}:
-                     (op_lbu) ? mem_addr[1] ? mem_addr[0] ? { 24'b0,                data_result[31:24]} : { 24'b0,                data_result[23:16]}:
-                                              mem_addr[0] ? { 24'b0,                data_result[15: 8]} : { 24'b0,                data_result[ 7: 0]}:
-                     (op_lh ) ? mem_addr[1] ? {{16{data_result[31]}}, data_result[31:16]} : {{16{data_result[15]}}, data_result[15:0]} :
-                     (op_lhu) ? mem_addr[1] ? { 16'b0,                data_result[31:16]} : { 16'b0,                data_result[15:0]} :
-                     (op_lwl) ? mem_addr[1] ? mem_addr[0] ?  data_result                          : {data_result[23: 0], rt_value[ 7:0]} :
-                                              mem_addr[0] ? {data_result[15: 0], rt_value[15: 0]} : {data_result[ 7: 0], rt_value[23:0]} :
-                     (op_lwr) ? mem_addr[1] ? mem_addr[0] ? {rt_value[31: 8], data_result[31:24]} : {rt_value[31:16], data_result[31:16]} :
-                                              mem_addr[0] ? {rt_value[31:24], data_result[31: 8]} :  data_result                :
-                                                             data_result;
-    end
-    else if(agu_stage == AGU_response || agu_stage == AGU_done) begin
+    // if((agu_stage == AGU_lookup || agu_stage == AGU_lookup_done) && data_exist && data_wstrb_match) begin
+    //     agu_result = (op_lb ) ? mem_addr[1] ? mem_addr[0] ? {{24{data_result[31]}}, data_result[31:24]} : {{24{data_result[23]}}, data_result[23:16]}:
+    //                                           mem_addr[0] ? {{24{data_result[15]}}, data_result[15: 8]} : {{24{data_result[ 7]}}, data_result[ 7: 0]}:
+    //                  (op_lbu) ? mem_addr[1] ? mem_addr[0] ? { 24'b0,                data_result[31:24]} : { 24'b0,                data_result[23:16]}:
+    //                                           mem_addr[0] ? { 24'b0,                data_result[15: 8]} : { 24'b0,                data_result[ 7: 0]}:
+    //                  (op_lh ) ? mem_addr[1] ? {{16{data_result[31]}}, data_result[31:16]} : {{16{data_result[15]}}, data_result[15:0]} :
+    //                  (op_lhu) ? mem_addr[1] ? { 16'b0,                data_result[31:16]} : { 16'b0,                data_result[15:0]} :
+    //                  (op_lwl) ? mem_addr[1] ? mem_addr[0] ?  data_result                          : {data_result[23: 0], rt_value[ 7:0]} :
+    //                                           mem_addr[0] ? {data_result[15: 0], rt_value[15: 0]} : {data_result[ 7: 0], rt_value[23:0]} :
+    //                  (op_lwr) ? mem_addr[1] ? mem_addr[0] ? {rt_value[31: 8], data_result[31:24]} : {rt_value[31:16], data_result[31:16]} :
+    //                                           mem_addr[0] ? {rt_value[31:24], data_result[31: 8]} :  data_result                :
+    //                                                          data_result;
+    // end
+    if(agu_stage == AGU_done) begin
         agu_result = (op_lb ) ? mem_addr[1] ? mem_addr[0] ? {{24{mem_rdata[31]}}, mem_rdata[31:24]} : {{24{mem_rdata[23]}}, mem_rdata[23:16]}:
                                               mem_addr[0] ? {{24{mem_rdata[15]}}, mem_rdata[15: 8]} : {{24{mem_rdata[ 7]}}, mem_rdata[ 7: 0]}:
                      (op_lbu) ? mem_addr[1] ? mem_addr[0] ? { 24'b0,              mem_rdata[31:24]} : { 24'b0,              mem_rdata[23:16]}:
@@ -348,7 +339,7 @@ end
 assign agu_to_commit_bus.valid = agu_to_valid;
 assign agu_to_commit_bus.rob_entry_num = rob_entry_num;
 
-assign agu_to_commit_bus.rf_we    = {4{op_lb | op_lbu | op_lh | op_lhu | op_lw | op_lwl | op_lwr}};
+assign agu_to_commit_bus.rf_we    = rf_we;
 assign agu_to_commit_bus.phy_dest = phy_dest;
 assign agu_to_commit_bus.result   = agu_result;
 

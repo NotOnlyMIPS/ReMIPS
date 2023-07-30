@@ -287,6 +287,7 @@ assign select_to_issue_bus1.rob_entry_num = issue_queue[select_inst1_num].rob_en
 
 assign select_to_issue_bus1.is_store_op   = 'b0;
 assign select_to_issue_bus1.store_num     = 'b0;
+assign select_to_issue_bus1.pre_store     = 'b0;
 
 assign select_to_issue_bus1.br_taken  = issue_queue[select_inst1_num].br_taken;
 assign select_to_issue_bus1.bpu_entry = issue_queue[select_inst1_num].bpu_entry;
@@ -306,6 +307,7 @@ assign select_to_issue_bus2.rob_entry_num = issue_queue[select_inst2_num].rob_en
 
 assign select_to_issue_bus2.is_store_op   = issue_queue[select_inst2_num].is_store_op;
 assign select_to_issue_bus2.store_num     = issue_queue[select_inst2_num].store_num  ;
+assign select_to_issue_bus2.pre_store     = issue_queue[select_inst2_num].pre_store  ;
 
 assign select_to_issue_bus2.br_taken  = issue_queue[select_inst2_num].br_taken;
 assign select_to_issue_bus2.bpu_entry = issue_queue[select_inst2_num].bpu_entry;
@@ -497,6 +499,9 @@ assign issue_to_execute_bus1.src2_value = inst1_src2_value;
 
 assign issue_to_execute_bus1.rob_entry_num = issue_inst1.rob_entry_num;
 
+assign issue_to_execute_bus1.store_num = issue_inst1.store_num;
+assign issue_to_execute_bus1.pre_store = issue_inst1.pre_store;
+
 assign issue_to_execute_bus1.br_taken  = issue_inst1.br_taken;
 assign issue_to_execute_bus1.bpu_entry = issue_inst1.bpu_entry;
 
@@ -512,6 +517,9 @@ assign issue_to_execute_bus2.src1_value = inst2_src1_value;
 assign issue_to_execute_bus2.src2_value = inst2_src2_value;
 
 assign issue_to_execute_bus2.rob_entry_num = issue_inst2.rob_entry_num;
+
+assign issue_to_execute_bus2.store_num = issue_inst2.store_num;
+assign issue_to_execute_bus2.pre_store = issue_inst2.pre_store;
 
 assign issue_to_execute_bus2.br_taken  = issue_inst2.br_taken;
 assign issue_to_execute_bus2.bpu_entry = issue_inst2.bpu_entry;

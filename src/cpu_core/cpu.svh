@@ -414,6 +414,7 @@ typedef struct packed {
     logic [3:0] rob_entry_num;
 
     logic is_store_op;
+    logic [3:0] pre_store;
     logic [3:0] store_num;
 
     logic       br_taken;
@@ -440,6 +441,9 @@ typedef struct packed {
 
     logic [3:0] rob_entry_num;
 
+    logic [3:0] pre_store;
+    logic [3:0] store_num;
+
     logic       br_taken;
     BHT_entry_t bpu_entry;
 
@@ -451,6 +455,7 @@ typedef struct packed {
     logic        valid;
     logic [ 3:0] wstrb;
     logic [ 2:0] size;
+    logic [ 3:0] store_num;
     logic [31:0] addr;
     logic [31:0] data;
 } st_buffer_t;
