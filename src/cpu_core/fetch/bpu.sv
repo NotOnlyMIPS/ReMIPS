@@ -8,6 +8,8 @@ module BPU (
     input   clk,
     input   reset,
 
+    input   flush_src_t flush_src,
+
     input   verify_result_t bpu_verify_result,
     input   fetch_to_bpu_bus_t fetch_to_bpu_bus,
     // output  bpu_to_fetch_bus_t bpu_to_fetch_bus,
@@ -83,7 +85,7 @@ logic          correction_is_taken;
 virt_t         correction_target;
 
 always_ff @(posedge clk) begin
-    if(reset) begin
+    if(reset || flush_src.exception) begin
         state               <= `IDLE;
         correction_is_taken <= '0;
         correction_target   <= '0;
@@ -140,7 +142,7 @@ always_comb begin
 end
 
 always_ff @ (posedge clk) begin
-    if(reset) begin
+    if(reset || flush_src.exception) begin
         predict_result_r <= '0;
         predict_entry_r  <= '0;
     end else if(fetch_to_bpu_bus.valid) begin

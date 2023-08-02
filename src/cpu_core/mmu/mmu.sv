@@ -126,6 +126,7 @@ always_ff @ (posedge clk) begin
     inst_tlb_ex_r.ex            <= inst_result.invalid | inst_result.miss;
     inst_tlb_ex_r.exccode       <= `EXCCODE_TLBL;
     inst_tlb_ex_r.bd            <= 1'b0;
+    inst_tlb_ex_r.epc           <= 32'b0;
 
     data_tlb_ex_r.tlb_refill    <= data_result.miss;
     data_tlb_ex_r.badvaddr      <= data_vaddr;
@@ -135,6 +136,7 @@ always_ff @ (posedge clk) begin
                                  (store_op & ~data_result.miss & ~data_result.dirty & ~data_result.invalid) ? `EXCCODE_MOD :
                                  `EXCCODE_TLBS;
     data_tlb_ex_r.bd            <= 1'b0;
+    data_tlb_ex_r.epc           <= 32'b0;
 end
 
 assign inst_tlb_ex = inst_tlb_ex_r;

@@ -113,6 +113,7 @@ always_comb begin
 
     commit_store_wstrb = '0;
     commit_store_addr  = '0;
+    commit_store_size  = '0;
     commit_store_data  = '0;
     if( commit_store_valid )begin
         commit_store_wstrb = store_buffer[store_buffer_head].wstrb;

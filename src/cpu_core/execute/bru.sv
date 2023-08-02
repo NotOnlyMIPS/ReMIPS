@@ -7,9 +7,9 @@ module bru(
     input  logic flush,
 
     input  logic issue_to_bru_valid,
-    output logic bru_allowin,
+    // output logic bru_allowin,
 
-    input  logic cs_allowin,
+    // input  logic cs_allowin,
     output logic bru_to_valid,
 
     input  issue_to_execute_bus_t issue_inst,
@@ -29,14 +29,13 @@ virt_t predict_target, br_target;
 decoded_inst_t inst;
 reg_addr_t  phy_dest;
 uint32_t rs_value, rt_value;
-exception_t exception;
 
 logic  target_branch, target_jump, target_jump_r, target_not_taken;
 logic  predict_is_taken,  predict_sucess;
 BHT_entry_t bpu_entry, verify_entry;
 verify_result_t verify_result;
 
-assign bru_allowin  = cs_allowin || !bru_valid;
+// assign bru_allowin  = cs_allowin || !bru_valid;
 assign bru_to_valid = bru_valid;
 
 always_ff @(posedge clk) begin
@@ -50,11 +49,11 @@ always_ff @(posedge clk) begin
         inst_pc   <= 'b0;
         next_pc   <= 'b0;
         pc_add8   <= 'b0;
-        exception <= 'b0;
         bpu_entry <= 'b0;
         predict_is_taken <= 'b0;
         rob_entry_num    <= 'b0;
-    end else if(bru_allowin) begin
+    end 
+    else begin
         bru_valid <= issue_to_bru_valid;
         inst      <= issue_inst.inst;
         phy_dest  <= issue_inst.phy_dest;
@@ -64,7 +63,6 @@ always_ff @(posedge clk) begin
         inst_pc   <= issue_inst.pc;
         next_pc   <= issue_inst.pc + 4;
         pc_add8   <= issue_inst.pc + 8;
-        exception <= issue_inst.exception;
         bpu_entry <= issue_inst.bpu_entry;
         predict_is_taken <= issue_inst.br_taken;
         rob_entry_num    <= issue_inst.rob_entry_num;
@@ -152,6 +150,6 @@ assign bru_to_commit_bus.result   = pc_add8;
 assign bru_to_commit_bus.is_store_op = 1'b0;
 
 assign bru_to_commit_bus.verify_result = verify_result;
-assign bru_to_commit_bus.exception     = exception;
+assign bru_to_commit_bus.exception     = 'b0;
 
 endmodule

@@ -6,6 +6,10 @@ module decode_stage (
 
     input  flush,
 
+    // exception
+    input  logic [1:0] cp0_sw,
+    input  logic [5:0] cp0_hw,
+
     input  logic fs_to_valid,
     output logic ds_allowin,
 
@@ -33,6 +37,8 @@ module decode_stage (
     output decode_to_issue_bus_t decode_to_issue_bus2,
 
     input  logic select_store_ready,
+
+    input  logic       rob_empty,
     input  logic [3:0] rob_tail_o,
     output rob_entry_t map_to_rob_bus1,
     output rob_entry_t map_to_rob_bus2
@@ -57,8 +63,9 @@ exception_t    decode_inst1_ex, decode_inst2_ex;
 
 logic decode_wait_1cycle_r, decode_wait_1cycle;
 logic inst1_mul_div_op, inst2_mul_div_op;
+logic inst1_sp_op, inst2_sp_op;
 
-assign decode_wait_1cycle = inst1_mul_div_op || inst2_mul_div_op;
+assign decode_wait_1cycle = inst1_mul_div_op || inst2_mul_div_op || inst1_sp_op || inst2_sp_op;
 assign decode_stage_ready_go = 1'b1;
 assign ds_allowin            = decode_stage_ready_go && map_stage_allowin && (!decode_wait_1cycle || decode_wait_1cycle_r)
                             || !decode_stage_valid;
@@ -80,7 +87,7 @@ always_ff @(posedge clk) begin
     if(reset || decode_wait_1cycle_r && map_stage_allowin) begin
         decode_wait_1cycle_r <= 1'b0;
     end
-    else if(inst1_mul_div_op || inst2_mul_div_op) begin
+    else if(decode_wait_1cycle && map_stage_allowin) begin
         decode_wait_1cycle_r <= 1'b1;
     end
 
@@ -93,6 +100,10 @@ operation_t inst1_op, inst2_op;
 decoded_inst_t sel_decode_inst1, sel_decode_inst2;
 operation_t sel_inst1_op, sel_inst2_op;
 virt_t  sel_inst1_pc, sel_inst2_pc;
+
+// exception
+logic inst1_is_privileged_op, inst2_is_privileged_op;
+logic inst1_is_eret, inst2_is_eret;
 
 inst_decoder u_inst_decoder1 (
     .valid(decode_inst1.valid),
@@ -109,6 +120,9 @@ inst_decoder u_inst_decoder2 (
 control_signal inst_control1 (
     .valid  (decode_inst1.valid),
 
+    .cp0_sw,
+    .cp0_hw,
+
     .pc         (sel_inst1_pc),
     .operation  (sel_inst1_op),
     .inst       (sel_decode_inst1),
@@ -116,6 +130,9 @@ control_signal inst_control1 (
 
     .is_inst2(1'b0),
     .is_store_op(inst1_is_store_op),
+
+    .is_privileged_op(inst1_is_privileged_op),
+    .is_eret         (inst1_is_eret),
 
     .exception   (decode_inst1.exception),
     .exception_d (decode_inst1_ex       )
@@ -125,6 +142,9 @@ control_signal inst_control1 (
 control_signal inst_control2 (
     .valid  (decode_inst2.valid),
 
+    .cp0_sw,
+    .cp0_hw,
+
     .pc         (sel_inst2_pc),
     .operation  (sel_inst2_op),
     .inst       (sel_decode_inst2),
@@ -132,6 +152,9 @@ control_signal inst_control2 (
 
     .is_inst2(1'b1),
     .is_store_op(inst2_is_store_op),
+
+    .is_privileged_op(inst2_is_privileged_op),
+    .is_eret         (inst2_is_eret),
 
     .exception   (decode_inst2.exception),
     .exception_d (decode_inst2_ex       )
@@ -150,6 +173,21 @@ assign inst2_mul_div_op = inst2_op == OP_MUL  || inst2_op == OP_MULT || inst2_op
                        || inst2_op == OP_MADD || inst2_op == OP_MADDU
                        || inst2_op == OP_MSUB || inst2_op == OP_MSUBU;
 
+assign inst1_sp_op = inst1_op == OP_MFC0    || inst1_op == OP_MTC0
+                  || inst1_op == OP_CACHE   || inst1_op == OP_ERET
+                  || inst1_op == OP_SYSCALL || inst1_op == OP_BREAK
+                  || inst1_op == OP_TLBP    || inst1_op == OP_TLBR
+                  || inst1_op == OP_TLBWI   || inst1_op == OP_TLBWR
+                  || inst1_op == OP_TGE     || inst1_op == OP_TGEU || inst1_op == OP_TLT || inst1_op == OP_TLTU  || inst1_op == OP_TEQ || inst1_op == OP_TNE
+                  || inst1_op == OP_TGEI    || inst1_op == OP_TGEIU|| inst1_op == OP_TLTI|| inst1_op == OP_TLTIU || inst1_op == OP_TEQI|| inst1_op == OP_TNEI;
+assign inst2_sp_op = inst2_op == OP_MFC0    || inst2_op == OP_MTC0
+                  || inst2_op == OP_CACHE   || inst2_op == OP_ERET
+                  || inst2_op == OP_SYSCALL || inst2_op == OP_BREAK
+                  || inst2_op == OP_TLBP    || inst2_op == OP_TLBR
+                  || inst2_op == OP_TLBWI   || inst2_op == OP_TLBWR
+                  || inst2_op == OP_TGE     || inst2_op == OP_TGEU || inst2_op == OP_TLT || inst2_op == OP_TLTU  || inst2_op == OP_TEQ || inst2_op == OP_TNE
+                  || inst2_op == OP_TGEI    || inst2_op == OP_TGEIU|| inst2_op == OP_TLTI|| inst2_op == OP_TLTIU || inst2_op == OP_TEQI|| inst2_op == OP_TNEI;
+
 always_comb begin
     sel_decode_inst1 = decode_inst1.inst;
     sel_decode_inst2 = decode_inst2.inst;
@@ -164,14 +202,19 @@ always_comb begin
     decode_to_map_bus1.is_store_op    = inst1_is_store_op;
     decode_to_map_bus1.br_taken       = decode_inst1.br_taken;
     decode_to_map_bus1.bpu_entry      = decode_inst1.bpu_entry;
-    decode_to_map_bus1.exception      = 'b0;
+    decode_to_map_bus1.is_privileged_op = inst1_is_privileged_op;
+    decode_to_map_bus1.is_eret          = inst1_is_eret;
+    decode_to_map_bus1.exception        = decode_inst1_ex;
+
     decode_to_map_bus2.valid = decode_inst2.valid;
     decode_to_map_bus2.inst  = decode_inst2_d;
     decode_to_map_bus2.pc    = decode_inst2.pc;
     decode_to_map_bus2.is_store_op    = inst2_is_store_op;
     decode_to_map_bus2.br_taken       = decode_inst2.br_taken;
     decode_to_map_bus2.bpu_entry      = decode_inst2.bpu_entry;
-    decode_to_map_bus2.exception      = 'b0;
+    decode_to_map_bus2.is_privileged_op = inst2_is_privileged_op;
+    decode_to_map_bus2.is_eret          = inst2_is_eret;
+    decode_to_map_bus2.exception        = decode_inst2_ex;
 
     if(decode_wait_1cycle_r) begin
         if(inst2_mul_div_op) begin
@@ -206,7 +249,11 @@ decode_to_map_bus_t map_inst1, map_inst2;
 logic  free_list_empty, map_done;
 logic [3:0] store_head, store_tail;
 
-assign map_stage_ready_go = !free_list_empty;
+logic  sp_inst_wait;
+
+assign sp_inst_wait = (map_inst1.inst.is_sp_op && map_inst1.valid || map_inst2.inst.is_sp_op && map_inst2.valid) && !rob_empty;
+
+assign map_stage_ready_go = !free_list_empty && !sp_inst_wait;
 assign map_stage_allowin  = map_stage_ready_go && is_allowin && cs_allowin || !map_stage_valid;
 assign ds_to_is_valid     = map_stage_valid && map_stage_ready_go && cs_allowin;
 assign ds_to_rob_valid    = map_stage_valid && map_stage_ready_go && is_allowin;
@@ -400,9 +447,16 @@ inst_dispatch inst_dispatch_u (
 
     // issue to rob
     .inst1_old_dest,
-    .map_to_rob_bus1,
+    .inst1_is_privileged_op(map_inst1.is_privileged_op),
+    .inst1_is_eret         (map_inst1.is_eret         ),
+    .inst1_exception       (map_inst1.exception       ),
 
     .inst2_old_dest,
+    .inst2_is_privileged_op(map_inst2.is_privileged_op),
+    .inst2_is_eret         (map_inst2.is_eret         ),
+    .inst2_exception       (map_inst2.exception       ),
+
+    .map_to_rob_bus1,
     .map_to_rob_bus2
 );
 

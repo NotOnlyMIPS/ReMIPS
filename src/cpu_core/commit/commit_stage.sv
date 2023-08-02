@@ -24,8 +24,10 @@ module commit_stage (
     // execute
     input  execute_to_commit_bus_t execute_to_commit_bus1,
     input  execute_to_commit_bus_t execute_to_commit_bus2,
-    input  logic commit_store_ready,
-    output logic commit_store_valid,
+
+    output logic       commit_store_valid,
+    input  logic       commit_store_ready,
+    input  exception_t commit_store_ex,
 
     // busytable
     output writeback_to_busytable_bus_t writeback_to_busytable_bus1,
@@ -40,8 +42,10 @@ module commit_stage (
 
     // regfile
     output writeback_to_rf_bus_t writeback_to_rf_bus1,
-    output writeback_to_rf_bus_t writeback_to_rf_bus2
+    output writeback_to_rf_bus_t writeback_to_rf_bus2,
 
+    // exception
+    output exception_t exception
 
 );
 
@@ -104,7 +108,11 @@ assign writeback_to_commit_bus2.exception     = writeback_inst2.exception;
 // commit
 rob_entry_t rob[ROB_ENTRY_NUM-1:0];
 logic [3:0] rob_head, rob_tail;
+logic [3:0] rob_head_writeback, rob_head_bpu, rob_head_miss_predict, rob_head_flush;
+logic [3:0] rob_head_commit_inst, rob_head_commit_store, rob_head_commit_rat;
 logic [3:0] rob_head_next, rob_tail_next;
+logic [3:0] rob_head_next_writeback, rob_head_next_bpu, rob_head_next_miss_predict, rob_head_next_flush;
+logic [3:0] rob_head_next_commit_inst, rob_head_next_commit_store, rob_head_next_commit_rat;
 logic [4:0] rob_num;
 logic commit_inst1_valid, commit_inst2_valid;
 logic map_to_rob_bus1_valid, map_to_rob_bus2_valid;
@@ -112,14 +120,22 @@ logic map_to_rob_bus1_valid, map_to_rob_bus2_valid;
 logic miss_predict;
 logic wait_1bd, wait_2bd;
 
-assign map_to_rob_bus1_valid = map_to_rob_bus1.state == Inst_Wait;
-assign map_to_rob_bus2_valid = map_to_rob_bus2.state == Inst_Wait;
+assign map_to_rob_bus1_valid = map_to_rob_bus1.state != Inst_Invalid;
+assign map_to_rob_bus2_valid = map_to_rob_bus2.state != Inst_Invalid;
 
 assign cs_allowin = rob_num < ROB_ENTRY_NUM-1;
-assign rob_empty  = rob_num == 0;
+assign rob_empty  = rob_num == 0 || rob_num == 1 && rob[rob_head].state == Inst_Complete;
 assign rob_tail_o = rob_tail;
 assign rob_head_next = rob_head+1;
 assign rob_tail_next = rob_tail+1;
+
+assign rob_head_next_writeback    = rob_head_writeback+1;
+assign rob_head_next_bpu          = rob_head_bpu+1;
+assign rob_head_next_miss_predict = rob_head_miss_predict+1;
+assign rob_head_next_flush        = rob_head_flush+1;
+assign rob_head_next_commit_inst  = rob_head_commit_inst+1;
+assign rob_head_next_commit_store = rob_head_commit_store+1;
+assign rob_head_next_commit_rat   = rob_head_commit_rat+1;
 
 always_ff @(posedge clk) begin
     if(reset || flush || commit_flush) begin
@@ -129,16 +145,20 @@ always_ff @(posedge clk) begin
     end
     else begin
         if(commit_inst1_valid) begin
-            rob[rob_head  ].state <= Inst_Invalid;
+            rob[rob_head_writeback  ].state <= Inst_Invalid;
         end
         else if(commit_store_ready && rob[rob_head].state == Store_Wait) begin
-            rob[rob_head  ].state <= Inst_Complete;
+            rob[rob_head_writeback  ].state <= Inst_Complete;
+            rob[rob_head_writeback  ].exception.ex        <= commit_store_ex.ex;
+            rob[rob_head_writeback  ].exception.exccode   <= commit_store_ex.exccode;
+            rob[rob_head_writeback  ].exception.badvaddr  <= commit_store_ex.badvaddr;
+            rob[rob_head_writeback  ].exception.tlb_refill<= commit_store_ex.tlb_refill;
         end
         if(commit_inst2_valid) begin
-            rob[rob_head_next].state <= Inst_Invalid;
+            rob[rob_head_next_writeback].state <= Inst_Invalid;
         end
         else if(commit_store_ready && rob[rob_head].state != Store_Wait && rob[rob_head_next].state == Store_Wait) begin
-            rob[rob_head_next].state <= Inst_Complete;
+            rob[rob_head_next_writeback].state <= Inst_Complete;
         end
 
         if(ds_to_rob_valid && cs_allowin) begin
@@ -147,14 +167,20 @@ always_ff @(posedge clk) begin
         end
 
         if(writeback_to_commit_bus1.valid) begin
-            rob[writeback_to_commit_bus1.rob_entry_num].state         <= writeback_to_commit_bus1.is_store_op ? Store_Wait : Inst_Complete;
+            rob[writeback_to_commit_bus1.rob_entry_num].state         <= Inst_Complete;
             rob[writeback_to_commit_bus1.rob_entry_num].verify_result <= writeback_to_commit_bus1.verify_result;
-            rob[writeback_to_commit_bus1.rob_entry_num].exception     <= writeback_to_commit_bus1.exception;
+            // rob[writeback_to_commit_bus1.rob_entry_num].exception     <= writeback_to_commit_bus1.exception;
+            rob[writeback_to_commit_bus1.rob_entry_num].exception.ex      <= writeback_to_commit_bus1.exception.ex;
+            rob[writeback_to_commit_bus1.rob_entry_num].exception.exccode <= writeback_to_commit_bus1.exception.exccode;
         end
         if(writeback_to_commit_bus2.valid) begin
-            rob[writeback_to_commit_bus2.rob_entry_num].state         <= writeback_to_commit_bus2.is_store_op ? Store_Wait : Inst_Complete;
+            rob[writeback_to_commit_bus2.rob_entry_num].state         <= writeback_to_commit_bus2.is_store_op &&
+                                                                        !writeback_to_commit_bus2.exception.ex ? Store_Wait : Inst_Complete;
             rob[writeback_to_commit_bus2.rob_entry_num].verify_result <= writeback_to_commit_bus2.verify_result;
-            rob[writeback_to_commit_bus2.rob_entry_num].exception     <= writeback_to_commit_bus2.exception;
+            rob[writeback_to_commit_bus2.rob_entry_num].exception.ex        <= writeback_to_commit_bus2.exception.ex;
+            rob[writeback_to_commit_bus2.rob_entry_num].exception.exccode   <= writeback_to_commit_bus2.exception.exccode;
+            rob[writeback_to_commit_bus2.rob_entry_num].exception.badvaddr  <= writeback_to_commit_bus2.exception.badvaddr;
+            rob[writeback_to_commit_bus2.rob_entry_num].exception.tlb_refill<= writeback_to_commit_bus2.exception.tlb_refill;
         end
     end
 
@@ -162,9 +188,26 @@ always_ff @(posedge clk) begin
         rob_head <= '0;
         rob_tail <= '0;
         rob_num  <= '0;
+
+        rob_head_writeback    <= '0;
+        rob_head_bpu          <= '0;
+        rob_head_miss_predict <= '0;
+        rob_head_flush        <= '0;
+        rob_head_commit_inst  <= '0;
+        rob_head_commit_store <= '0;
+        rob_head_commit_rat   <= '0;
+
     end
     else begin
         rob_head <= rob_head + commit_inst1_valid + commit_inst2_valid;
+
+        rob_head_writeback    <= rob_head_writeback + commit_inst1_valid + commit_inst2_valid;
+        rob_head_bpu          <= rob_head_bpu + commit_inst1_valid + commit_inst2_valid;
+        rob_head_miss_predict <= rob_head_miss_predict + commit_inst1_valid + commit_inst2_valid;
+        rob_head_flush        <= rob_head_flush + commit_inst1_valid + commit_inst2_valid;
+        rob_head_commit_inst  <= rob_head_commit_inst + commit_inst1_valid + commit_inst2_valid;
+        rob_head_commit_store <= rob_head_commit_store + commit_inst1_valid + commit_inst2_valid;
+        rob_head_commit_rat   <= rob_head_commit_rat + commit_inst1_valid + commit_inst2_valid;
 
         if(cs_allowin && ds_to_rob_valid) begin
             rob_tail <= rob_tail + map_to_rob_bus1_valid + map_to_rob_bus2_valid;
@@ -186,49 +229,57 @@ always_ff @(posedge clk) begin
         wait_2bd <= 1'b0;
     end
     else if(miss_predict && !flush_r) begin
-        if(rob[rob_head_next].is_mul_div_op)
+        if(rob[rob_head_next_bpu].is_mul_div_op)
             wait_2bd <= 1'b1;
         else
             wait_1bd <= 1'b1;
     end
 
-    if(reset || commit_flush)
+    if(reset || commit_flush || flush_src.exception)
         bpu_verify_result <= 'b0;
     else if(miss_predict && !flush_r)
-        bpu_verify_result <= rob[rob_head].verify_result;
+        bpu_verify_result <= rob[rob_head_bpu].verify_result;
 end
 
-assign flush = flush_r && !wait_1bd && !wait_2bd;
-assign commit_flush = (wait_1bd || wait_2bd) && rob[rob_head].state == Inst_Complete;
+assign flush = flush_r && !wait_1bd && !wait_2bd || flush_src.exception || flush_src.eret || flush_src.privileged_inst;
+assign commit_flush = (wait_1bd || wait_2bd) && rob[rob_head_miss_predict].state == Inst_Complete;
 
-assign miss_predict = commit_inst1_valid && (!rob[rob_head].verify_result.predict_sucess && rob[rob_head].is_br_op);
-assign flush_src.miss_predict    = rob[rob_head].state == Inst_Complete && rob[rob_head].is_br_op && !rob[rob_head].verify_result.predict_sucess;
-assign flush_src.eret            = 1'b0;
-assign flush_src.exception       = rob[rob_head].state == Inst_Complete && rob[rob_head].exception.ex;
-assign flush_src.privileged_inst = 1'b0;
+assign miss_predict = commit_inst1_valid && (!rob[rob_head_miss_predict].verify_result.predict_sucess && rob[rob_head_miss_predict].is_br_op);
+
+assign flush_src.miss_predict    = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].is_br_op && !rob[rob_head_flush].verify_result.predict_sucess;
+assign flush_src.eret            = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].is_eret;
+assign flush_src.exception       = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].exception.ex;
+assign flush_src.privileged_inst = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].is_privileged_op;
+
+// exception
+always_comb begin
+    exception = '0;
+    if(rob[rob_head_flush].state == Inst_Complete)
+        exception = rob[rob_head_flush].exception;
+end
 
 always_comb begin
-    commit_inst1_valid = rob[rob_head     ].state == Inst_Complete;
-    commit_inst2_valid = rob[rob_head_next].state == Inst_Complete && commit_inst1_valid;
-    if(rob[rob_head].is_br_op && rob[rob_head_next].state != Inst_Complete)
+    commit_inst1_valid = rob[rob_head_commit_inst     ].state == Inst_Complete && !rob[rob_head_commit_inst].exception.ex;
+    commit_inst2_valid = rob[rob_head_next_commit_inst].state == Inst_Complete && commit_inst1_valid;
+    if(rob[rob_head_commit_inst].is_br_op && rob[rob_head_next_commit_inst].state != Inst_Complete)
         commit_inst1_valid = 1'b0;
-    if(rob[rob_head_next].is_br_op || rob[rob_head_next].is_store_op
-    || rob[rob_head_next].exception.ex
+    if(rob[rob_head_next_commit_inst].is_br_op || rob[rob_head_next_commit_inst].is_store_op
+    || rob[rob_head_next_commit_inst].exception.ex
     || miss_predict || wait_1bd) begin
         commit_inst2_valid = 1'b0;
     end
 end
 
-assign commit_store_valid = rob[rob_head].state == Store_Wait || rob[rob_head_next].state == Store_Wait;
+assign commit_store_valid = rob[rob_head_commit_store].state == Store_Wait || rob[rob_head_next_commit_store].state == Store_Wait;
 
-assign commit_to_rat_bus1 = { commit_inst1_valid && rob[rob_head].rf_we,
-                              rob[rob_head  ].dest,
-                              rob[rob_head  ].phy_dest,
-                              rob[rob_head  ].old_dest};
-assign commit_to_rat_bus2 = { commit_inst2_valid && rob[rob_head_next].rf_we,
-                              rob[rob_head_next].dest,
-                              rob[rob_head_next].phy_dest,
-                              rob[rob_head_next].old_dest};
+assign commit_to_rat_bus1 = { commit_inst1_valid && rob[rob_head_commit_rat].rf_we,
+                              rob[rob_head_commit_rat  ].dest,
+                              rob[rob_head_commit_rat  ].phy_dest,
+                              rob[rob_head_commit_rat  ].old_dest};
+assign commit_to_rat_bus2 = { commit_inst2_valid && rob[rob_head_next_commit_rat].rf_we,
+                              rob[rob_head_next_commit_rat].dest,
+                              rob[rob_head_next_commit_rat].phy_dest,
+                              rob[rob_head_next_commit_rat].old_dest};
 
 `ifdef GOLDEN_TRACE
 

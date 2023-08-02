@@ -8,7 +8,7 @@ module inst_decoder(
 );
 
 logic [ 5:0] op, func;
-logic [ 5:0] rs, rt, rd;
+logic [ 4:0] rs, rt, rd;
 logic [ 4:0] sa;
 logic [15:0] imm;
 logic [ 2:0] sel;
@@ -27,7 +27,7 @@ assign jidx = inst[25: 0];
 always_comb begin
     operation = OP_INVALID;
     if(valid) begin
-        unique casez(op) 
+        unique case(op) 
             6'b000000: begin // SPECIAL
             unique case(func)
                 /* shift */
@@ -119,17 +119,16 @@ always_comb begin
             6'b001111: operation = OP_LUI;
             /* CP0 */
             6'b010000: begin
-            unique case(rs)
+            unique casez(rs)
                 5'b00000: operation = OP_MFC0;
                 5'b00100: operation = OP_MTC0;
                 5'b10???, 5'b11???: begin // CO
                 unique case(func)
-                    6'b000000: operation = OP_TLBR;
-                    6'b000001: operation = OP_TLBWI;
-                    6'b000010: operation = OP_TLBWR;
-                    6'b000100: operation = OP_TLBP;
-                    6'b001000: operation = OP_ERET;
-                    6'b010000: operation = OP_WAIT;
+                    6'b000001: operation = OP_TLBR;
+                    6'b000010: operation = OP_TLBWI;
+                    6'b000110: operation = OP_TLBWR;
+                    6'b001000: operation = OP_TLBP;
+                    6'b011000: operation = OP_ERET;
                     default:   operation = OP_INVALID;
                 endcase
                 end
@@ -137,10 +136,10 @@ always_comb begin
             endcase
             end
             /* Branch Likely */
-            6'b010100: operation = OP_BEQL;
-            6'b010101: operation = OP_BNEL;
-            6'b010110: operation = OP_BLEZL;
-            6'b010111: operation = OP_BGTZL;
+            // 6'b010100: operation = OP_BEQL;
+            // 6'b010101: operation = OP_BNEL;
+            // 6'b010110: operation = OP_BLEZL;
+            // 6'b010111: operation = OP_BGTZL;
             6'b011100: begin // SPECIAL2
             unique case(func)
                 /* multiplication and division */

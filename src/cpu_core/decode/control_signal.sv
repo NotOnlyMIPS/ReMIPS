@@ -10,6 +10,11 @@ module control_signal(
     input   logic is_inst2,
     output  logic is_store_op,
 
+    output  logic is_privileged_op,
+    output  logic is_eret,
+
+    input   logic [1:0]     cp0_sw,
+    input   logic [5:0]     cp0_hw,
     input   exception_t     exception,
     output  exception_t     exception_d
 
@@ -32,7 +37,33 @@ assign func = inst[ 5: 0];
 assign imm  = inst[15: 0];
 assign jidx = inst[25: 0];
 
-assign exception_d = 'b0;
+// exception
+always_comb begin
+    exception_d = exception;
+
+    if(cp0_hw || cp0_sw) begin
+        exception_d.ex      = 1'b1;
+        exception_d.exccode = `EXCCODE_INT;
+    end
+    else if(!exception.ex && valid) begin
+        if(operation == OP_INVALID) begin
+            exception_d.ex      = 1'b1;
+            exception_d.exccode = `EXCCODE_RI;
+        end
+        else if(operation == OP_SYSCALL) begin
+            exception_d.ex      = 1'b1;
+            exception_d.exccode = `EXCCODE_SYS;
+        end
+        else if(operation == OP_BREAK) begin
+            exception_d.ex      = 1'b1;
+            exception_d.exccode = `EXCCODE_BP;
+        end
+    end
+
+    if(!exception.ex && valid && is_privileged_op) begin
+        exception_d.epc = pc+4;
+    end
+end
 
 always_comb begin
     inst_d = '0;
@@ -42,8 +73,13 @@ always_comb begin
     inst_d.sel  = sel;
     inst_d.imm  = imm;
     inst_d.jidx = jidx;
+    
+    inst_d.cp0_addr  = {sel, rd};
 
-    is_store_op = 1'b0;
+    is_store_op      = 1'b0;
+
+    is_privileged_op = 1'b0;
+    is_eret          = 1'b0;
 
     // operation
     unique case(operation) 
@@ -169,10 +205,20 @@ always_comb begin
         OP_SYSCALL, OP_BREAK,
         /* trap */
         OP_TGE, OP_TGEU, OP_TLT, OP_TLTU, OP_TEQ, OP_TNE,
-        /* privileged instructions */
-        OP_CACHE, OP_ERET, OP_MFC0, OP_MTC0,
-        OP_TLBP, OP_TLBR, OP_TLBWI, OP_TLBWR, OP_WAIT: begin
+        OP_TGEI, OP_TGEIU, OP_TLTI, OP_TLTIU, OP_TEQI, OP_TNEI,
+        /* CP0 */
+        OP_MFC0, OP_MTC0: begin
             inst_d.is_sp_op = 1'b1;
+        end
+        /* eret */
+        OP_ERET: begin
+            inst_d.is_sp_op = 1'b1;
+            is_eret = 1'b1;
+        end
+        /* privileged instructions */
+        OP_CACHE, OP_TLBP, OP_TLBR, OP_TLBWI, OP_TLBWR: begin
+            inst_d.is_sp_op  = 1'b1;
+            is_privileged_op = 1'b1;
         end
     endcase
 
@@ -186,6 +232,11 @@ always_comb begin
         OP_BEQ, OP_BNE,
         OP_LWL, OP_LWR,
         OP_SB, OP_SH, OP_SWL, OP_SW, OP_SWR: begin
+            inst_d.use_src1 = 1'b1;
+            inst_d.use_src2 = 1'b1;
+        end
+        OP_TGE, OP_TGEU, OP_TLT, OP_TLTU, OP_TEQ, OP_TNE,
+        OP_TGEI, OP_TGEIU, OP_TLTI, OP_TLTIU, OP_TEQI, OP_TNEI: begin
             inst_d.use_src1 = 1'b1;
             inst_d.use_src2 = 1'b1;
         end
@@ -210,6 +261,9 @@ always_comb begin
             inst_d.use_src1 = 1'b1;
         end
         OP_SLL, OP_SRL, OP_SRA: begin
+            inst_d.use_src2 = 1'b1;
+        end
+        OP_MTC0: begin
             inst_d.use_src2 = 1'b1;
         end
         OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU: begin
@@ -243,7 +297,7 @@ always_comb begin
         OP_MOVN, OP_MOVZ,
         OP_JALR: begin
             inst_d.rf_we = rd != 0;
-            inst_d.dest = rd;
+            inst_d.dest  = rd;
         end
         OP_ADDI, OP_ADDIU, OP_SUBI, OP_SUBIU,
         OP_SLTI, OP_SLTIU,
@@ -254,7 +308,11 @@ always_comb begin
         OP_LB, OP_LH, OP_LWL, OP_LW, OP_LBU, OP_LHU, OP_LWR
         : begin
             inst_d.rf_we = rt != 0;
-            inst_d.dest = rt;
+            inst_d.dest  = rt;
+        end
+        OP_MFC0: begin
+            inst_d.rf_we = rt != 0;
+            inst_d.dest  = rt;
         end
         OP_MTHI:begin
             inst_d.rf_we = 1'b1;

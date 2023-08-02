@@ -1,0 +1,137 @@
+`include "../cpu.svh"
+
+module spu (
+    input clk,
+    input reset,
+
+    input flush,
+
+    input  logic issue_to_spu_valid,
+    // output logic sp_allowin,
+
+    // input  logic cs_allowin,
+    output logic spu_to_valid,
+
+    input  issue_to_execute_bus_t issue_inst,
+
+    // mmu
+    input  phys_t data_paddr,
+
+    // CP0
+    output logic       cp0_we,
+    output logic [7:0] cp0_addr,
+    output uint32_t    cp0_wdata,
+    input  uint32_t    cp0_rdata,
+
+    output execute_to_commit_bus_t spu_to_commit_bus
+
+);
+
+logic spu_valid;
+logic [3:0] rob_entry_num;
+
+decoded_inst_t inst;
+reg_addr_t phy_dest;
+uint32_t src1_value, src2_value;
+
+logic [3:0] rf_we;
+
+assign spu_to_valid = spu_valid;
+
+always_ff @(posedge clk) begin
+    if(reset || flush) begin
+        spu_valid  <= 1'b0;
+        src1_value <= '0;
+        src2_value <= '0;
+        phy_dest   <= '0;
+        inst       <= '0;
+        rob_entry_num <= '0;
+    end else begin
+        spu_valid  <= issue_to_spu_valid;
+        src1_value <= issue_inst.src1_value;
+        src2_value <= issue_inst.src2_value;
+        phy_dest   <= issue_inst.phy_dest;
+        inst       <= issue_inst.inst;
+        rob_entry_num <= issue_inst.rob_entry_num;
+    end
+end
+
+logic op_teq;
+logic op_tne;
+logic op_tlt;
+logic op_tge;
+logic op_tltu;
+logic op_tgeu;
+logic op_tgei;
+logic op_tgeiu;
+logic op_tlti;
+logic op_tltiu;
+logic op_teqi;
+logic op_tnei;
+
+logic op_mfc0;
+logic op_mtc0;
+
+logic op_eret;
+
+logic op_tlbp;
+logic op_tlbwr;
+logic op_tlbwi;
+logic op_tlbr;
+
+logic op_cache;
+
+assign op_teq   = inst.operation == OP_TEQ;
+assign op_tne   = inst.operation == OP_TNE;
+assign op_tlt   = inst.operation == OP_TLT;
+assign op_tge   = inst.operation == OP_TGE;
+assign op_tltu  = inst.operation == OP_TLTU;
+assign op_tgeu  = inst.operation == OP_TGEU;
+assign op_tgei  = inst.operation == OP_TGEI;
+assign op_tgeiu = inst.operation == OP_TGEIU;
+assign op_tlti  = inst.operation == OP_TLTI;
+assign op_tltiu = inst.operation == OP_TLTIU;
+assign op_teqi  = inst.operation == OP_TEQI;
+assign op_tnei  = inst.operation == OP_TNEI;
+
+assign op_mfc0  = inst.operation == OP_MFC0;
+assign op_mtc0  = inst.operation == OP_MTC0;
+
+assign op_eret  = inst.operation == OP_ERET;
+
+assign op_tlbp  = inst.operation == OP_TLBP;
+assign op_tlbwr = inst.operation == OP_TLBWR;
+assign op_tlbwi = inst.operation == OP_TLBWI;
+assign op_tlbr  = inst.operation == OP_TLBR;
+
+assign op_cache = inst.operation == OP_CACHE;
+
+assign rf_we = {4{op_mfc0}};
+
+// CP0
+assign cp0_we    = op_mtc0 && spu_valid;
+assign cp0_addr  = inst.cp0_addr;
+assign cp0_wdata = src2_value;
+
+// exception
+exception_t exception;
+assign exception = '0;
+
+uint32_t spu_result;
+
+assign spu_result = cp0_rdata;
+
+assign spu_to_commit_bus.valid = spu_valid;
+assign spu_to_commit_bus.rob_entry_num = rob_entry_num;
+
+assign spu_to_commit_bus.rf_we    = rf_we;
+assign spu_to_commit_bus.phy_dest = phy_dest;
+assign spu_to_commit_bus.result   = spu_result;
+
+assign spu_to_commit_bus.is_store_op = 1'b0;
+
+assign spu_to_commit_bus.verify_result = 'b0;
+
+assign spu_to_commit_bus.exception = exception;
+
+endmodule

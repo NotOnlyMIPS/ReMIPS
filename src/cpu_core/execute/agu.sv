@@ -13,11 +13,13 @@ module agu (
     output logic agu_to_valid,
 
     input  issue_to_execute_bus_t issue_inst,
-    input  logic commit_store_valid,
-    output logic commit_store_ready,
+    input  logic       commit_store_valid,
+    output logic       commit_store_ready,
+    output exception_t commit_store_ex,
 
     // mmu
     output virt_t      data_vaddr,
+    input  exception_t data_tlb_ex,
 
     // DBus
     output logic       dcache_req,
@@ -91,7 +93,10 @@ uint32_t storebuffer_req_data, storebuffer_req_data_r;
 // writeback
 uint32_t agu_result;
 
-assign agu_readygo = (agu_stage == AGU_store || agu_stage == AGU_store_done ) && (mem_wr)
+// exception
+exception_t addr_ex, tlb_ex;
+
+assign agu_readygo = (agu_stage == AGU_store || agu_stage == AGU_store_done ) && (mem_wr || addr_ex.ex)
                   ||  agu_stage == AGU_done;
 assign agu_allowin = !agu_valid || agu_readygo && cs_allowin;
 assign agu_to_valid = agu_valid && agu_readygo;
@@ -209,6 +214,23 @@ always_ff @(posedge clk) begin
     end
 end
 
+always_comb begin
+    addr_ex = 'b0;
+    if((agu_stage == AGU_store || agu_stage == AGU_store_done)) begin
+        if((op_lh || op_lhu) && mem_addr[0] 
+        ||  op_lw && mem_addr[1:0]) begin
+            addr_ex.ex       = 1'b1;
+            addr_ex.exccode  = `EXCCODE_ADEL;
+            addr_ex.badvaddr = mem_addr;
+        end
+        else if(op_sh && mem_addr[0] || op_sw && mem_addr[1:0]) begin
+            addr_ex.ex       = 1'b1;
+            addr_ex.exccode  = `EXCCODE_ADES;
+            addr_ex.badvaddr = mem_addr;
+        end
+    end
+end
+
 store_buffer store_buffer_u (
     .clk,
     .reset,
@@ -218,7 +240,7 @@ store_buffer store_buffer_u (
     .pre_store,
     .load_wait,
 
-    .valid      (agu_stage == AGU_store),
+    .valid      (agu_stage == AGU_store && !addr_ex.ex),
     .wr         (mem_wr),
     .buffer_we  (mem_we),
     .buffer_size(store_size),
@@ -336,6 +358,26 @@ always_comb begin
     end
 end
 
+// tlb exception
+always_ff @(posedge clk) begin
+    if(reset || flush) begin
+        tlb_ex <= 'b0;
+    end
+    else if(agu_stage == AGU_response && dcache_data_ok && !data_cancel) begin
+        tlb_ex <= data_tlb_ex;
+    end
+end
+
+// commit store exception
+always_ff @(posedge clk) begin
+    if(reset || flush) begin
+        commit_store_ex <= 'b0;
+    end
+    else if(storebuffer_req_state == Store_Req_Data && dcache_data_ok && !data_cancel) begin
+        commit_store_ex <= data_tlb_ex;
+    end
+end
+
 assign agu_to_commit_bus.valid = agu_to_valid;
 assign agu_to_commit_bus.rob_entry_num = rob_entry_num;
 
@@ -347,6 +389,6 @@ assign agu_to_commit_bus.is_store_op = mem_wr;
 
 assign agu_to_commit_bus.verify_result = 'b0;
 
-assign agu_to_commit_bus.exception = 'b0;
+assign agu_to_commit_bus.exception = agu_stage == AGU_done ? tlb_ex : addr_ex;
 
 endmodule

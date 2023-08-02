@@ -4,9 +4,9 @@ module pre_fetch_stage (
     input  clk,
     input  reset,
 
-    input  logic flush,
-    // input  flush_src_t flush_src,
-    // input  virt_t      epc,
+    input  logic       flush,
+    input  flush_src_t flush_src,
+    input  virt_t      epc,
 
     input  logic fs_allowin,
     output logic pfs_to_valid,
@@ -43,11 +43,14 @@ virt_t next_pc;
 virt_t branch_target, correction_target;
 next_pc_src_t next_pc_src;
 
+logic exception_en;
+exception_t exception1, exception2;
+
 assign icache_req  = pfs_valid && fs_allowin && !flush;
 assign icache_addr = {next_pc[31:3], 3'b0};
 assign inst_vaddr  = icache_addr;
 
-assign pfs_readygo  = icache_req && icache_addr_ok;
+assign pfs_readygo  = icache_req && icache_addr_ok || exception_en;
 assign pfs_allowin  = !pfs_valid || pfs_readygo && fs_allowin;
 assign pfs_to_valid = pfs_readygo && pfs_valid;
 
@@ -68,12 +71,16 @@ always_ff @(posedge clk) begin
         pc     <= 32'hbfbf_fff8;
         seq_pc <= 32'hbfc0_0000;
     end
+    else if(flush) begin
+        pc     <= epc-4;
+        seq_pc <= epc;
+    end
     else if(pfs_to_valid && fs_allowin) begin
         pc     <= next_pc;
         seq_pc <= next_pc[2] ? next_pc+4 : next_pc+8;
     end
 
-    if(reset) begin
+    if(reset || flush_src.eret || flush_src.privileged_inst || flush_src.exception) begin
         next_pc_src <= Seq_PC;
     end
     else begin
@@ -91,7 +98,7 @@ always_ff @(posedge clk) begin
             end
             Branch_Delay     : next_pc_src <= Branch_Target;
             Branch_Target    : next_pc_src <= icache_addr_ok ? Seq_PC : Branch_Target;
-            Correction_Target: next_pc_src <= icache_addr_ok ? Seq_PC : Correction_Target;
+            Correction_Target: next_pc_src <= (icache_addr_ok || exception_en) ? Seq_PC : Correction_Target;
             default          : next_pc_src <= Seq_PC;
         endcase
     end
@@ -109,13 +116,31 @@ always_ff @(posedge clk) begin
 
 end
 
+// exception
+always_comb begin
+    exception_en = '0;
+    exception1   = '0;
+    exception2   = '0;
+    exception1.epc = {next_pc[31:3], 1'b0, next_pc[1:0]};
+    exception2.epc = {next_pc[31:3], 1'b1, next_pc[1:0]};
+    exception1.badvaddr = {next_pc[31:3], 1'b0, next_pc[1:0]};
+    exception2.badvaddr = {next_pc[31:3], 1'b1, next_pc[1:0]};
+    if(pfs_valid && next_pc[1:0] != 2'b0) begin
+        exception_en  = 1'b1;
+        exception1.ex = 1'b1;
+        exception1.exccode = `EXCCODE_ADEL;
+        exception2.ex = 1'b1;
+        exception2.exccode = `EXCCODE_ADEL;
+    end
+end
+
 assign prefetch_to_fetch_bus1.valid     = pfs_to_valid && !next_pc[2];
 assign prefetch_to_fetch_bus1.pc        = {next_pc[31:3], 3'b000};
-assign prefetch_to_fetch_bus1.exception      = '0;
+assign prefetch_to_fetch_bus1.exception = exception1;
 
 assign prefetch_to_fetch_bus2.valid     = pfs_to_valid;
 assign prefetch_to_fetch_bus2.pc        = {next_pc[31:3], 3'b100};
-assign prefetch_to_fetch_bus2.exception      = '0;
+assign prefetch_to_fetch_bus2.exception = exception2;
 
 
 endmodule

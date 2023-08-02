@@ -7,9 +7,9 @@ module alu(
     input flush,
 
     input  logic issue_to_alu_valid,
-    output logic alu_allowin,
+    // output logic alu_allowin,
 
-    input  logic cs_allowin,
+    // input  logic cs_allowin,
     output logic alu_to_valid,
 
     input  issue_to_execute_bus_t issue_inst,
@@ -30,7 +30,7 @@ uint32_t src1_value, src2_value;
 // virt_t inst_pc;
 exception_t exception;
 
-assign alu_allowin  = cs_allowin || !alu_valid;
+// assign alu_allowin  = cs_allowin || !alu_valid;
 assign alu_to_valid = alu_valid;
 
 always_ff @(posedge clk) begin
@@ -42,7 +42,7 @@ always_ff @(posedge clk) begin
         src2_value <= 'b0;
         rob_entry_num <= 'b0;
     end
-    else if(alu_allowin) begin
+    else begin
         alu_valid  <= issue_to_alu_valid;
         inst       <= issue_inst.inst;
         phy_dest   <= issue_inst.phy_dest;
@@ -183,6 +183,15 @@ assign alu_result = ({32{op_add|op_addu|op_sub|op_subu  }} & add_sub_result)
                   | ({32{op_srl|op_sra                  }} & sr_result)
                   | ({32{op_mfhi|op_mflo|op_mthi|op_mtlo}} & src1_value);
 
+// exception
+always_comb begin
+    exception = '0;
+    if(alu_valid && alu_ex) begin
+        exception.ex      = 1'b1;
+        exception.exccode = `EXCCODE_OV;
+    end
+end
+
 // bypass
 assign alu_bypass_bus = {{4{inst.rf_we&alu_valid}}, phy_dest, alu_result};
 
@@ -197,6 +206,6 @@ assign alu_to_commit_bus.is_store_op = 1'b0;
 
 assign alu_to_commit_bus.verify_result = 'b0;
 
-assign alu_to_commit_bus.exception = '0;
+assign alu_to_commit_bus.exception = exception;
 
 endmodule

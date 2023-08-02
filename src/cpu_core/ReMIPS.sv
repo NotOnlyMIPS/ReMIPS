@@ -98,7 +98,7 @@ logic           uncache_wr_bvalid;
 
 cpu_core u_cpu_core(
     .clk,
-    .reset,
+    .reset(~resetn),
 
     .ext_int,
 

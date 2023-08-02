@@ -166,13 +166,15 @@ typedef struct packed {
 
 // exception
 typedef struct packed {
-    //TLB
-    logic        tlb_refill;
+    logic        ex;
+    logic [4:0]  exccode;
+    virt_t       badvaddr;
+    virt_t       epc;
 
     logic        bd;
-    logic        ex;
-    logic [ 4:0] exccode;
-    virt_t       badvaddr;
+
+    //TLB
+    logic        tlb_refill;
 } exception_t;
 
 // BPU
@@ -234,6 +236,8 @@ typedef struct packed {
     logic is_mul_div_op;
     logic is_br_op;
     logic is_store_op;
+    logic is_privileged_op;
+    logic is_eret;
 
     verify_result_t verify_result;
 
@@ -322,9 +326,11 @@ typedef struct packed {
     uint16_t    imm;
     logic[25:0] jidx;
 
-    branch_type_t   branch_type;
+    branch_type_t branch_type;
 
     CacheCodeType cache_op;
+
+    logic [7:0]   cp0_addr;
 } decoded_inst_t;
 
 typedef struct packed {
@@ -336,7 +342,9 @@ typedef struct packed {
     logic       br_taken;
     BHT_entry_t bpu_entry;
 
-    exception_t      exception;
+    logic       is_privileged_op;
+    logic       is_eret;
+    exception_t exception;
 } decode_to_map_bus_t;
 
 typedef struct packed {
@@ -368,8 +376,6 @@ typedef struct packed {
 
     logic       br_taken;
     BHT_entry_t bpu_entry;
-
-    exception_t exception;
 } decode_to_issue_bus_t;
 
 // ISSUE stage
@@ -393,8 +399,6 @@ typedef struct packed {
 
     logic       br_taken;
     BHT_entry_t bpu_entry;
-
-    exception_t exception;
 } issue_entry_t;
 
 typedef struct packed {
@@ -419,8 +423,6 @@ typedef struct packed {
 
     logic       br_taken;
     BHT_entry_t bpu_entry;
-
-    exception_t exception;
 } select_to_issue_bus_t;
 
 typedef struct packed {
@@ -446,8 +448,6 @@ typedef struct packed {
 
     logic       br_taken;
     BHT_entry_t bpu_entry;
-
-    exception_t exception;
 } issue_to_execute_bus_t;
 
 // EXE stage
@@ -530,6 +530,7 @@ typedef struct packed {
 
 //MMU/TLB
 typedef logic [$clog2(`TLB_ENTRIES_NUM)-1:0] tlb_index_t;
+
 typedef struct packed {
     phys_t phy_addr;
     tlb_index_t which;

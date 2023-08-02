@@ -9,12 +9,12 @@ module issue_stage (
     input  logic ds_to_is_valid,
     output logic is_allowin,
 
-    input  logic alu1_allowin,
-    input  logic bru_allowin,
+    // input  logic alu1_allowin,
+    // input  logic bru_allowin,
     input  logic mul_div_allowin,
-    input  logic alu2_allowin,
+    // input  logic alu2_allowin,
     input  logic agu_allowin,
-    input  logic sp_allowin,
+    // input  logic sp_allowin,
 
     // bypass
     input  bypass_bus_t alu1_bypass_bus,
@@ -48,12 +48,12 @@ logic select_to_issue_valid;
 
 logic issue_stage_valid;
 
-
 // issue queue
 issue_entry_t issue_queue[ISSUE_QUEUE_SIZE-1:0]; // alu1, mul_div, branch; alu2, load_store, spcial
 issue_entry_t issue_queue_bus[ISSUE_QUEUE_SIZE-1:0]; 
 logic issue_queue_full;
-logic [3:0] issue_queue_num, issue_queue_tail, issue_queue_tail_next;
+logic [3:0] issue_queue_num_full, issue_queue_num_tail, issue_queue_num_valid;
+logic [3:0] issue_queue_tail, issue_queue_tail_next;
 logic [1:0] compress_entry_num[ISSUE_QUEUE_SIZE-1:0];
 
 logic select_inst1_valid, select_inst2_valid;
@@ -67,7 +67,7 @@ logic select_exe1_valid, select_exe2_valid;
 logic [2:0] select_exe1_num, select_exe2_num;
 
 
-assign issue_queue_full = (issue_queue_num == ISSUE_QUEUE_SIZE || issue_queue_num == ISSUE_QUEUE_SIZE-1);
+assign issue_queue_full = (issue_queue_num_full == ISSUE_QUEUE_SIZE || issue_queue_num_full == ISSUE_QUEUE_SIZE-1);
 
 always_ff @(posedge clk) begin
     // issue queue
@@ -96,10 +96,16 @@ always_ff @(posedge clk) begin
     end
 
     if(reset || flush) begin
-        issue_queue_num <= 3'd0;
+        issue_queue_num_full  <= 3'd0;
+        issue_queue_num_tail  <= 3'd0;
+        issue_queue_num_valid <= 3'd0;
     end else begin
-        issue_queue_num <= issue_queue_num + {3'b0, decode_to_issue_bus1.valid && is_allowin} + {3'b0, decode_to_issue_bus2.valid && is_allowin}
-                                           - {3'b0, select_inst1_valid}         - {3'b0, select_inst2_valid};
+        issue_queue_num_full  <= issue_queue_num_full  + {3'b0, decode_to_issue_bus1.valid && is_allowin} + {3'b0, decode_to_issue_bus2.valid && is_allowin}
+                                                       - {3'b0, select_inst1_valid}         - {3'b0, select_inst2_valid};
+        issue_queue_num_tail  <= issue_queue_num_tail  + {3'b0, decode_to_issue_bus1.valid && is_allowin} + {3'b0, decode_to_issue_bus2.valid && is_allowin}
+                                                       - {3'b0, select_inst1_valid}         - {3'b0, select_inst2_valid};
+        issue_queue_num_valid <= issue_queue_num_valid + {3'b0, decode_to_issue_bus1.valid && is_allowin} + {3'b0, decode_to_issue_bus2.valid && is_allowin}
+                                                       - {3'b0, select_inst1_valid}         - {3'b0, select_inst2_valid};
     end
 
     // FU busy
@@ -115,13 +121,13 @@ always_ff @(posedge clk) begin
     || agu_busy && !(issue_to_execute_bus2.inst.is_load_store_op && issue_to_execute_bus2.valid)) begin
         agu_busy <= 1'b0;
     end
-    else if(select_exe2_valid && issue_queue[select_exe2_num].inst.is_load_store_op) begin
+    else if(select_inst2_valid && issue_queue[select_inst2_num].inst.is_load_store_op) begin
         agu_busy <= 1'b1;
     end
 end
 
 always_comb begin
-    issue_queue_tail = issue_queue_num - {3'b0, select_inst1_valid} - {3'b0, select_inst2_valid};
+    issue_queue_tail = issue_queue_num_tail - {3'b0, select_inst1_valid} - {3'b0, select_inst2_valid};
     issue_queue_tail_next = issue_queue_tail + 1;
 
     for(int i=0; i<ISSUE_QUEUE_SIZE; i++) begin
@@ -132,7 +138,7 @@ end
 
 // select and wakeup stage
 
-assign select_stage_valid = (issue_queue_num != 3'd0);
+assign select_stage_valid = (issue_queue_num_valid != 3'd0);
 assign select_stage_ready_go = select_inst1_valid || select_inst2_valid;
 assign is_allowin = !issue_queue_full;
 assign select_to_issue_valid = select_inst1_valid || select_inst2_valid;
@@ -163,8 +169,8 @@ always_comb begin
     select_exe1_num = 3'd0;
     for(int i=0; i<ISSUE_QUEUE_SIZE; i++) begin
         if(issue_queue[i].valid &&
-          (issue_queue[i].inst.is_alu1_op   && alu1_allowin
-        || issue_queue[i].inst.is_br_op && bru_allowin)
+          (issue_queue[i].inst.is_alu1_op
+        || issue_queue[i].inst.is_br_op)
         && issue_queue[i].src1_ready && issue_queue[i].src2_ready) begin
             select_exe1_valid = 1'b1;
             select_exe1_num = i;
@@ -177,9 +183,9 @@ always_comb begin
     select_exe2_num = 3'd0;
     for(int i=0; i<ISSUE_QUEUE_SIZE; i++) begin
         if(issue_queue[i].valid &&
-          (issue_queue[i].inst.is_alu2_op && alu2_allowin
+          (issue_queue[i].inst.is_alu2_op
         || issue_queue[i].inst.is_load_store_op && agu_allowin && issue_queue[i].pre_store_ready && !agu_busy
-        || issue_queue[i].inst.is_sp_op && sp_allowin)
+        || issue_queue[i].inst.is_sp_op)
         && issue_queue[i].src1_ready && issue_queue[i].src2_ready) begin
             select_exe2_valid = 1'b1;
             select_exe2_num = i;
@@ -292,8 +298,6 @@ assign select_to_issue_bus1.pre_store     = 'b0;
 assign select_to_issue_bus1.br_taken  = issue_queue[select_inst1_num].br_taken;
 assign select_to_issue_bus1.bpu_entry = issue_queue[select_inst1_num].bpu_entry;
 
-assign select_to_issue_bus1.exception = issue_queue[select_inst1_num].exception;
-
 // inst2
 assign select_to_issue_bus2.valid = select_inst2_valid;
 assign select_to_issue_bus2.pc    = issue_queue[select_inst2_num].pc;
@@ -311,8 +315,6 @@ assign select_to_issue_bus2.pre_store     = issue_queue[select_inst2_num].pre_st
 
 assign select_to_issue_bus2.br_taken  = issue_queue[select_inst2_num].br_taken;
 assign select_to_issue_bus2.bpu_entry = issue_queue[select_inst2_num].bpu_entry;
-
-assign select_to_issue_bus2.exception = issue_queue[select_inst2_num].exception;
 
 
 // issue stage
@@ -505,8 +507,6 @@ assign issue_to_execute_bus1.pre_store = issue_inst1.pre_store;
 assign issue_to_execute_bus1.br_taken  = issue_inst1.br_taken;
 assign issue_to_execute_bus1.bpu_entry = issue_inst1.bpu_entry;
 
-assign issue_to_execute_bus1.exception = issue_inst1.exception;
-
 // inst2
 assign issue_to_execute_bus2.valid = issue_inst2.valid;
 assign issue_to_execute_bus2.pc    = issue_inst2.pc;
@@ -523,7 +523,5 @@ assign issue_to_execute_bus2.pre_store = issue_inst2.pre_store;
 
 assign issue_to_execute_bus2.br_taken  = issue_inst2.br_taken;
 assign issue_to_execute_bus2.bpu_entry = issue_inst2.bpu_entry;
-
-assign issue_to_execute_bus2.exception = issue_inst2.exception;
 
 endmodule

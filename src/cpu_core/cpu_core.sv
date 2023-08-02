@@ -19,8 +19,25 @@ module cpu_core(
 
 );
 
+// reset
+logic prefetch_reset, fetch_reset, decode_reset, issue_reset, execute_reset, commit_reset;
+logic bpu_reset, cp0_reset, mmu_reset;
+
+always_ff @(posedge clk) begin
+    prefetch_reset <= reset;
+    fetch_reset    <= reset;
+    decode_reset   <= reset;
+    issue_reset    <= reset;
+    execute_reset  <= reset;
+    commit_reset   <= reset;
+    bpu_reset      <= reset;
+    cp0_reset      <= reset;
+    mmu_reset      <= reset;
+end
+
 logic       flush;
 flush_src_t flush_src;
+virt_t      epc;
 
 // pipeline
 prefetch_to_fetch_bus_t prefetch_to_fetch_bus1, prefetch_to_fetch_bus2;
@@ -32,7 +49,8 @@ execute_to_commit_bus_t execute_to_commit_bus1, execute_to_commit_bus2;
 
 logic pfs_to_valid, fs_to_valid, ds_to_is_valid, ds_to_rob_valid;
 logic fs_allowin, ds_allowin, is_allowin, cs_allowin;
-logic alu1_allowin, bru_allowin, mul_div_allowin, alu2_allowin, agu_allowin, sp_allowin;
+// logic alu1_allowin, bru_allowin, mul_div_allowin, alu2_allowin, agu_allowin, sp_allowin;
+logic mul_div_allowin, agu_allowin;
 
 // BPU
 bpu_to_prefetch_bus_t bpu_predict_result;
@@ -46,6 +64,7 @@ logic select_store_ready;
 writeback_to_rf_bus_t writeback_to_rf_bus1, writeback_to_rf_bus2;
 
 // commit
+exception_t commit_store_ex;
 logic       commit_store_valid, commit_store_ready;
 logic       rob_empty;
 logic [3:0] rob_tail_o;
@@ -65,6 +84,7 @@ commit_to_debug_bus_t commit_to_debug_bus1, commit_to_debug_bus2;
 `endif
 
 // tlb/mmu
+logic            kseg0_uncached;
 virt_t           inst_vaddr;
 virt_t           data_vaddr;
 mmu_result_t     inst_result;
@@ -152,10 +172,23 @@ assign DBus.cache_way   = '0;
 assign DBus.cache_dirty = '0;
 assign DBus.tlb_ex      = '0;
 
+// CP0
+logic [1:0] cp0_sw;
+logic [5:0] cp0_hw;
+
+logic       cp0_we;
+logic [7:0] cp0_addr;
+uint32_t    cp0_wdata;
+uint32_t    cp0_rdata;
+
+exception_t exception;
+
 // BPU
 BPU u_BPU (
     .clk  ,
-    .reset,
+    .reset(bpu_reset),
+
+    .flush_src,
 
     .bpu_verify_result,
     .fetch_to_bpu_bus,
@@ -165,9 +198,11 @@ BPU u_BPU (
 // PreFetch stage
 pre_fetch_stage u_prefetch_stage (
     .clk  ,
-    .reset,
+    .reset(prefetch_reset),
 
     .flush,
+    .flush_src,
+    .epc,
 
     // pipeline control
     .fs_allowin,
@@ -183,8 +218,6 @@ pre_fetch_stage u_prefetch_stage (
 
     // tlb/mmu
     .inst_vaddr,
-    // .tlb_cache_pc   (tlb_cache_pc   ),
-    // .inst_tlb_ex    (inst_tlb_ex    ),
 
     // to IF
     .prefetch_to_fetch_bus1,
@@ -195,7 +228,7 @@ pre_fetch_stage u_prefetch_stage (
 // Fetch stage
 fetch_stage u_fetch_stage (
     .clk  ,
-    .reset,
+    .reset(fetch_reset),
     .flush,
 
     // pipeline control
@@ -219,6 +252,11 @@ fetch_stage u_fetch_stage (
     .bpu_entry(bpu_predict_result.entry),
     .fetch_to_bpu_bus,
 
+    // tlb exception
+    .inst_tlb_ex     (inst_tlb_ex.ex),
+    .inst_tlb_exccode(inst_tlb_ex.exccode),
+    .inst_tlb_refill (inst_tlb_ex.tlb_refill),
+
     // to ID
     .fetch_to_decode_bus1,
     .fetch_to_decode_bus2
@@ -228,9 +266,13 @@ fetch_stage u_fetch_stage (
 // Decode stage
 decode_stage u_decode_stage (
     .clk,
-    .reset,
+    .reset(decode_reset),
     
     .flush,
+
+    // exception
+    .cp0_sw,
+    .cp0_hw,
     
     .fs_to_valid,
     .ds_allowin,
@@ -259,6 +301,8 @@ decode_stage u_decode_stage (
     .decode_to_issue_bus2,
     
     .select_store_ready,
+
+    .rob_empty,
     .rob_tail_o,
     .map_to_rob_bus1,
     .map_to_rob_bus2
@@ -267,19 +311,19 @@ decode_stage u_decode_stage (
 // Issue stage
 issue_stage u_issue_stage (
     .clk,
-    .reset,
+    .reset(issue_reset),
     
     .flush,
     
     .ds_to_is_valid,
     .is_allowin,
     
-    .alu1_allowin,
-    .bru_allowin,
+    // .alu1_allowin,
+    // .bru_allowin,
     .mul_div_allowin,
-    .alu2_allowin,
+    // .alu2_allowin,
     .agu_allowin,
-    .sp_allowin,
+    // .sp_allowin,
     
     // bypass
     .alu1_bypass_bus,
@@ -308,19 +352,21 @@ issue_stage u_issue_stage (
 // Execute stage
 execute_stage u_execute_stage (
     .clk,
-    .reset,
+    .reset(execute_reset),
     
     .flush,
     
-    .alu1_allowin,
-    .alu2_allowin,
+    // .alu1_allowin,
+    // .alu2_allowin,
     .mul_div_allowin,
-    .bru_allowin,
+    // .bru_allowin,
     .agu_allowin,
-    .sp_allowin,
+    // .sp_allowin,
 
     // mmu
     .data_vaddr,
+    .data_paddr(data_result.phy_addr),
+    .data_tlb_ex,
 
     // DCache
     .dcache_req,
@@ -340,10 +386,17 @@ execute_stage u_execute_stage (
     
     .issue_to_execute_bus1,
     .issue_to_execute_bus2,
+
+    // CP0
+    .cp0_we,
+    .cp0_addr,
+    .cp0_wdata,
+    .cp0_rdata,
     
     // commit store
     .commit_store_valid,
     .commit_store_ready,
+    .commit_store_ex,
     
     // commit
     .execute_to_commit_bus1,
@@ -354,7 +407,7 @@ execute_stage u_execute_stage (
 // Commit stage
 commit_stage u_commit_stage (
     .clk,
-    .reset,
+    .reset(commit_reset),
     
     .flush,
     .flush_src,
@@ -374,8 +427,10 @@ commit_stage u_commit_stage (
     
     .execute_to_commit_bus1,
     .execute_to_commit_bus2,
+
     .commit_store_ready,
     .commit_store_valid,
+    .commit_store_ex,
     
     .writeback_to_busytable_bus1,
     .writeback_to_busytable_bus2,
@@ -386,17 +441,18 @@ commit_stage u_commit_stage (
     .bpu_verify_result,
     
     .writeback_to_rf_bus1,
-    .writeback_to_rf_bus2
+    .writeback_to_rf_bus2,
 
+    .exception
 
 );
 
 // MMU
 mmu u_mmu (
     .clk,
-    .reset,
+    .reset(mmu_reset),
     // .asid,
-    .kseg0_uncached('0),
+    .kseg0_uncached,
     .is_user_mode('0),
     .inst_vaddr,
     .data_vaddr,
@@ -414,10 +470,52 @@ mmu u_mmu (
     // .tlbp_index,
     
     
-    // .load_op,
-    // .store_op,
+    .load_op  (dcache_req && !dcache_wr),
+    .store_op (dcache_req &&  dcache_wr),
     .inst_tlb_ex,
     .data_tlb_ex
+
+);
+
+// CP0
+reg_cp0 u_reg_cp0 (
+    .clk,
+    .reset(cp0_reset),
+
+    // interrupt
+    .ext_int,
+    .cp0_hw,
+    .cp0_sw,
+
+    // TLB
+    .kseg0_uncached,
+
+    // .tlb_asid,
+    // .tlbrw_index,
+    // .tlbrw_we,
+    // .tlbrw_wdata,
+    // .tlbrw_rdata,
+    // .tlbp_entry_hi,
+    // .tlbp_index,
+
+    // Cache
+    // .cache_valid,
+    // .cache_tag,
+    // .cache_dirty,
+    // .cache_op,
+    // .cache_index,
+    // .cache_way,
+
+    // Exception
+    .cp0_we,
+    .cp0_addr,
+    .cp0_wdata,
+    .cp0_rdata,
+
+    .flush_src,
+    .exception,
+
+    .epc
 
 );
 
@@ -426,7 +524,7 @@ mmu u_mmu (
 test_write u_test_write (
 
     .clk,
-    .reset,
+    .reset(commit_reset),
 
     .flush,
 

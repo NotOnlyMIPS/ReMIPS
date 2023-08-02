@@ -6,12 +6,17 @@ module execute_stage(
 
     input  flush,
 
-    output logic alu1_allowin,
-    output logic alu2_allowin,
+    // output logic alu1_allowin,
+    // output logic alu2_allowin,
     output logic mul_div_allowin,
-    output logic bru_allowin,
+    // output logic bru_allowin,
     output logic agu_allowin,
-    output logic sp_allowin,
+    // output logic sp_allowin,
+
+    // MMU
+    output virt_t      data_vaddr,
+    input  phys_t      data_paddr,
+    input  exception_t data_tlb_ex,
 
     // DCache
     output logic       dcache_req,
@@ -24,9 +29,6 @@ module execute_stage(
     input  logic       dcache_data_ok,
     input  uint32_t    dcache_rdata,
 
-    // MMU
-    output virt_t      data_vaddr,
-
     // bypass
     output bypass_bus_t alu1_bypass_bus,
     output bypass_bus_t alu2_bypass_bus,
@@ -35,9 +37,16 @@ module execute_stage(
     input  issue_to_execute_bus_t issue_to_execute_bus1,
     input  issue_to_execute_bus_t issue_to_execute_bus2,
 
+    // CP0
+    output logic       cp0_we,
+    output logic [7:0] cp0_addr,
+    output uint32_t    cp0_wdata,
+    input  uint32_t    cp0_rdata,
+
     // commit store
-    input  logic commit_store_valid,
-    output logic commit_store_ready,
+    input  logic       commit_store_valid,
+    output logic       commit_store_ready,
+    output exception_t commit_store_ex,
 
     // commit
     output execute_to_commit_bus_t execute_to_commit_bus1,
@@ -51,14 +60,14 @@ logic issue_to_alu1_valid;
 logic issue_to_bru_valid;
 logic issue_to_alu2_valid;
 logic issue_to_agu_valid;
-logic issue_to_sp_valid;
+logic issue_to_spu_valid;
 
 assign issue_to_mul_div_valid = issue_to_execute_bus1.valid && issue_to_execute_bus1.inst.is_mul_div_op;
 assign issue_to_alu1_valid    = issue_to_execute_bus1.valid && issue_to_execute_bus1.inst.is_alu1_op;
 assign issue_to_bru_valid     = issue_to_execute_bus1.valid && issue_to_execute_bus1.inst.is_br_op;
 assign issue_to_alu2_valid    = issue_to_execute_bus2.valid && issue_to_execute_bus2.inst.is_alu2_op;
 assign issue_to_agu_valid     = issue_to_execute_bus2.valid && issue_to_execute_bus2.inst.is_load_store_op;
-assign issue_to_sp_valid      = issue_to_execute_bus2.valid && issue_to_execute_bus2.inst.is_sp_op;
+assign issue_to_spu_valid     = issue_to_execute_bus2.valid && issue_to_execute_bus2.inst.is_sp_op;
 
 // cs_allowin
 logic alu1_to_cs_allowin;
@@ -66,22 +75,22 @@ logic alu2_to_cs_allowin;
 logic mul_div_to_cs_allowin;
 logic bru_to_cs_allowin;
 logic agu_to_cs_allowin;
-logic sp_to_cs_allowin;
+logic spu_to_cs_allowin;
 
 logic alu1_to_valid;
 logic alu2_to_valid;
 logic mul_div_to_valid;
 logic bru_to_valid;
 logic agu_to_valid;
-logic sp_to_valid;
+logic spu_to_valid;
 
 assign alu1_to_cs_allowin    = 1'b1;
 assign bru_to_cs_allowin     = 1'b1;
-assign mul_div_to_cs_allowin = !alu1_to_valid && !bru_to_valid && !alu2_to_valid && !agu_to_valid && !sp_to_valid;
+assign mul_div_to_cs_allowin = !alu1_to_valid && !bru_to_valid && !alu2_to_valid && !agu_to_valid && !spu_to_valid;
 
 assign alu2_to_cs_allowin    = 1'b1;
-assign agu_to_cs_allowin     = !alu2_to_valid && !sp_to_valid;
-assign sp_to_cs_allowin      = 1'b1;
+assign agu_to_cs_allowin     = !alu2_to_valid && !spu_to_valid;
+assign spu_to_cs_allowin      = 1'b1;
 
 // commit
 execute_to_commit_bus_t alu1_to_commit_bus;
@@ -90,7 +99,7 @@ execute_to_commit_bus_t mul_div_to_commit_bus1;
 execute_to_commit_bus_t mul_div_to_commit_bus2;
 execute_to_commit_bus_t bru_to_commit_bus;
 execute_to_commit_bus_t agu_to_commit_bus;
-execute_to_commit_bus_t sp_to_commit_bus;
+execute_to_commit_bus_t spu_to_commit_bus;
 
 always_comb begin
     execute_to_commit_bus1 = 'b0;
@@ -98,7 +107,9 @@ always_comb begin
 
     if(!mul_div_to_cs_allowin)begin
         execute_to_commit_bus1 = alu1_to_valid ? alu1_to_commit_bus : bru_to_commit_bus;
-        execute_to_commit_bus2 = alu2_to_valid ? alu2_to_commit_bus : agu_to_commit_bus;
+        execute_to_commit_bus2 = spu_to_valid   ? spu_to_commit_bus   :
+                                 alu2_to_valid ? alu2_to_commit_bus :
+                                                 agu_to_commit_bus  ;
     end
     else begin
         execute_to_commit_bus1 = mul_div_to_commit_bus1;
@@ -113,9 +124,9 @@ alu alu1 (
     .flush,
 
     .issue_to_alu_valid(issue_to_alu1_valid),
-    .alu_allowin       (alu1_allowin       ),
+    // .alu_allowin       (alu1_allowin       ),
 
-    .cs_allowin        (alu1_to_cs_allowin ),
+    // .cs_allowin        (alu1_to_cs_allowin ),
     .alu_to_valid      (alu1_to_valid      ),
 
     .issue_inst         (issue_to_execute_bus1),
@@ -149,9 +160,9 @@ bru bru_u (
     .flush,
 
     .issue_to_bru_valid(issue_to_bru_valid),
-    .bru_allowin       (bru_allowin       ),
+    // .bru_allowin       (bru_allowin       ),
 
-    .cs_allowin        (bru_to_cs_allowin ),
+    // .cs_allowin        (bru_to_cs_allowin ),
     .bru_to_valid,
 
     .issue_inst         (issue_to_execute_bus1),
@@ -166,9 +177,9 @@ alu alu2 (
     .flush,
 
     .issue_to_alu_valid(issue_to_alu2_valid),
-    .alu_allowin       (alu2_allowin       ),
+    // .alu_allowin       (alu2_allowin       ),
 
-    .cs_allowin        (alu2_to_cs_allowin ),
+    // .cs_allowin        (alu2_to_cs_allowin ),
     .alu_to_valid      (alu2_to_valid      ),
 
     .issue_inst         (issue_to_execute_bus2),
@@ -194,9 +205,11 @@ agu agu_u (
     // commit store
     .commit_store_valid,
     .commit_store_ready,
+    .commit_store_ex,
 
     // mmu
     .data_vaddr,
+    .data_tlb_ex,
 
     // DBus
     .dcache_req,
@@ -214,8 +227,29 @@ agu agu_u (
 
 
 // special unit
-// assign sp_allowin  = 1'b0;
-assign sp_to_valid = 1'b0;
+spu spu_u (
+    .clk,
+    .reset,
+    .flush,
 
+    .issue_to_spu_valid(issue_to_spu_valid),
+    // .spu_allowin       (spu_allowin       ),
+
+    // .cs_allowin        (spu_to_cs_allowin ),
+    .spu_to_valid,
+
+    .issue_inst        (issue_to_execute_bus2),
+
+    // mmu
+    .data_paddr,
+
+    // cp0
+    .cp0_we,
+    .cp0_addr,
+    .cp0_wdata,
+    .cp0_rdata,
+
+    .spu_to_commit_bus
+);
 
 endmodule

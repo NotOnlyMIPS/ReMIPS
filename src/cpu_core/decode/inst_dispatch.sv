@@ -48,13 +48,20 @@ module inst_dispatch (
 
     // map to rob
     // inst1
-    input  reg_addr_t inst1_old_dest,
+    input  reg_addr_t  inst1_old_dest,
 
-    output rob_entry_t map_to_rob_bus1,
+    input  logic       inst1_is_privileged_op,
+    input  logic       inst1_is_eret,
+    input  exception_t inst1_exception,
 
     // inst2
-    input  reg_addr_t inst2_old_dest,
+    input  reg_addr_t  inst2_old_dest,
 
+    input  logic       inst2_is_privileged_op,
+    input  logic       inst2_is_eret,
+    input  exception_t inst2_exception,
+
+    output rob_entry_t map_to_rob_bus1,
     output rob_entry_t map_to_rob_bus2
 
 );
@@ -80,7 +87,7 @@ end
 
 // decode to issue
 // inst1
-assign pre_issue_inst1.valid = inst1_valid && ds_to_is_valid;
+assign pre_issue_inst1.valid = inst1_valid && ds_to_is_valid && !inst1_exception.ex;
 assign pre_issue_inst1.pc    = inst1_pc;
 
 assign pre_issue_inst1.src1_ready = inst1_src1_ready;
@@ -100,10 +107,8 @@ assign pre_issue_inst1.store_num       = store_tail;
 assign pre_issue_inst1.br_taken  = inst1_br_taken;
 assign pre_issue_inst1.bpu_entry = inst1_bpu_entry;
 
-assign pre_issue_inst1.exception = 'b0;
-
 // inst2
-assign pre_issue_inst2.valid = inst2_valid && ds_to_is_valid;
+assign pre_issue_inst2.valid = inst2_valid && ds_to_is_valid && !inst1_exception.ex && !inst2_exception.ex;
 assign pre_issue_inst2.pc    = inst2_pc;
 
 assign pre_issue_inst2.src1_ready = inst2_src1_ready;
@@ -123,11 +128,11 @@ assign pre_issue_inst2.store_num       = inst1_valid&&inst1_is_store_op ? store_
 assign pre_issue_inst2.br_taken  = inst2_br_taken;
 assign pre_issue_inst2.bpu_entry = inst2_bpu_entry;
 
-assign pre_issue_inst2.exception = 'b0;
-
 // map to rob
 // inst1
-assign dispatch_inst1.state = inst1_valid && ds_to_rob_valid ? Inst_Wait : Inst_Invalid;
+assign dispatch_inst1.state = inst1_valid && ds_to_rob_valid ? 
+                             (inst1_exception.ex             ? Inst_Complete : Inst_Wait) 
+                                                             : Inst_Invalid;
 assign dispatch_inst1.pc    = inst1_pc;
 
 assign dispatch_inst1.rf_we = inst1_inst.rf_we;
@@ -141,10 +146,14 @@ assign dispatch_inst1.is_store_op   = inst1_is_store_op;
 
 assign dispatch_inst1.verify_result = '0;
 
-assign dispatch_inst1.exception = 'b0;
+assign dispatch_inst1.is_privileged_op = inst1_is_privileged_op;
+assign dispatch_inst1.is_eret          = inst1_is_eret;
+assign dispatch_inst1.exception        = inst1_exception;
 
 // inst2
-assign dispatch_inst2.state = inst2_valid && ds_to_rob_valid ? Inst_Wait : Inst_Invalid;
+assign dispatch_inst2.state = inst2_valid && ds_to_rob_valid ? 
+                             (inst2_exception.ex             ? Inst_Complete : Inst_Wait) 
+                                                             : Inst_Invalid;
 assign dispatch_inst2.pc    = inst2_pc;
 
 assign dispatch_inst2.rf_we = inst2_inst.rf_we;
@@ -158,6 +167,8 @@ assign dispatch_inst2.is_store_op   = inst2_is_store_op;
 
 assign dispatch_inst2.verify_result = '0;
 
-assign dispatch_inst2.exception = 'b0;
+assign dispatch_inst2.is_privileged_op = inst2_is_privileged_op;
+assign dispatch_inst2.is_eret          = inst2_is_eret;
+assign dispatch_inst2.exception        = inst2_exception;
 
 endmodule
