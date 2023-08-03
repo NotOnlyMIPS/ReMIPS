@@ -14,6 +14,7 @@ module execute_stage(
     // output logic sp_allowin,
 
     // MMU
+    output logic       data_valid,
     output virt_t      data_vaddr,
     input  phys_t      data_paddr,
     input  exception_t data_tlb_ex,
@@ -42,6 +43,15 @@ module execute_stage(
     output logic [7:0] cp0_addr,
     output uint32_t    cp0_wdata,
     input  uint32_t    cp0_rdata,
+
+    // TLB op
+    output logic [2:0] tlb_op,
+
+    // Cache up
+    output logic         cache_op_valid,
+    output CacheCodeType cache_op,
+    output virt_t        cache_vaddr,
+    output phys_t        cache_paddr,
 
     // commit store
     input  logic       commit_store_valid,
@@ -100,6 +110,13 @@ execute_to_commit_bus_t mul_div_to_commit_bus2;
 execute_to_commit_bus_t bru_to_commit_bus;
 execute_to_commit_bus_t agu_to_commit_bus;
 execute_to_commit_bus_t spu_to_commit_bus;
+
+// MMU
+logic spu_data_valid;
+virt_t spu_data_vaddr, agu_data_vaddr;
+
+assign data_valid = spu_data_valid || dcache_req;
+assign data_vaddr = spu_data_valid ? spu_data_vaddr : agu_data_vaddr;
 
 always_comb begin
     execute_to_commit_bus1 = 'b0;
@@ -208,7 +225,7 @@ agu agu_u (
     .commit_store_ex,
 
     // mmu
-    .data_vaddr,
+    .data_vaddr(agu_data_vaddr),
     .data_tlb_ex,
 
     // DBus
@@ -241,7 +258,18 @@ spu spu_u (
     .issue_inst        (issue_to_execute_bus2),
 
     // mmu
+    .data_valid(spu_data_valid),
+    .data_vaddr(spu_data_vaddr),
     .data_paddr,
+
+    // TLB op
+    .tlb_op,
+
+    // Cache op
+    .cache_op_valid,
+    .cache_op,
+    .cache_vaddr,
+    .cache_paddr,
 
     // cp0
     .cp0_we,

@@ -22,7 +22,7 @@
 `define T       2'b11  //taken
 
 //MMU
-`define CPU_MMU_ENABLED 0
+`define CPU_MMU_ENABLED 1
 
 // TLB
 `define TLB_ENTRIES_NUM 16

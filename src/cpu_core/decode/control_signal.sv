@@ -74,6 +74,8 @@ always_comb begin
     inst_d.imm  = imm;
     inst_d.jidx = jidx;
     
+    inst_d.cache_op  = Cache_Code_EMPTY;
+
     inst_d.cp0_addr  = {sel, rd};
 
     is_store_op      = 1'b0;
@@ -256,7 +258,8 @@ always_comb begin
         OP_JR, OP_JALR,
         OP_BLTZ, OP_BGEZ, OP_BLEZ, OP_BGTZ,
         OP_BLTZAL, OP_BGEZAL,
-        OP_LB, OP_LH, OP_LW, OP_LBU, OP_LHU
+        OP_LB, OP_LH, OP_LW, OP_LBU, OP_LHU,
+        OP_CACHE
         : begin
             inst_d.use_src1 = 1'b1;
         end
@@ -336,6 +339,20 @@ always_comb begin
             inst_d.dest = `REG_RA;
         end
     endcase
+
+    // Cache op
+    if(operation == OP_CACHE) begin
+        case(inst[20:16])
+            5'b00000: inst_d.cache_op = I_Index_Invalid;
+            5'b01000: inst_d.cache_op = I_Index_Store_Tag;
+            5'b10000: inst_d.cache_op = I_Hit_Invalid;
+            5'b00001: inst_d.cache_op = D_Index_Writeback_Invalid;
+            5'b01001: inst_d.cache_op = D_Index_Store_Tag;
+            5'b10001: inst_d.cache_op = D_Hit_Invalid;
+            5'b10101: inst_d.cache_op = D_Hit_Writeback_Invalid;
+            default:  inst_d.cache_op = Cache_Code_EMPTY;
+        endcase
+    end
 end
 
 endmodule

@@ -21,12 +21,13 @@ module reg_cp0 (
 
     output logic        kseg0_uncached,
     // Cache
+    input  CacheCodeType cache_op,
     input  virt_t        cache_vaddr,
     input  phys_t        cache_paddr,
+
     output logic         cache_valid,
     output logic [19:0]  cache_tag,
     output logic         cache_dirty,
-    output CacheCodeType cache_op,
     output logic [7:0]   cache_index,
     output logic         cache_way,
     // exception
@@ -243,15 +244,15 @@ always @(posedge clk) begin
     if(cp0_we && cp0_addr == `CR_TAGLO)
         cp0_tag_lo <= cp0_wdata[31:10];
 end
-// logic  tag_from_cp0;
-// logic  cache_is_index;
+logic  tag_from_cp0;
+logic  cache_is_index;
 assign tag_from_cp0 = (cache_op == I_Index_Store_Tag || cache_op == D_Index_Store_Tag);
 
 assign cache_valid = cp0_tag_lo[10];
 assign cache_dirty = cp0_tag_lo[11];
-// assign cache_tag   = tag_from_cp0 ? cp0_tag_lo[31:12] : ws_to_c0_bus.cache_paddr[31:12];
-// assign cache_way   = ws_to_c0_bus.cache_paddr[12];
-// assign cache_index = ws_to_c0_bus.cache_vaddr[11:4];
+assign cache_tag   = tag_from_cp0 ? cp0_tag_lo[31:12] : cache_paddr[31:12];
+assign cache_way   = cache_paddr[12];
+assign cache_index = cache_vaddr[11:4];
 
 // CP0_PRID
 uint32_t cp0_prid;

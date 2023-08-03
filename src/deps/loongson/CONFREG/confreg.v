@@ -406,6 +406,7 @@ begin
     if(!aresetn)
     begin
         open_trace <= 1'b1;
+        // open_trace <= 1'b0;
     end
     else if(write_open_trace)
     begin

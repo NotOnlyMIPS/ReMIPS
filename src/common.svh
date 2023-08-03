@@ -10,7 +10,7 @@
 `timescale 1ns / 1ps
 
 // golden trace
-`define GOLDEN_TRACE
+// `define GOLDEN_TRACE
 
 typedef logic [  7:0] uint8_t;
 typedef logic [ 15:0] uint16_t;

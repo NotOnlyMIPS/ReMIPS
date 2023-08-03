@@ -15,7 +15,18 @@ module spu (
     input  issue_to_execute_bus_t issue_inst,
 
     // mmu
+    output logic  data_valid,
+    output virt_t data_vaddr,
     input  phys_t data_paddr,
+
+    // TLB op
+    output logic [2:0] tlb_op,
+
+    // Cache up
+    output logic         cache_op_valid,
+    output CacheCodeType cache_op,
+    output virt_t        cache_vaddr,
+    output phys_t        cache_paddr,
 
     // CP0
     output logic       cp0_we,
@@ -36,8 +47,6 @@ uint32_t src1_value, src2_value;
 
 logic [3:0] rf_we;
 
-assign spu_to_valid = spu_valid;
-
 always_ff @(posedge clk) begin
     if(reset || flush) begin
         spu_valid  <= 1'b0;
@@ -46,7 +55,7 @@ always_ff @(posedge clk) begin
         phy_dest   <= '0;
         inst       <= '0;
         rob_entry_num <= '0;
-    end else begin
+    end else if(spu_to_valid || !spu_valid) begin
         spu_valid  <= issue_to_spu_valid;
         src1_value <= issue_inst.src1_value;
         src2_value <= issue_inst.src2_value;
@@ -113,6 +122,32 @@ assign cp0_we    = op_mtc0 && spu_valid;
 assign cp0_addr  = inst.cp0_addr;
 assign cp0_wdata = src2_value;
 
+// TLB op
+assign tlb_op = {3{spu_valid}} & {
+                // op_tlbwr,
+                op_tlbwi,
+                op_tlbr,
+                op_tlbp};
+
+// Cache op
+logic wait_cache_op;
+
+assign data_valid = spu_valid && op_cache && !wait_cache_op;
+assign data_vaddr = src1_value + {{16{inst.imm[15]}}, inst.imm};
+
+assign cache_op_valid = wait_cache_op;
+assign cache_op    = wait_cache_op ? inst.cache_op : Cache_Code_EMPTY;
+assign cache_vaddr = src1_value + {{16{inst.imm[15]}}, inst.imm};
+assign cache_paddr = data_paddr;
+
+always_ff @(posedge clk) begin
+    if(reset || wait_cache_op) begin
+        wait_cache_op <= 1'b0;
+    end else if(spu_valid && op_cache) begin
+        wait_cache_op <= 1'b1;
+    end
+end
+
 // exception
 exception_t exception;
 assign exception = '0;
@@ -121,7 +156,9 @@ uint32_t spu_result;
 
 assign spu_result = cp0_rdata;
 
-assign spu_to_commit_bus.valid = spu_valid;
+assign spu_to_valid = spu_valid && !op_cache || wait_cache_op;
+
+assign spu_to_commit_bus.valid = spu_valid && !op_cache || wait_cache_op;
 assign spu_to_commit_bus.rob_entry_num = rob_entry_num;
 
 assign spu_to_commit_bus.rf_we    = rf_we;

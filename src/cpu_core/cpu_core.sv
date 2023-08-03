@@ -84,6 +84,9 @@ commit_to_debug_bus_t commit_to_debug_bus1, commit_to_debug_bus2;
 `endif
 
 // tlb/mmu
+logic[2:0]       tlb_op;
+
+logic            data_valid;
 logic            kseg0_uncached;
 virt_t           inst_vaddr;
 virt_t           data_vaddr;
@@ -110,6 +113,17 @@ virt_t           icache_addr;
 uint32_t         icache_rdata1;
 uint32_t         icache_rdata2;
 
+logic         cache_op_valid;
+logic         cache_valid;
+logic [19:0]  cache_tag;
+logic         cache_way;
+logic [ 7:0]  cache_index;
+logic         cache_dirty;
+
+CacheCodeType cache_op;
+virt_t        cache_vaddr;
+phys_t        cache_paddr;
+
 assign IBus.req     = icache_req;
 assign IBus.iscache = ~inst_result.uncached;
 assign IBus.offset  = icache_addr[3:0];
@@ -121,16 +135,12 @@ assign icache_data_ok = IBus.data_ok;
 assign icache_rdata1  = IBus.rdata[31:0];
 assign icache_rdata2  = IBus.rdata[63:32];
 
-// assign ibus.cache_type = {cache_op, cache_op != cache_code_empty, 1'b0};
-// assign IBus.cache_valid = cache_valid;
-// assign IBus.cache_tag   = cache_tag;
-// assign IBus.cache_index = cache_index;
-assign IBus.cache_type  = '0;
-assign IBus.cache_valid = '0;
-assign IBus.cache_tag   = '0;
-assign IBus.cache_index = '0;
-assign IBus.tlb_ex      = '0;
+assign IBus.cache_type = {cache_op, cache_op_valid, 1'b0};
+assign IBus.cache_valid = cache_valid;
+assign IBus.cache_tag   = cache_tag;
+assign IBus.cache_index = cache_index;
 
+assign IBus.tlb_ex = inst_tlb_ex.ex;
 
 /* DBus */
 logic       dcache_req;
@@ -157,20 +167,14 @@ assign dcache_addr_ok = DBus.addr_ok;
 assign dcache_data_ok = DBus.data_ok;
 assign dcache_rdata   = DBus.rdata;
 
-// assign DBus.cache_type = {cache_op, 1'b0, cache_op != Cache_Code_EMPTY};
-// assign DBus.cache_valid = cache_valid;
-// assign DBus.cache_tag   = cache_tag;
-// assign DBus.cache_way   = cache_way;
-// assign DBus.cache_dirty = cache_dirty;
-// assign DBus.cache_index = cache_index;
+assign DBus.cache_type = {cache_op, 1'b0, cache_op != Cache_Code_EMPTY};
+assign DBus.cache_valid = cache_valid;
+assign DBus.cache_tag   = cache_tag;
+assign DBus.cache_way   = cache_way;
+assign DBus.cache_dirty = cache_dirty;
+assign DBus.cache_index = cache_index;
 
-assign DBus.cache_type   = '0;
-assign DBus.cache_valid = '0;
-assign DBus.cache_tag   = '0;
-assign DBus.cache_index = '0;
-assign DBus.cache_way   = '0;
-assign DBus.cache_dirty = '0;
-assign DBus.tlb_ex      = '0;
+assign DBus.tlb_ex = data_tlb_ex.ex;
 
 // CP0
 logic [1:0] cp0_sw;
@@ -364,6 +368,7 @@ execute_stage u_execute_stage (
     // .sp_allowin,
 
     // mmu
+    .data_valid,
     .data_vaddr,
     .data_paddr(data_result.phy_addr),
     .data_tlb_ex,
@@ -392,6 +397,15 @@ execute_stage u_execute_stage (
     .cp0_addr,
     .cp0_wdata,
     .cp0_rdata,
+
+    // TLB op
+    .tlb_op,
+
+    // Cache op
+    .cache_op_valid,
+    .cache_op,
+    .cache_vaddr,
+    .cache_paddr,
     
     // commit store
     .commit_store_valid,
@@ -451,24 +465,25 @@ commit_stage u_commit_stage (
 mmu u_mmu (
     .clk,
     .reset(mmu_reset),
-    // .asid,
+    .tlb_asid,
     .kseg0_uncached,
     .is_user_mode('0),
+    .inst_valid(icache_req),
     .inst_vaddr,
+    .data_valid,
     .data_vaddr,
     
     .inst_result,
     .data_result,
     
-    // // for TLBR/TLBWI/TLBWR
-    // .tlbrw_index,
-    // .tlbrw_we,
-    // .tlbrw_wdata,
-    // .tlbrw_rdata,
+    // for TLBR/TLBWI/TLBWR
+    .tlbrw_index,
+    .tlbrw_we,
+    .tlbrw_wdata,
+    .tlbrw_rdata,
     
-    // .tlbp_entry_hi,
-    // .tlbp_index,
-    
+    .tlbp_entry_hi,
+    .tlbp_index,
     
     .load_op  (dcache_req && !dcache_wr),
     .store_op (dcache_req &&  dcache_wr),
@@ -490,21 +505,26 @@ reg_cp0 u_reg_cp0 (
     // TLB
     .kseg0_uncached,
 
-    // .tlb_asid,
-    // .tlbrw_index,
-    // .tlbrw_we,
-    // .tlbrw_wdata,
-    // .tlbrw_rdata,
-    // .tlbp_entry_hi,
-    // .tlbp_index,
+    .tlb_op,
+
+    .tlb_asid,
+    .tlbrw_index,
+    .tlbrw_we,
+    .tlbrw_wdata,
+    .tlbrw_rdata,
+    .tlbp_entry_hi,
+    .tlbp_index,
 
     // Cache
-    // .cache_valid,
-    // .cache_tag,
-    // .cache_dirty,
-    // .cache_op,
-    // .cache_index,
-    // .cache_way,
+    .cache_op,
+    .cache_vaddr,
+    .cache_paddr,
+
+    .cache_valid,
+    .cache_tag,
+    .cache_dirty,
+    .cache_index,
+    .cache_way,
 
     // Exception
     .cp0_we,

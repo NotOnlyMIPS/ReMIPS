@@ -75,11 +75,15 @@ typedef struct packed {
     offset_t          offset;
     logic             is_cache;//判断时cache还是uncache
     CacheType         cache_type;
+	// logic             cache_valid;
+	logic [19:0]      cache_tag;
+    logic [ 7:0]      cache_index;
 } request_t;
 
 state_t  state,state_next;
 
 logic [63:0] uncache_rdata;
+
 
 index_t read_addr, tagv_addr;//读ram地址
 
@@ -101,6 +105,8 @@ logic req_buffer_en;
 logic [$clog2(ASSOC_NUM)-1:0]                                 lru[GROUP_NUM-1:0] ;
 logic [ASSOC_NUM-1:0]                                         hit;
 logic                                                         cache_hit;
+logic                                                         ins_hit;
+logic [ASSOC_NUM-1:0]                                         cache_ins_hit;
 
 logic [ASSOC_NUM-1:0]                                         pipe_hit;
 tagv_t [ASSOC_NUM-1:0]                                        pipe_tagv_rdata;
@@ -123,16 +129,21 @@ assign rd_addr    = {req_buffer.tag, req_buffer.index, req_buffer.is_cache ? {OF
 
 //判断是否命中
 assign cache_hit        = |hit;//ok
+assign ins_hit          = |cache_ins_hit;//ok
+
+
 //读ram地址
 assign read_addr        = state_next == REFILLDONE ? req_buffer.index : IBus.index;
 assign tagv_addr        = IBus.cache_type.isIcache ? IBus.cache_index :
-                                state == REFILL ? req_buffer.index :
-                                IBus.index;
+                        (req_buffer.cache_type.isIcache && req_buffer.cache_type.cacheCode == I_Hit_Invalid) ?
+                                          req_buffer.cache_index :
+                        state == REFILL ? req_buffer.index :
+                                          IBus.index;
 
 //pipe写使能
 assign pipe_wr          = (state == LOOKUP || state == REFILLDONE); // ??????????????????
 //req_buffer写使能
-assign req_buffer_en    = state == LOOKUP && state_next == LOOKUP && IBus.req;
+assign req_buffer_en    = state == LOOKUP && state_next == LOOKUP && IBus.req || IBus.cache_type.isIcache;
 
 //将axi返回数据写入
 generate;//
@@ -153,6 +164,8 @@ always_comb begin : tagv_wdata_blockName
                 tagv_wdata = '0;
             end
         endcase
+    end else if (req_buffer.cache_type.isIcache && req_buffer.cache_type.cacheCode == I_Hit_Invalid) begin
+        tagv_wdata = '0;
     end else begin
         tagv_wdata = (state == REFILL) ? {1'b1,req_buffer.tag} : '0;
     end
@@ -217,6 +230,14 @@ generate;
     end
 endgenerate
 
+
+generate;
+    for(genvar i = 0; i < ASSOC_NUM; i++ ) begin
+        assign cache_ins_hit[i]= pipe_tagv_rdata[i].valid & (req_buffer.cache_tag == pipe_tagv_rdata[i].tag);
+    end
+endgenerate
+
+
 //选择出某一路的某个字数据
 generate;
     for(genvar i = 0;i < ASSOC_NUM; i++) begin
@@ -237,33 +258,16 @@ end
 
 always_comb begin : tagv_we_blockName
     if(IBus.cache_type.isIcache)begin
-        if(ASSOC_NUM==2) begin
-            case (IBus.cache_type.cacheCode)
-                I_Index_Invalid, I_Index_Store_Tag:begin
-                    tagv_we = (IBus.cache_tag[0]) ? 2'b10 : 2'b01;
-                end
-                I_Hit_Invalid:begin
-                    tagv_we = (cache_hit) ? hit : '0;
-                end
-                default: begin
-                    tagv_we = '0;
-                end
-            endcase
-        end else if(ASSOC_NUM == 4) begin
-            case (IBus.cache_type.cacheCode)
-                I_Index_Invalid,I_Index_Store_Tag:begin
-                    tagv_we =   (IBus.cache_tag[1:0] == 2'b00) ? 4'b0001 :
-                                (IBus.cache_tag[1:0] == 2'b01) ? 4'b0010 :
-                                (IBus.cache_tag[1:0] == 2'b10) ? 4'b0100 : 4'b1000;
-                end
-                I_Hit_Invalid:begin
-                    tagv_we = (cache_hit) ? hit : '0;
-                end
-                default: begin
-                    tagv_we = '0;
-                end
-            endcase
-        end
+        case (IBus.cache_type.cacheCode)
+            I_Index_Invalid, I_Index_Store_Tag:begin
+                tagv_we = (IBus.cache_tag[0]) ? 2'b10 : 2'b01;
+            end
+            default: begin
+                tagv_we = '0;
+            end
+        endcase
+    end else if (req_buffer.cache_type.isIcache && req_buffer.cache_type.cacheCode == I_Hit_Invalid) begin
+        tagv_we = (ins_hit) ? cache_ins_hit : '0;
     end else if (state == REFILL && ret_valid && req_buffer.is_cache) begin
         tagv_we = '0;
         tagv_we = pipe_hit;
@@ -320,6 +324,8 @@ always_ff @( posedge clk_g ) begin : req_buffer_block
         req_buffer.offset   <=  IBus.offset;
         req_buffer.is_cache  <=  IBus.iscache;
         req_buffer.cache_type<=  IBus.cache_type;
+        req_buffer.cache_tag <=  IBus.cache_tag;
+        req_buffer.cache_index <= IBus.cache_index;
     end else if(state_next == LOOKUP) 
         req_buffer.valid    <= '0;
 
