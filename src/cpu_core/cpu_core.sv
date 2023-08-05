@@ -20,20 +20,20 @@ module cpu_core(
 );
 
 // reset
-logic prefetch_reset, fetch_reset, decode_reset, issue_reset, execute_reset, commit_reset;
+// logic prefetch_reset, fetch_reset, decode_reset, issue_reset, execute_reset, commit_reset;
 logic bpu_reset, cp0_reset, mmu_reset;
 
-always_ff @(posedge clk) begin
-    prefetch_reset <= reset;
-    fetch_reset    <= reset;
-    decode_reset   <= reset;
-    issue_reset    <= reset;
-    execute_reset  <= reset;
-    commit_reset   <= reset;
-    bpu_reset      <= reset;
-    cp0_reset      <= reset;
-    mmu_reset      <= reset;
-end
+// always_ff @(posedge clk) begin
+//     prefetch_reset <= reset;
+//     fetch_reset    <= reset;
+//     decode_reset   <= reset;
+//     issue_reset    <= reset;
+//     execute_reset  <= reset;
+//     commit_reset   <= reset;
+//     bpu_reset      <= reset;
+//     cp0_reset      <= reset;
+//     mmu_reset      <= reset;
+// end
 
 logic       flush;
 flush_src_t flush_src;
@@ -190,7 +190,8 @@ exception_t exception;
 // BPU
 BPU u_BPU (
     .clk  ,
-    .reset(bpu_reset),
+    .reset,
+    // .reset(bpu_reset),
 
     .flush_src,
 
@@ -202,7 +203,8 @@ BPU u_BPU (
 // PreFetch stage
 pre_fetch_stage u_prefetch_stage (
     .clk  ,
-    .reset(prefetch_reset),
+    .reset,
+    // .reset(prefetch_reset),
 
     .flush,
     .flush_src,
@@ -232,7 +234,8 @@ pre_fetch_stage u_prefetch_stage (
 // Fetch stage
 fetch_stage u_fetch_stage (
     .clk  ,
-    .reset(fetch_reset),
+    .reset,
+    // .reset(fetch_reset),
     .flush,
 
     // pipeline control
@@ -270,7 +273,8 @@ fetch_stage u_fetch_stage (
 // Decode stage
 decode_stage u_decode_stage (
     .clk,
-    .reset(decode_reset),
+    .reset,
+    // .reset(decode_reset),
     
     .flush,
 
@@ -315,7 +319,8 @@ decode_stage u_decode_stage (
 // Issue stage
 issue_stage u_issue_stage (
     .clk,
-    .reset(issue_reset),
+    .reset,
+    // .reset(issue_reset),
     
     .flush,
     
@@ -356,7 +361,8 @@ issue_stage u_issue_stage (
 // Execute stage
 execute_stage u_execute_stage (
     .clk,
-    .reset(execute_reset),
+    .reset,
+    // .reset(execute_reset),
     
     .flush,
     
@@ -421,7 +427,8 @@ execute_stage u_execute_stage (
 // Commit stage
 commit_stage u_commit_stage (
     .clk,
-    .reset(commit_reset),
+    .reset,
+    // .reset(commit_reset),
     
     .flush,
     .flush_src,
@@ -464,7 +471,9 @@ commit_stage u_commit_stage (
 // MMU
 mmu u_mmu (
     .clk,
-    .reset(mmu_reset),
+    .reset,
+    // .reset(mmu_reset),
+
     .tlb_asid,
     .kseg0_uncached,
     .is_user_mode('0),
@@ -495,7 +504,8 @@ mmu u_mmu (
 // CP0
 reg_cp0 u_reg_cp0 (
     .clk,
-    .reset(cp0_reset),
+    .reset,
+    // .reset(cp0_reset),
 
     // interrupt
     .ext_int,
@@ -544,7 +554,8 @@ reg_cp0 u_reg_cp0 (
 test_write u_test_write (
 
     .clk,
-    .reset(commit_reset),
+    .reset,
+    // .reset(commit_reset),
 
     .flush,
 

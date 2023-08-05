@@ -306,8 +306,6 @@ always_comb begin
         OP_SLTI, OP_SLTIU,
         OP_ANDI, OP_ORI, OP_XORI,
         OP_LUI,
-        OP_SLL, OP_SRL, OP_SRA,
-        OP_CLO, OP_CLZ,
         OP_LB, OP_LH, OP_LWL, OP_LW, OP_LBU, OP_LHU, OP_LWR
         : begin
             inst_d.rf_we = rt != 0;

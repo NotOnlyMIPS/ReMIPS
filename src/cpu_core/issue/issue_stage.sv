@@ -49,7 +49,8 @@ logic select_to_issue_valid;
 logic issue_stage_valid;
 
 // issue queue
-issue_entry_t issue_queue[ISSUE_QUEUE_SIZE-1:0]; // alu1, mul_div, branch; alu2, load_store, spcial
+(*mark_debug = "true"*) issue_entry_t issue_queue[ISSUE_QUEUE_SIZE-1:0]; // debug
+// issue_entry_t issue_queue[ISSUE_QUEUE_SIZE-1:0]; // alu1, mul_div, branch; alu2, load_store, spcial
 issue_entry_t issue_queue_bus[ISSUE_QUEUE_SIZE-1:0]; 
 logic issue_queue_full;
 logic [3:0] issue_queue_num_full, issue_queue_num_tail, issue_queue_num_valid;
@@ -78,20 +79,30 @@ always_ff @(posedge clk) begin
     end
     else begin
         if(is_allowin) begin
-            issue_queue[issue_queue_tail  ] <= decode_to_issue_bus1;
-            issue_queue[issue_queue_tail_next] <= decode_to_issue_bus2;
+            issue_queue[issue_queue_tail[2:0]  ] <= decode_to_issue_bus1;
+            issue_queue[issue_queue_tail_next[2:0]] <= decode_to_issue_bus2;
         end
         else begin
-            issue_queue[issue_queue_tail  ] <= 'b0;
-            issue_queue[issue_queue_tail_next] <= 'b0;
+            issue_queue[issue_queue_tail[2:0]  ] <= 'b0;
+            issue_queue[issue_queue_tail_next[2:0]] <= 'b0;
         end
 
         // compress
         for(int i=0; i<issue_queue_tail; i++) begin
-            issue_queue[i] <= compress_entry_num[i  ] == 2'd0 ? issue_queue_bus[i  ] :
-                              compress_entry_num[i+1] == 2'd1 ? issue_queue_bus[i+1] :
-                              compress_entry_num[i+2] == 2'd2 ? issue_queue_bus[i+2] :
-                                                                'b0;
+            if(i < ISSUE_QUEUE_SIZE-2) begin
+                issue_queue[i] <= compress_entry_num[i  ] == 2'd0 ? issue_queue_bus[i  ] :
+                                  compress_entry_num[i+1] == 2'd1 ? issue_queue_bus[i+1] :
+                                  compress_entry_num[i+2] == 2'd2 ? issue_queue_bus[i+2] :
+                                                                    'b0;
+            end
+            else if(i < ISSUE_QUEUE_SIZE-1) begin
+                issue_queue[i] <= compress_entry_num[i  ] == 2'd0 ? issue_queue_bus[i  ] :
+                                  compress_entry_num[i+1] == 2'd1 ? issue_queue_bus[i+1] :
+                                                                    'b0;
+            end
+            else begin
+                issue_queue[i] <= issue_queue_bus[i];
+            end
         end
     end
 
@@ -131,7 +142,8 @@ always_comb begin
     issue_queue_tail_next = issue_queue_tail + 1;
 
     for(int i=0; i<ISSUE_QUEUE_SIZE; i++) begin
-        compress_entry_num[i] = ((i >= select_inst1_num) && select_inst1_valid) + ((i >= select_inst2_num) && select_inst2_valid);
+        compress_entry_num[i] = ((i >= select_inst1_num) && select_inst1_valid && issue_queue[i].valid) 
+                              + ((i >= select_inst2_num) && select_inst2_valid && issue_queue[i].valid);
     end
 end
 

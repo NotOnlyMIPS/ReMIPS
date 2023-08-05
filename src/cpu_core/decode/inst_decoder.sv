@@ -94,8 +94,8 @@ always_comb begin
                 5'b01110: operation = OP_TNEI;
                 5'b10000: operation = OP_BLTZAL;
                 5'b10001: operation = OP_BGEZAL;
-                5'b10010: operation = OP_BLTZALL;
-                5'b10011: operation = OP_BGEZALL;
+                // 5'b10010: operation = OP_BLTZALL;
+                // 5'b10011: operation = OP_BGEZALL;
                 default:  operation = OP_INVALID;
             endcase
             end

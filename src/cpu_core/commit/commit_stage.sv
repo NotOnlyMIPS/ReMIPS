@@ -106,6 +106,7 @@ assign writeback_to_commit_bus2.verify_result = writeback_inst2.verify_result;
 assign writeback_to_commit_bus2.exception     = writeback_inst2.exception;
 
 // commit
+// (*mark_debug = "true"*) rob_entry_t rob[ROB_ENTRY_NUM-1:0]; // debug
 rob_entry_t rob[ROB_ENTRY_NUM-1:0];
 logic [3:0] rob_head, rob_tail;
 logic [3:0] rob_head_writeback, rob_head_bpu, rob_head_miss_predict, rob_head_flush;

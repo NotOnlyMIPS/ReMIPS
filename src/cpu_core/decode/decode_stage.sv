@@ -97,7 +97,7 @@ end
 logic inst1_is_store_op, inst2_is_store_op;
 operation_t inst1_op, inst2_op;
 
-decoded_inst_t sel_decode_inst1, sel_decode_inst2;
+uint32_t sel_decode_inst1, sel_decode_inst2;
 operation_t sel_inst1_op, sel_inst2_op;
 virt_t  sel_inst1_pc, sel_inst2_pc;
 
