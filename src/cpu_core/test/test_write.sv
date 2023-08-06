@@ -69,13 +69,31 @@ always_ff @(posedge clk) begin
         debug_bus1_r <= '0;
         debug_bus2_r <= '0;
     end else begin
-        if(commit_to_debug_bus1.valid) 
-            debug_bus1_r <= test_queue[commit_to_debug_bus1.rob_entry_num];
+        if(commit_to_debug_bus1.valid) begin
+            debug_bus1_r.valid    <= test_queue[commit_to_debug_bus1.rob_entry_num].valid;
+            debug_bus1_r.pc       <= test_queue[commit_to_debug_bus1.rob_entry_num].pc;
+            debug_bus1_r.wstrb    <= test_queue[commit_to_debug_bus1.rob_entry_num].wstrb;
+            debug_bus1_r.dest     <= test_queue[commit_to_debug_bus1.rob_entry_num].dest;
+            debug_bus1_r.phy_dest <= test_queue[commit_to_debug_bus1.rob_entry_num].phy_dest;
+            debug_bus1_r.wdata    <= test_queue[commit_to_debug_bus1.rob_entry_num].wdata;
+
+            debug_bus1_r.br_op          <= commit_to_debug_bus1.br_op;
+            debug_bus1_r.predict_sucess <= commit_to_debug_bus1.predict_sucess;
+        end
         else
             debug_bus1_r.valid = 1'b0;
 
-        if(commit_to_debug_bus2.valid) 
-            debug_bus2_r <= test_queue[commit_to_debug_bus2.rob_entry_num];
+        if(commit_to_debug_bus2.valid)  begin
+            debug_bus2_r.valid    <= test_queue[commit_to_debug_bus2.rob_entry_num].valid;
+            debug_bus2_r.pc       <= test_queue[commit_to_debug_bus2.rob_entry_num].pc;
+            debug_bus2_r.wstrb    <= test_queue[commit_to_debug_bus2.rob_entry_num].wstrb;
+            debug_bus2_r.dest     <= test_queue[commit_to_debug_bus2.rob_entry_num].dest;
+            debug_bus2_r.phy_dest <= test_queue[commit_to_debug_bus2.rob_entry_num].phy_dest;
+            debug_bus2_r.wdata    <= test_queue[commit_to_debug_bus2.rob_entry_num].wdata;
+
+            debug_bus2_r.br_op          <= commit_to_debug_bus2.br_op;
+            debug_bus2_r.predict_sucess <= commit_to_debug_bus2.predict_sucess;
+        end
         else
             debug_bus2_r.valid = 1'b0;
     end

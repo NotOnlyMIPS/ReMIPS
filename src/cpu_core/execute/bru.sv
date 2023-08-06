@@ -114,7 +114,7 @@ assign target_not_taken = (    inst_beq  && !rs_eq_rt
                           ) &&  bru_valid;
 assign target_jump   = inst_j;
 assign target_jump_r = inst_jr;
-assign target_branch = inst_beq || inst_bne || inst_bgez || inst_bgtz || inst_blez || inst_bltz;
+assign target_branch = (inst_beq || inst_bne || inst_bgez || inst_bgtz || inst_blez || inst_bltz) && br_taken;
 
 assign jump_target = {next_pc[31:28], inst.jidx, 2'b0};
 assign branch_target = next_pc + {{14{inst.imm[15]}}, inst.imm, 2'b0 };

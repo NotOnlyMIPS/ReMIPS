@@ -61,7 +61,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //   cpu_clk=clk, sys_clk = clk.
 //   at this time, frequency of cpu_clk is 91MHz.
 // `define SIMU_USE_PLL 0 //set 0 to speed up simulation
-`define SIMU_USE_PLL 1 //set 0 to speed up simulation
+`define SIMU_USE_PLL 0 //set 0 to speed up simulation
 `include "common.svh"
 
 module soc_axi_lite_top #(parameter SIMULATION=1'b0)

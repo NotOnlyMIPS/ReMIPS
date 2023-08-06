@@ -41,7 +41,7 @@ simple_port_ram_without_bypass_customized #(
     .ena(1'b1),
     .wea(verify_valid),
     // .addra(EXE_BResult.Index),
-    .addra(bpu_verify_result.pc[11:2]),
+    .addra({bpu_verify_result.pc[11:3], 1'b0}),
     .dina(w_entry),
     //read port
     .enb(1'b1),
@@ -101,7 +101,7 @@ always_ff @(posedge clk) begin
 end
 
 assign pc_add8 = fetch_to_bpu_bus.pc + 32'h8;
-assign bht_hit = (fetch_to_bpu_bus.pc[31:11] == r_entry.tag);
+assign bht_hit = (fetch_to_bpu_bus.pc[31:10] == r_entry.tag);
 assign valid   = (state == `IDLE) && (r_entry.br_type != Branch_None) && fetch_to_bpu_bus.valid;
 
 always_comb begin
@@ -109,14 +109,14 @@ always_comb begin
         target = pc_add8;
         is_taken = 1'b0;
     end
-    else begin
+    else if(valid) begin
         unique case(r_entry.br_type)
         Branch_Call: begin
             target = r_entry.target;
             is_taken = 1'b1;
         end
         Branch_Return: begin
-            target = valid ? ras_data.data : pc_add8;
+            target = ras_data.data;
             is_taken = 1'b1;
         end
         Branch_Cond: begin
@@ -141,25 +141,34 @@ always_comb begin
     end
 end
 
-always_ff @ (posedge clk) begin
-    if(reset || flush_src.exception) begin
-        predict_result_r <= '0;
-        predict_entry_r  <= '0;
-    end else if(fetch_to_bpu_bus.valid) begin
-        predict_result_r.br_op    <= (r_entry.br_type != Branch_None);
-        predict_result_r.br_taken <= is_taken;
-        predict_result_r.target   <= target;
-        predict_entry_r           <= r_entry;
-    end
+// always_ff @ (posedge clk) begin
+//     if(reset || flush_src.exception) begin
+//         predict_result_r <= '0;
+//         predict_entry_r  <= '0;
+//     end else if(fetch_to_bpu_bus.valid) begin
+//         predict_result_r.br_op    <= (r_entry.br_type != Branch_None);
+//         predict_result_r.br_taken <= is_taken;
+//         predict_result_r.target   <= target;
+//         predict_entry_r           <= r_entry;
+//     end
     
-    predict_result_r.valid  <= valid;
-end
+//     predict_result_r.valid  <= valid;
+// end
+
+// assign bpu_predict_result = {
+//     state == `IDLE,
+//     predict_result_r.br_taken,
+//     predict_result_r.target,
+//     predict_entry_r,
+//     state == `CORRECTION,
+//     correction_target
+// };
 
 assign bpu_predict_result = {
     state == `IDLE,
-    predict_result_r.br_taken,
-    predict_result_r.target,
-    predict_entry_r,
+    is_taken,
+    target,
+    r_entry,
     state == `CORRECTION,
     correction_target
 };
@@ -171,8 +180,8 @@ assign bpu_predict_result = {
 ras ras_instance(
     .clk,
     .reset,
-    .push_req  (r_entry.br_type == Branch_Call  ),
-    .pop_req   (r_entry.br_type == Branch_Return),
+    .push_req  (bpu_verify_result.predict_entry.br_type == Branch_Call  ),
+    .pop_req   (bpu_verify_result.predict_entry.br_type == Branch_Return),
     .push_data ({1'b1, bpu_verify_result.pc + 8}),
     .ras_top   (ras_data)
 );

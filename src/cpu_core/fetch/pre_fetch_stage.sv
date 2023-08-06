@@ -46,7 +46,7 @@ next_pc_src_t next_pc_src;
 logic exception_en;
 exception_t exception1, exception2;
 
-assign icache_req  = pfs_valid && fs_allowin && !flush;
+assign icache_req  = pfs_valid && fs_allowin && !flush && !exception_en;
 assign icache_addr = {next_pc[31:3], 3'b0};
 assign inst_vaddr  = icache_addr;
 
@@ -83,20 +83,20 @@ always_ff @(posedge clk) begin
     if(reset || flush_src.eret || flush_src.privileged_inst || flush_src.exception) begin
         next_pc_src <= Seq_PC;
     end
+    else if(bpu_predict_result.is_correction) begin
+        next_pc_src <= Correction_Target;
+    end
     else begin
         case (next_pc_src)
             Seq_PC: begin
-                if(bpu_predict_result.is_correction) begin
-                    next_pc_src <= Correction_Target;
-                end
-                else if(bpu_predict_result.valid && bpu_predict_result.br_taken) begin
+                if(bpu_predict_result.valid && bpu_predict_result.br_taken) begin
                     next_pc_src <= icache_addr_ok ? Branch_Target : Branch_Delay;
                 end
                 else begin
                     next_pc_src <= Seq_PC;
                 end
             end
-            Branch_Delay     : next_pc_src <= Branch_Target;
+            Branch_Delay     : next_pc_src <= icache_addr_ok ? Branch_Target : Branch_Delay;
             Branch_Target    : next_pc_src <= icache_addr_ok ? Seq_PC : Branch_Target;
             Correction_Target: next_pc_src <= (icache_addr_ok || exception_en) ? Seq_PC : Correction_Target;
             default          : next_pc_src <= Seq_PC;

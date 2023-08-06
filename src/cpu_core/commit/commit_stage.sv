@@ -238,8 +238,10 @@ always_ff @(posedge clk) begin
 
     if(reset || commit_flush || flush_src.exception)
         bpu_verify_result <= 'b0;
-    else if(miss_predict && !flush_r)
+    else if(!flush_r && commit_inst1_valid)
         bpu_verify_result <= rob[rob_head_bpu].verify_result;
+    else
+        bpu_verify_result <= 'b0;
 end
 
 assign flush = flush_r && !wait_1bd && !wait_2bd || flush_src.exception || flush_src.eret || flush_src.privileged_inst;
@@ -287,8 +289,14 @@ assign commit_to_rat_bus2 = { commit_inst2_valid && rob[rob_head_next_commit_rat
 assign commit_to_debug_bus1.valid         = commit_inst1_valid && rob[rob_head].dest != `REG_HI && rob[rob_head].dest != `REG_LO;
 assign commit_to_debug_bus1.rob_entry_num = rob_head;
 
+assign commit_to_debug_bus1.br_op = commit_inst1_valid && rob[rob_head].is_br_op;
+assign commit_to_debug_bus1.predict_sucess = commit_inst1_valid && rob[rob_head].verify_result.predict_sucess;
+
 assign commit_to_debug_bus2.valid         = commit_inst2_valid && rob[rob_head_next].dest != `REG_HI && rob[rob_head_next].dest != `REG_LO;
 assign commit_to_debug_bus2.rob_entry_num = rob_head_next;
+
+assign commit_to_debug_bus2.br_op = commit_inst2_valid && rob[rob_head_next].is_br_op;
+assign commit_to_debug_bus2.predict_sucess = commit_inst2_valid && rob[rob_head_next].verify_result.predict_sucess;
 
 `endif
 

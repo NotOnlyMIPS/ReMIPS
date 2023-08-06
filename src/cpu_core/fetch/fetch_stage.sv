@@ -23,6 +23,7 @@ module fetch_stage (
 
     // BPU
     input  logic       br_taken,
+    input  virt_t      br_target,
     input  BHT_entry_t bpu_entry,
 
     output fetch_to_bpu_bus_t fetch_to_bpu_bus,
@@ -110,8 +111,19 @@ always_ff @(posedge clk) begin
         else if(icache_data_ok && !data_cancel) begin
                 fetch_queue[inst_fetch_tail].state      <= Fetch_Complete;
                 fetch_queue[inst_fetch_tail].inst       <= icache_rdata1;
-                fetch_queue[inst_fetch_tail_next].state <= Fetch_Complete;
-                fetch_queue[inst_fetch_tail_next].inst  <= icache_rdata2;
+                fetch_queue[inst_fetch_tail].br_taken   <= br_taken;
+                fetch_queue[inst_fetch_tail].bpu_entry.tag     <= bpu_entry.tag;
+                fetch_queue[inst_fetch_tail].bpu_entry.br_type <= bpu_entry.br_type;
+                fetch_queue[inst_fetch_tail].bpu_entry.count   <= bpu_entry.count;
+                fetch_queue[inst_fetch_tail].bpu_entry.target  <= br_target;
+
+                fetch_queue[inst_fetch_tail_next].state      <= Fetch_Complete;
+                fetch_queue[inst_fetch_tail_next].inst       <= icache_rdata2;
+                fetch_queue[inst_fetch_tail_next].br_taken   <= br_taken;
+                fetch_queue[inst_fetch_tail_next].bpu_entry.tag     <= bpu_entry.tag;
+                fetch_queue[inst_fetch_tail_next].bpu_entry.br_type <= bpu_entry.br_type;
+                fetch_queue[inst_fetch_tail_next].bpu_entry.count   <= bpu_entry.count;
+                fetch_queue[inst_fetch_tail_next].bpu_entry.target  <= br_target;
 
                 if(inst_tlb_ex) begin
                     fetch_queue[inst_fetch_tail].exception.ex              <= 1'b1;
@@ -167,7 +179,7 @@ always_ff @(posedge clk) begin
         bd_invalid1 <= 1'b0;
         bd_invalid2 <= 1'b0;
     end
-    else if((br_op1 || br_op2) && br_taken && fs_to_valid && ds_allowin) begin
+    else if((br_op1 || br_op2) && fetch_queue[fetch_queue_head].br_taken && fs_to_valid && ds_allowin) begin
         bd_invalid1 <= !br_op2;
         bd_invalid2 <= 1'b1;
     end
@@ -179,8 +191,8 @@ always_ff @(posedge clk) begin
 end
 
 // bpu
-assign fetch_to_bpu_bus.valid = fs2_valid;
-assign fetch_to_bpu_bus.pc    = {fetch_queue[fetch_queue_head].pc[31:3], 3'b0};
+assign fetch_to_bpu_bus.valid = fetch_queue[inst_fetch_tail].valid || fetch_queue[inst_fetch_tail_next].valid;
+assign fetch_to_bpu_bus.pc    = {fetch_queue[inst_fetch_tail].pc[31:3], 3'b0};
 
 // exception
 always_comb begin
@@ -202,8 +214,11 @@ assign fetch_to_decode_bus1.valid = fetch_queue[fetch_queue_head  ].valid && !bd
 assign fetch_to_decode_bus1.inst  = fetch_queue[fetch_queue_head  ].inst;
 assign fetch_to_decode_bus1.pc    = fetch_queue[fetch_queue_head  ].pc;
 
-assign fetch_to_decode_bus1.br_taken  = br_taken;
-assign fetch_to_decode_bus1.bpu_entry = bpu_entry;
+// assign fetch_to_decode_bus1.br_taken  = br_taken;
+// assign fetch_to_decode_bus1.bpu_entry = bpu_entry;
+assign fetch_to_decode_bus1.br_taken  = fetch_queue[fetch_queue_head].br_taken;
+assign fetch_to_decode_bus1.bpu_entry = fetch_queue[fetch_queue_head].bpu_entry;
+
 assign fetch_to_decode_bus1.exception = exception1;
 
 // inst2
@@ -212,8 +227,11 @@ assign fetch_to_decode_bus2.valid = fetch_queue[fetch_queue_head_next].valid && 
 assign fetch_to_decode_bus2.inst  = fetch_queue[fetch_queue_head_next].inst;
 assign fetch_to_decode_bus2.pc    = fetch_queue[fetch_queue_head_next].pc;
 
-assign fetch_to_decode_bus2.br_taken  = br_taken;
-assign fetch_to_decode_bus2.bpu_entry = bpu_entry;
+// assign fetch_to_decode_bus2.br_taken  = br_taken;
+// assign fetch_to_decode_bus2.bpu_entry = bpu_entry;
+assign fetch_to_decode_bus2.br_taken  = fetch_queue[fetch_queue_head_next].br_taken;
+assign fetch_to_decode_bus2.bpu_entry = fetch_queue[fetch_queue_head_next].bpu_entry;
+
 assign fetch_to_decode_bus2.exception = exception2;
 
 endmodule

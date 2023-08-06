@@ -146,7 +146,7 @@ always_comb begin
             inst_d.branch_type = inst_d.dest == `REG_RA ? Branch_Call : Branch_Jump;
         end
         OP_JR: begin
-            inst_d.branch_type = inst_d.dest == `REG_RA ? Branch_Return : Branch_Jump;
+            inst_d.branch_type = inst_d.src1 == `REG_RA ? Branch_Return : Branch_Jump;
         end
         OP_J: begin
             inst_d.branch_type = Branch_Jump;

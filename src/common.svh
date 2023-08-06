@@ -10,7 +10,7 @@
 `timescale 1ns / 1ps
 
 // golden trace
-// `define GOLDEN_TRACE
+`define GOLDEN_TRACE
 
 typedef logic [  7:0] uint8_t;
 typedef logic [ 15:0] uint16_t;
@@ -29,11 +29,17 @@ typedef struct packed {
     reg_addr_t  dest;
     reg_addr_t  phy_dest;
     uint32_t    wdata;
+
+    logic       br_op;
+    logic       predict_sucess;
 } debug_bus_t;
 
 typedef struct packed {
     logic       valid;
     logic [3:0] rob_entry_num;
+
+    logic       br_op;
+    logic       predict_sucess;
 } commit_to_debug_bus_t;
 `endif
 

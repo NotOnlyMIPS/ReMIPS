@@ -38,8 +38,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define CONFREG_NUM_MONITOR  soc_lite.u_confreg.num_monitor
 `define CONFREG_UART_DISPLAY soc_lite.u_confreg.write_uart_valid
 `define CONFREG_UART_DATA    soc_lite.u_confreg.write_uart_data
-`define END_PC  32'hbfc00100
-`define END_PC2 32'hbfc00104
+`define END_PC 32'hbfc00100
 
 module tb_top( );
 reg resetn;
@@ -90,12 +89,15 @@ soc_axi_lite_top #(.SIMULATION(1'b1)) soc_lite
 //"rf" means regfiles in cpu
 //"w" in "wen/wnum/wdata" means writing
 wire soc_clk;
-debug_bus_t debug_bus1, debug_bus2;
-
+wire [31:0] debug_wb_pc;
+wire [3 :0] debug_wb_rf_wen;
+wire [4 :0] debug_wb_rf_wnum;
+wire [31:0] debug_wb_rf_wdata;
 assign soc_clk           = soc_lite.cpu_clk;
-
-assign debug_bus1 = soc_lite.debug_bus1;
-assign debug_bus2 = soc_lite.debug_bus2;
+assign debug_wb_pc       = soc_lite.debug_wb_pc;
+assign debug_wb_rf_wen   = soc_lite.debug_wb_rf_wen;
+assign debug_wb_rf_wnum  = soc_lite.debug_wb_rf_wnum;
+assign debug_wb_rf_wdata = soc_lite.debug_wb_rf_wdata;
 
 // open the trace file;
 integer trace_ref;
@@ -107,81 +109,35 @@ end
 reg        trace_cmp_flag;
 reg        debug_end;
 
-debug_bus_t ref_bus1_r, ref_bus2_r;
+reg [31:0] ref_wb_pc;
+reg [4 :0] ref_wb_rf_wnum;
+reg [31:0] ref_wb_rf_wdata;
 
 always @(posedge soc_clk)
 begin 
     #1;
-    if(debug_bus1.valid && debug_bus1.wstrb && debug_bus1.dest !=5'd0 && !debug_end && `CONFREG_OPEN_TRACE)
-    // if(debug_bus1.valid && debug_bus1.wstrb && debug_bus1.dest !=5'd0 && !debug_end)
+    if(|debug_wb_rf_wen && debug_wb_rf_wnum!=5'd0 && !debug_end && `CONFREG_OPEN_TRACE)
     begin
         trace_cmp_flag=1'b0;
         while (!trace_cmp_flag && !($feof(trace_ref)))
         begin
             $fscanf(trace_ref, "%h %h %h %h", trace_cmp_flag,
-                    ref_bus1_r.pc, ref_bus1_r.dest, ref_bus1_r.wdata);
-        end
-    end
-    if(debug_bus2.valid && debug_bus2.wstrb && debug_bus2.dest !=5'd0 && !debug_end && `CONFREG_OPEN_TRACE)
-    // if(debug_bus2.valid && debug_bus2.wstrb && debug_bus2.dest !=5'd0 && !debug_end)
-    begin
-        trace_cmp_flag=1'b0;
-        while (!trace_cmp_flag && !($feof(trace_ref)))
-        begin
-            $fscanf(trace_ref, "%h %h %h %h", trace_cmp_flag,
-                    ref_bus2_r.pc, ref_bus2_r.dest, ref_bus2_r.wdata);
-        end
-    end
-end
-
-// IPC
-uint32_t inst_count, circle_count;
-
-always_ff @( soc_clk ) begin 
-    if(!resetn) begin
-        inst_count   <= 0;
-        circle_count <= 0;
-    end
-    else begin
-        circle_count <= circle_count + 1;
-        inst_count <= inst_count + debug_bus1.valid + debug_bus2.valid;
-    end
-end
-
-// branch prediction
-uint32_t br_op;
-uint32_t br_right;
-
-always @(posedge soc_clk) begin
-    if(debug_bus1.valid && debug_bus1.br_op) begin
-        br_op = br_op + 1;
-        if(debug_bus1.predict_sucess) begin
-            br_right = br_right + 1;
+                    ref_wb_pc, ref_wb_rf_wnum, ref_wb_rf_wdata);
         end
     end
 end
 
 //wdata[i*8+7 : i*8] is valid, only wehile wen[i] is valid
-uint32_t debug_wdata1, debug_wdata2;
-uint32_t ref_wdata1, ref_wdata2;
-
-assign debug_wdata1 = { debug_bus1.wdata[31:24]&{8{debug_bus1.wstrb[3]}},
-                        debug_bus1.wdata[23:16]&{8{debug_bus1.wstrb[2]}},
-                        debug_bus1.wdata[15: 8]&{8{debug_bus1.wstrb[1]}},
-                        debug_bus1.wdata[ 7: 0]&{8{debug_bus1.wstrb[0]}}};
-assign debug_wdata2 = { debug_bus2.wdata[31:24]&{8{debug_bus2.wstrb[3]}},
-                        debug_bus2.wdata[23:16]&{8{debug_bus2.wstrb[2]}},
-                        debug_bus2.wdata[15: 8]&{8{debug_bus2.wstrb[1]}},
-                        debug_bus2.wdata[ 7: 0]&{8{debug_bus2.wstrb[0]}}};
-
-assign ref_wdata1 = { ref_bus1_r.wdata[31:24]&{8{debug_bus1.wstrb[3]}},
-                      ref_bus1_r.wdata[23:16]&{8{debug_bus1.wstrb[2]}},
-                      ref_bus1_r.wdata[15: 8]&{8{debug_bus1.wstrb[1]}},
-                      ref_bus1_r.wdata[ 7: 0]&{8{debug_bus1.wstrb[0]}}};
-assign ref_wdata2 = { ref_bus2_r.wdata[31:24]&{8{debug_bus2.wstrb[3]}},
-                      ref_bus2_r.wdata[23:16]&{8{debug_bus2.wstrb[2]}},
-                      ref_bus2_r.wdata[15: 8]&{8{debug_bus2.wstrb[1]}},
-                      ref_bus2_r.wdata[ 7: 0]&{8{debug_bus2.wstrb[0]}}};
+wire [31:0] debug_wb_rf_wdata_v;
+wire [31:0] ref_wb_rf_wdata_v;
+assign debug_wb_rf_wdata_v[31:24] = debug_wb_rf_wdata[31:24] & {8{debug_wb_rf_wen[3]}};
+assign debug_wb_rf_wdata_v[23:16] = debug_wb_rf_wdata[23:16] & {8{debug_wb_rf_wen[2]}};
+assign debug_wb_rf_wdata_v[15: 8] = debug_wb_rf_wdata[15: 8] & {8{debug_wb_rf_wen[1]}};
+assign debug_wb_rf_wdata_v[7 : 0] = debug_wb_rf_wdata[7 : 0] & {8{debug_wb_rf_wen[0]}};
+assign   ref_wb_rf_wdata_v[31:24] =   ref_wb_rf_wdata[31:24] & {8{debug_wb_rf_wen[3]}};
+assign   ref_wb_rf_wdata_v[23:16] =   ref_wb_rf_wdata[23:16] & {8{debug_wb_rf_wen[2]}};
+assign   ref_wb_rf_wdata_v[15: 8] =   ref_wb_rf_wdata[15: 8] & {8{debug_wb_rf_wen[1]}};
+assign   ref_wb_rf_wdata_v[7 : 0] =   ref_wb_rf_wdata[7 : 0] & {8{debug_wb_rf_wen[0]}};
 
 
 //compare result in rsing edge 
@@ -192,47 +148,22 @@ begin
     if(!resetn)
     begin
         debug_wb_err <= 1'b0;
-        ref_bus1_r <= '0;
-        ref_bus2_r <= '0;
     end
-    else begin
-        if(debug_bus1.valid && debug_bus1.wstrb && debug_bus1.dest!=5'd0 && !debug_end && `CONFREG_OPEN_TRACE)
-        // if(debug_bus1.valid && debug_bus1.wstrb && debug_bus1.dest!=5'd0 && !debug_end)
+    else if(|debug_wb_rf_wen && debug_wb_rf_wnum!=5'd0 && !debug_end && `CONFREG_OPEN_TRACE)
+    begin
+        if (  (debug_wb_pc!==ref_wb_pc) || (debug_wb_rf_wnum!==ref_wb_rf_wnum)
+            ||(debug_wb_rf_wdata_v!==ref_wb_rf_wdata_v) )
         begin
-            if (  (debug_bus1.pc  != ref_bus1_r.pc) 
-               || (debug_bus1.dest!= ref_bus1_r.dest) 
-               || (debug_wdata1   != ref_wdata1) )
-            begin
-                $display("--------------------------------------------------------------");
-                $display("[%t] Error!!!",$time);
-                $display("    reference: PC = 0x%8h, wb_rf_wnum = 0x%2h, wb_rf_wdata = 0x%8h",
-                        ref_bus1_r.pc, ref_bus1_r.dest, ref_wdata1);
-                $display("    mycpu    : PC = 0x%8h, wb_rf_wnum = 0x%2h, wb_rf_wdata = 0x%8h",
-                        debug_bus1.pc, debug_bus1.dest, debug_wdata1);
-                $display("--------------------------------------------------------------");
-                debug_wb_err <= 1'b1;
-                #40;
-                $finish;
-            end
-        end
-        if(debug_bus2.valid && debug_bus2.wstrb && debug_bus2.dest!=5'd0 && debug_bus2.pc != `END_PC2 && !debug_end && `CONFREG_OPEN_TRACE)
-        // if(debug_bus2.valid && debug_bus2.wstrb && debug_bus2.dest!=5'd0 && debug_bus2.pc != `END_PC2 && !debug_end)
-        begin
-            if (  (debug_bus2.pc != ref_bus2_r.pc) 
-               || (debug_bus2.dest!==ref_bus2_r.dest) 
-               || (debug_wdata2!==ref_wdata2) )
-            begin
-                $display("--------------------------------------------------------------");
-                $display("[%t] Error!!!",$time);
-                $display("    reference: PC = 0x%8h, wb_rf_wnum = 0x%2h, wb_rf_wdata = 0x%8h",
-                        ref_bus2_r.pc, ref_bus2_r.dest, ref_wdata2);
-                $display("    mycpu    : PC = 0x%8h, wb_rf_wnum = 0x%2h, wb_rf_wdata = 0x%8h",
-                        debug_bus2.pc, debug_bus2.dest, debug_wdata2);
-                $display("--------------------------------------------------------------");
-                debug_wb_err <= 1'b1;
-                #40;
-                $finish;
-            end
+            $display("--------------------------------------------------------------");
+            $display("[%t] Error!!!",$time);
+            $display("    reference: PC = 0x%8h, wb_rf_wnum = 0x%2h, wb_rf_wdata = 0x%8h",
+                      ref_wb_pc, ref_wb_rf_wnum, ref_wb_rf_wdata_v);
+            $display("    mycpu    : PC = 0x%8h, wb_rf_wnum = 0x%2h, wb_rf_wdata = 0x%8h",
+                      debug_wb_pc, debug_wb_rf_wnum, debug_wb_rf_wdata_v);
+            $display("--------------------------------------------------------------");
+            debug_wb_err <= 1'b1;
+            #40;
+            $finish;
         end
     end
 end
@@ -284,7 +215,7 @@ begin
     while(`CONFREG_NUM_MONITOR)
     begin
         #10000;
-        $display ("        [%t] Test is running, debug_wb_pc = 0x%8h",$time, debug_bus1.pc);
+        $display ("        [%t] Test is running, debug_wb_pc = 0x%8h",$time, debug_wb_pc);
     end
 end
 
@@ -311,20 +242,16 @@ end
 
 //test end
 wire global_err = debug_wb_err || (err_count!=8'd0);
-wire test_end = (debug_bus1.pc==`END_PC) || (debug_bus2.pc == `END_PC) || (uart_display && uart_data==8'hff);
+wire test_end = (debug_wb_pc==`END_PC) || (uart_display && uart_data==8'hff);
 always @(posedge soc_clk)
 begin
     if (!resetn)
     begin
         debug_end <= 1'b0;
-        br_op     <= '0;
-        br_right  <= '0;
     end
     else if(test_end && !debug_end)
     begin
         debug_end <= 1'b1;
-        $display("Inst/Circle: %d/%d", inst_count, circle_count);
-        $display("branch prediction accuracy: %d/%d", br_right, br_op);
         $display("==============================================================");
         $display("Test end!");
         #40;

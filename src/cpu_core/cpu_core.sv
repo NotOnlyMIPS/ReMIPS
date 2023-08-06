@@ -255,7 +255,8 @@ fetch_stage u_fetch_stage (
     .icache_rdata2,
 
     // BPU
-    .br_taken(bpu_predict_result.br_taken),
+    .br_taken (bpu_predict_result.br_taken),
+    .br_target(bpu_predict_result.br_target),
     .bpu_entry(bpu_predict_result.entry),
     .fetch_to_bpu_bus,
 

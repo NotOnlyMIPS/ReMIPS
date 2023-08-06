@@ -12,7 +12,7 @@ module ras #(
     input logic     flush,
     input logic     push_req,
     input logic     pop_req,
-    input logic [32: 0]    push_data,
+    input virt_t    push_data,
     output ras_t    ras_top
 );
 
