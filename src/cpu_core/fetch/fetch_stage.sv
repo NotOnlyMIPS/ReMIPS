@@ -43,6 +43,7 @@ logic fs1_valid, fs2_valid, fs_valid;
 logic fs_ready_go;
 
 logic data_cancel;
+logic branch_invalid;
 
 fetch_queue_entry_t fetch_queue[7:0];
 logic [2:0] fetch_queue_head, fetch_queue_tail;
@@ -157,6 +158,13 @@ always_ff @(posedge clk) begin
         data_cancel <= 1'b0;
     end
 
+    if(reset || flush || branch_invalid && icache_data_ok && !data_cancel) begin
+        branch_invalid <= 1'b0;
+    end
+    else if(icache_data_ok && !data_cancel && br_taken) begin
+        branch_invalid <= 1'b1;
+    end
+
 end
 
 // fast decoder
@@ -191,7 +199,7 @@ always_ff @(posedge clk) begin
 end
 
 // bpu
-assign fetch_to_bpu_bus.valid = fetch_queue[inst_fetch_tail].valid || fetch_queue[inst_fetch_tail_next].valid;
+assign fetch_to_bpu_bus.valid = (fetch_queue[inst_fetch_tail].valid || fetch_queue[inst_fetch_tail_next].valid) && !branch_invalid;
 assign fetch_to_bpu_bus.pc    = {fetch_queue[inst_fetch_tail].pc[31:3], 3'b0};
 
 // exception

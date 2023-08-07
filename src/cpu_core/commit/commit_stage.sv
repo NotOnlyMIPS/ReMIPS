@@ -273,7 +273,8 @@ always_comb begin
     end
 end
 
-assign commit_store_valid = rob[rob_head_commit_store].state == Store_Wait || rob[rob_head_next_commit_store].state == Store_Wait;
+assign commit_store_valid = rob[rob_head_commit_store].state == Store_Wait
+                         || rob[rob_head_next_commit_store].state == Store_Wait && !wait_1bd;
 
 assign commit_to_rat_bus1 = { commit_inst1_valid && rob[rob_head_commit_rat].rf_we,
                               rob[rob_head_commit_rat  ].dest,

@@ -118,6 +118,14 @@ always_comb begin
         Branch_Return: begin
             target = ras_data.data;
             is_taken = 1'b1;
+            // if(r_entry.count[1]) begin
+            //     target = r_entry.target;
+            //     is_taken = 1'b1;
+            // end
+            // else begin
+            //     target = pc_add8;
+            //     is_taken = 1'b0;
+            // end
         end
         Branch_Cond: begin
             if(r_entry.count[1]) begin

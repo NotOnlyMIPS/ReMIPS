@@ -29,7 +29,9 @@ logic [3:0] rob_entry_num1, rob_entry_num2;
 decoded_inst_t inst1, inst2;
 reg_addr_t phy_dest1, phy_dest2;
 uint32_t src1_value, src2_value, hi, lo;
-exception_t exception;
+// exception_t exception;
+
+logic data_cancle;
 
 assign mul_div_allowin  = cs_allowin && mul_div_readygo || !mul_div_valid;
 assign mul_div_to_valid = mul_div_valid && mul_div_readygo;
@@ -164,12 +166,21 @@ always @(posedge clk) begin
             default: div_state <= div_state;
         endcase
     end
+
+    if(reset || div_res_tvalid || divu_res_tvalid) begin
+        data_cancle <= 1'b0;
+    end
+    else if(flush && (div_state == 2'd1 
+         || dividend_tvalid   && dividend_tready
+         || dividend_tvalid_u && dividend_tready_u)) begin
+        data_cancle <= 1'b1;
+    end
 end
 
-assign dividend_tvalid   = (op_div  && !div_state);
-assign dividend_tvalid_u = (op_divu && !div_state);
-assign divisor_tvalid    = (op_div  && !div_state);
-assign divisor_tvalid_u  = (op_divu && !div_state);
+assign dividend_tvalid   = (op_div  && !div_state) && !data_cancle;
+assign dividend_tvalid_u = (op_divu && !div_state) && !data_cancle;
+assign divisor_tvalid    = (op_div  && !div_state) && !data_cancle;
+assign divisor_tvalid_u  = (op_divu && !div_state) && !data_cancle;
 
 div u_div(
     .aclk                   (clk            ),
