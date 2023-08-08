@@ -13,6 +13,7 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
+    nop
 
     LI(t0, 126)             # in:  126
     LI(t1, 0)               # in:  0
@@ -20,6 +21,7 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
+    nop
 
     LI(t0, 0)               # in:  0
     LI(t1, 126)             # in:  126
@@ -27,6 +29,7 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
+    nop
 
     LI(t0, 1)               # in:  1
     LI(t1, 126)             # in:  126
@@ -34,6 +37,7 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
+    nop
 
     LI(t0, -1)              # in:  -1
     LI(t1, 126)             # in:  126
@@ -41,6 +45,7 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
+    nop
 
     LI(t0, 38)              # in:  38
     LI(t1, 126)             # in:  126
@@ -48,6 +53,7 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
+    nop
 
     LI(t0, 38)              # in:  38
     LI(t1, 126)             # in:  126
@@ -55,6 +61,7 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
+    nop
 
     LI(t0, 0xffff)          # in:  0xffff
     LI(t1, 0xffff)          # in:  0xffff
@@ -62,6 +69,7 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
+    nop
 
     LI(t0, 0xffff0)         # in:  0xffff0
     LI(t1, 0xffff0)         # in:  0xffff0
@@ -75,6 +83,7 @@ LEAF(n5_mul_test)
     bne t1, t3, inst_error
     mflo t2
     bne t2, v1, inst_error
+    nop
 
     LI(t0, 0xffff9b25)      # in:  0xffff9b25
     LI(t1, 0x7cffeb)        # in:  0x7cffeb
@@ -88,6 +97,7 @@ LEAF(n5_mul_test)
     bne t1, t3, inst_error
     mflo t2
     bne t2, v1, inst_error
+    nop
 ###detect exception
     bne s2, zero, inst_error
     nop

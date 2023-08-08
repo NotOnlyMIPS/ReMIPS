@@ -14,6 +14,7 @@ LEAF(n9_msubu_test)
     bne v0, a0, inst_error
     mflo v0
     bne v0, a0, inst_error
+    nop
 
     LI(t1, -1)              # in:  -1
     LI(t2, 1)               # in:  1
@@ -24,6 +25,7 @@ LEAF(n9_msubu_test)
     bne v0, t3, inst_error
     mflo v0
     bne v0, t4, inst_error
+    nop
 
     LI(t1, 1)               # in:  1
     LI(t2, 1)               # in:  1
@@ -34,6 +36,7 @@ LEAF(n9_msubu_test)
     bne v0, t3, inst_error
     mflo v0
     bne v0, t4, inst_error
+    nop
 
     LI(t1, 3)               # in:  3
     LI(t2, -4)              # in:  -4
@@ -44,6 +47,7 @@ LEAF(n9_msubu_test)
     bne v0, t3, inst_error
     mflo v0
     bne v0, t4, inst_error
+    nop
 
     LI(t1, 12369)           # in:  12369
     LI(t2, -98812)          # in:  -98812
@@ -54,6 +58,7 @@ LEAF(n9_msubu_test)
     bne v0, t3, inst_error
     mflo v0
     bne v0, t4, inst_error
+    nop
 
     LI(t1, 0x40000000)      # in:  0x40000000
     LI(t2, 0x80)            # in:  0x80
@@ -64,6 +69,7 @@ LEAF(n9_msubu_test)
     bne v0, t3, inst_error
     mflo v0
     bne v0, t4, inst_error
+    nop
 
     LI(t1, 99999)           # in:  99999
     LI(t2, -99999)          # in: -99999
@@ -74,6 +80,7 @@ LEAF(n9_msubu_test)
     bne v0, t3, inst_error
     mflo v0
     bne v0, t4, inst_error
+    nop
 ###detect exception
     bne s2, zero, inst_error
     nop

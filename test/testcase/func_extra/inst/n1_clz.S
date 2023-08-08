@@ -11,21 +11,25 @@ LEAF(n1_clz_test)
     LI(v1, 32)              # out: 32
     clz v0, a1
     bne v0, v1, inst_error
+    nop
 
     LI(a1, 0x23712223)      # in:  0x23712223
     LI(v1, 2)               # out: 2
     clz v0, a1
     bne v0, v1, inst_error
+    nop
 
     LI(a1, 0xefffffff)      # in:  0xefffffff
     LI(v1, 0)               # out: 0
     clz v0, a1
     bne v0, v1, inst_error
+    nop
 
     LI(a1, 0x00007f00)      # in:  0x00007f00
     LI(v1, 0)               # out: 17
     clz v0, a1
     bne v0, v1, inst_error
+    nop
 ###detect exception
     bne s2, zero, inst_error
     nop

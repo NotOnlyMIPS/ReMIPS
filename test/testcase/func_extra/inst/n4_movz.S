@@ -15,24 +15,28 @@ LEAF(n4_movz_test)
     move v0, v1
     movn v0, t0, a0
     bne v0, t0, inst_error
+    nop
 
     LI(a0, 1)           # in:  1
                         # out: v1
     move v0, v1
     movn v0, t0, a0
     bne v0, v1, inst_error
+    nop
 
     LI(a0, 0xffffffff)  # in:  0xffffffff
                         # out: v1
     move v0, v1
     movn v0, t0, a0
     bne v0, v1, inst_error
+    nop
 
     LI(a0, 0x1234bf00)  # in:  0x1234bf00
                         # out: v1
     move v0, v1
     movn v0, t0, a0
     bne v0, v1, inst_error
+    nop
 ###detect exception
     bne s2, zero, inst_error
     nop

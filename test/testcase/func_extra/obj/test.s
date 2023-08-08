@@ -524,7 +524,7 @@ Disassembly of section .text:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:303
 9fc00718:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:304
-9fc0071c:	0ff00240 	jal	9fc00900 <n2_clo_test>
+9fc0071c:	0ff00244 	jal	9fc00910 <n2_clo_test>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:305
 9fc00720:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:306
@@ -532,7 +532,7 @@ Disassembly of section .text:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:307
 9fc00728:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:308
-9fc0072c:	0ff0025c 	jal	9fc00970 <n3_movn_test>
+9fc0072c:	0ff00264 	jal	9fc00990 <n3_movn_test>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:309
 9fc00730:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:310
@@ -540,7 +540,7 @@ Disassembly of section .text:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:311
 9fc00738:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:312
-9fc0073c:	0ff00280 	jal	9fc00a00 <n4_movz_test>
+9fc0073c:	0ff0028c 	jal	9fc00a30 <n4_movz_test>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:313
 9fc00740:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:314
@@ -548,7 +548,7 @@ Disassembly of section .text:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:315
 9fc00748:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:316
-9fc0074c:	0ff002a4 	jal	9fc00a90 <n5_mul_test>
+9fc0074c:	0ff002b4 	jal	9fc00ad0 <n5_mul_test>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:317
 9fc00750:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:318
@@ -556,7 +556,7 @@ Disassembly of section .text:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:319
 9fc00758:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:320
-9fc0075c:	0ff00318 	jal	9fc00c60 <n6_madd_test>
+9fc0075c:	0ff00330 	jal	9fc00cc0 <n6_madd_test>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:321
 9fc00760:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:322
@@ -564,7 +564,7 @@ Disassembly of section .text:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:323
 9fc00768:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:324
-9fc0076c:	0ff00378 	jal	9fc00de0 <n7_maddu_test>
+9fc0076c:	0ff00398 	jal	9fc00e60 <n7_maddu_test>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:325
 9fc00770:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:326
@@ -572,7 +572,7 @@ Disassembly of section .text:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:327
 9fc00778:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:328
-9fc0077c:	0ff003d8 	jal	9fc00f60 <n8_msub_test>
+9fc0077c:	0ff00400 	jal	9fc01000 <n8_msub_test>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:329
 9fc00780:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:330
@@ -580,7 +580,7 @@ Disassembly of section .text:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:331
 9fc00788:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:332
-9fc0078c:	0ff00438 	jal	9fc010e0 <n9_msubu_test>
+9fc0078c:	0ff00468 	jal	9fc011a0 <n9_msubu_test>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:333
 9fc00790:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/start.S:334
@@ -703,1129 +703,1239 @@ Disassembly of section .text:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:12
 9fc00888:	70a21020 	clz	v0,a1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:13
-9fc0088c:	14430015 	bne	v0,v1,9fc008e4 <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:15
-9fc00890:	3c052371 	lui	a1,0x2371
-9fc00894:	24a52223 	addiu	a1,a1,8739
+9fc0088c:	14430019 	bne	v0,v1,9fc008f4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:14
+9fc00890:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:16
-9fc00898:	3c030000 	lui	v1,0x0
-9fc0089c:	24630002 	addiu	v1,v1,2
+9fc00894:	3c052371 	lui	a1,0x2371
+9fc00898:	24a52223 	addiu	a1,a1,8739
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:17
-9fc008a0:	70a21020 	clz	v0,a1
+9fc0089c:	3c030000 	lui	v1,0x0
+9fc008a0:	24630002 	addiu	v1,v1,2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:18
-9fc008a4:	1443000f 	bne	v0,v1,9fc008e4 <inst_error>
+9fc008a4:	70a21020 	clz	v0,a1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:19
+9fc008a8:	14430012 	bne	v0,v1,9fc008f4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:20
-9fc008a8:	3c05f000 	lui	a1,0xf000
-9fc008ac:	24a5ffff 	addiu	a1,a1,-1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:21
-9fc008b0:	3c030000 	lui	v1,0x0
-9fc008b4:	24630000 	addiu	v1,v1,0
+9fc008ac:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:22
-9fc008b8:	70a21020 	clz	v0,a1
+9fc008b0:	3c05f000 	lui	a1,0xf000
+9fc008b4:	24a5ffff 	addiu	a1,a1,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:23
-9fc008bc:	14430009 	bne	v0,v1,9fc008e4 <inst_error>
+9fc008b8:	3c030000 	lui	v1,0x0
+9fc008bc:	24630000 	addiu	v1,v1,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:24
+9fc008c0:	70a21020 	clz	v0,a1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:25
-9fc008c0:	3c050000 	lui	a1,0x0
-9fc008c4:	24a57f00 	addiu	a1,a1,32512
+9fc008c4:	1443000b 	bne	v0,v1,9fc008f4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:26
-9fc008c8:	3c030000 	lui	v1,0x0
-9fc008cc:	24630000 	addiu	v1,v1,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:27
-9fc008d0:	70a21020 	clz	v0,a1
+9fc008c8:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:28
-9fc008d4:	14430003 	bne	v0,v1,9fc008e4 <inst_error>
+9fc008cc:	3c050000 	lui	a1,0x0
+9fc008d0:	24a57f00 	addiu	a1,a1,32512
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:29
+9fc008d4:	3c030000 	lui	v1,0x0
+9fc008d8:	24630000 	addiu	v1,v1,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:30
-9fc008d8:	16400002 	bnez	s2,9fc008e4 <inst_error>
+9fc008dc:	70a21020 	clz	v0,a1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:31
-9fc008dc:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:33
-9fc008e0:	26730001 	addiu	s3,s3,1
+9fc008e0:	14430004 	bne	v0,v1,9fc008f4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:32
+9fc008e4:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:34
+9fc008e8:	16400002 	bnez	s2,9fc008f4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:35
+9fc008ec:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:37
+9fc008f0:	26730001 	addiu	s3,s3,1
 
-9fc008e4 <inst_error>:
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:36
-9fc008e4:	00104e00 	sll	t1,s0,0x18
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:38
-9fc008e8:	01334025 	or	t0,t1,s3
+9fc008f4 <inst_error>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:40
-9fc008ec:	ae280000 	sw	t0,0(s1)
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:41
-9fc008f0:	03e00008 	jr	ra
+9fc008f4:	00104e00 	sll	t1,s0,0x18
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:42
-9fc008f4:	00000000 	nop
+9fc008f8:	01334025 	or	t0,t1,s3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:44
+9fc008fc:	ae280000 	sw	t0,0(s1)
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:45
+9fc00900:	03e00008 	jr	ra
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n1_clz.S:46
+9fc00904:	00000000 	nop
 	...
 
-9fc00900 <n2_clo_test>:
+9fc00910 <n2_clo_test>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:7
-9fc00900:	26100001 	addiu	s0,s0,1
+9fc00910:	26100001 	addiu	s0,s0,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:8
-9fc00904:	24120000 	li	s2,0
+9fc00914:	24120000 	li	s2,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:10
-9fc00908:	3c050000 	lui	a1,0x0
-9fc0090c:	24a50000 	addiu	a1,a1,0
+9fc00918:	3c050000 	lui	a1,0x0
+9fc0091c:	24a50000 	addiu	a1,a1,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:11
-9fc00910:	3c030000 	lui	v1,0x0
-9fc00914:	24630000 	addiu	v1,v1,0
+9fc00920:	3c030000 	lui	v1,0x0
+9fc00924:	24630000 	addiu	v1,v1,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:12
-9fc00918:	70a21021 	clo	v0,a1
+9fc00928:	70a21021 	clo	v0,a1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:13
-9fc0091c:	1443000f 	bne	v0,v1,9fc0095c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:15
-9fc00920:	3c05f000 	lui	a1,0xf000
-9fc00924:	24a5efff 	addiu	a1,a1,-4097
+9fc0092c:	14430012 	bne	v0,v1,9fc00978 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:14
+9fc00930:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:16
-9fc00928:	3c030000 	lui	v1,0x0
-9fc0092c:	24630003 	addiu	v1,v1,3
+9fc00934:	3c05f000 	lui	a1,0xf000
+9fc00938:	24a5efff 	addiu	a1,a1,-4097
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:17
-9fc00930:	70a21021 	clo	v0,a1
+9fc0093c:	3c030000 	lui	v1,0x0
+9fc00940:	24630003 	addiu	v1,v1,3
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:18
-9fc00934:	14430009 	bne	v0,v1,9fc0095c <inst_error>
+9fc00944:	70a21021 	clo	v0,a1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:19
+9fc00948:	1443000b 	bne	v0,v1,9fc00978 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:20
-9fc00938:	3c050000 	lui	a1,0x0
-9fc0093c:	24a5fffe 	addiu	a1,a1,-2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:21
-9fc00940:	3c030000 	lui	v1,0x0
-9fc00944:	2463001f 	addiu	v1,v1,31
+9fc0094c:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:22
-9fc00948:	70a21021 	clo	v0,a1
+9fc00950:	3c050000 	lui	a1,0x0
+9fc00954:	24a5fffe 	addiu	a1,a1,-2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:23
-9fc0094c:	14430003 	bne	v0,v1,9fc0095c <inst_error>
+9fc00958:	3c030000 	lui	v1,0x0
+9fc0095c:	2463001f 	addiu	v1,v1,31
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:24
+9fc00960:	70a21021 	clo	v0,a1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:25
-9fc00950:	16400002 	bnez	s2,9fc0095c <inst_error>
+9fc00964:	14430004 	bne	v0,v1,9fc00978 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:26
-9fc00954:	00000000 	nop
+9fc00968:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:28
-9fc00958:	26730001 	addiu	s3,s3,1
-
-9fc0095c <inst_error>:
+9fc0096c:	16400002 	bnez	s2,9fc00978 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:29
+9fc00970:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:31
-9fc0095c:	00104e00 	sll	t1,s0,0x18
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:33
-9fc00960:	01334025 	or	t0,t1,s3
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:35
-9fc00964:	ae280000 	sw	t0,0(s1)
+9fc00974:	26730001 	addiu	s3,s3,1
+
+9fc00978 <inst_error>:
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:34
+9fc00978:	00104e00 	sll	t1,s0,0x18
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:36
-9fc00968:	03e00008 	jr	ra
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:37
-9fc0096c:	00000000 	nop
+9fc0097c:	01334025 	or	t0,t1,s3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:38
+9fc00980:	ae280000 	sw	t0,0(s1)
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:39
+9fc00984:	03e00008 	jr	ra
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n2_clo.S:40
+9fc00988:	00000000 	nop
+inst_error():
+9fc0098c:	00000000 	nop
 
-9fc00970 <n3_movn_test>:
+9fc00990 <n3_movn_test>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:7
-9fc00970:	26100001 	addiu	s0,s0,1
+9fc00990:	26100001 	addiu	s0,s0,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:8
-9fc00974:	24120000 	li	s2,0
+9fc00994:	24120000 	li	s2,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:10
-9fc00978:	3c03bef0 	lui	v1,0xbef0
-9fc0097c:	2463beef 	addiu	v1,v1,-16657
+9fc00998:	3c03bef0 	lui	v1,0xbef0
+9fc0099c:	2463beef 	addiu	v1,v1,-16657
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:11
-9fc00980:	3c08cfd0 	lui	t0,0xcfd0
-9fc00984:	2508cfcf 	addiu	t0,t0,-12337
+9fc009a0:	3c08cfd0 	lui	t0,0xcfd0
+9fc009a4:	2508cfcf 	addiu	t0,t0,-12337
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:13
-9fc00988:	3c040000 	lui	a0,0x0
-9fc0098c:	24840000 	addiu	a0,a0,0
+9fc009a8:	3c040000 	lui	a0,0x0
+9fc009ac:	24840000 	addiu	a0,a0,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:15
-9fc00990:	00601021 	move	v0,v1
+9fc009b0:	00601021 	move	v0,v1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:16
-9fc00994:	0104100b 	movn	v0,t0,a0
+9fc009b4:	0104100b 	movn	v0,t0,a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:17
-9fc00998:	14430012 	bne	v0,v1,9fc009e4 <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:19
-9fc0099c:	3c040000 	lui	a0,0x0
-9fc009a0:	24840001 	addiu	a0,a0,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:21
-9fc009a4:	00601021 	move	v0,v1
+9fc009b8:	14430016 	bne	v0,v1,9fc00a14 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:18
+9fc009bc:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:20
+9fc009c0:	3c040000 	lui	a0,0x0
+9fc009c4:	24840001 	addiu	a0,a0,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:22
-9fc009a8:	0104100b 	movn	v0,t0,a0
+9fc009c8:	00601021 	move	v0,v1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:23
-9fc009ac:	1448000d 	bne	v0,t0,9fc009e4 <inst_error>
+9fc009cc:	0104100b 	movn	v0,t0,a0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:24
+9fc009d0:	14480010 	bne	v0,t0,9fc00a14 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:25
-9fc009b0:	3c040000 	lui	a0,0x0
-9fc009b4:	2484ffff 	addiu	a0,a0,-1
+9fc009d4:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:27
-9fc009b8:	00601021 	move	v0,v1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:28
-9fc009bc:	0104100b 	movn	v0,t0,a0
+9fc009d8:	3c040000 	lui	a0,0x0
+9fc009dc:	2484ffff 	addiu	a0,a0,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:29
-9fc009c0:	14480008 	bne	v0,t0,9fc009e4 <inst_error>
+9fc009e0:	00601021 	move	v0,v1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:30
+9fc009e4:	0104100b 	movn	v0,t0,a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:31
-9fc009c4:	3c041235 	lui	a0,0x1235
-9fc009c8:	2484bf00 	addiu	a0,a0,-16640
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:33
-9fc009cc:	00601021 	move	v0,v1
+9fc009e8:	1448000a 	bne	v0,t0,9fc00a14 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:32
+9fc009ec:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:34
-9fc009d0:	0104100b 	movn	v0,t0,a0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:35
-9fc009d4:	14480003 	bne	v0,t0,9fc009e4 <inst_error>
+9fc009f0:	3c041235 	lui	a0,0x1235
+9fc009f4:	2484bf00 	addiu	a0,a0,-16640
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:36
+9fc009f8:	00601021 	move	v0,v1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:37
-9fc009d8:	16400002 	bnez	s2,9fc009e4 <inst_error>
+9fc009fc:	0104100b 	movn	v0,t0,a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:38
-9fc009dc:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:40
-9fc009e0:	26730001 	addiu	s3,s3,1
+9fc00a00:	14480004 	bne	v0,t0,9fc00a14 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:39
+9fc00a04:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:41
+9fc00a08:	16400002 	bnez	s2,9fc00a14 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:42
+9fc00a0c:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:44
+9fc00a10:	26730001 	addiu	s3,s3,1
 
-9fc009e4 <inst_error>:
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:43
-9fc009e4:	00104e00 	sll	t1,s0,0x18
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:45
-9fc009e8:	01334025 	or	t0,t1,s3
+9fc00a14 <inst_error>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:47
-9fc009ec:	ae280000 	sw	t0,0(s1)
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:48
-9fc009f0:	03e00008 	jr	ra
+9fc00a14:	00104e00 	sll	t1,s0,0x18
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:49
-9fc009f4:	00000000 	nop
+9fc00a18:	01334025 	or	t0,t1,s3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:51
+9fc00a1c:	ae280000 	sw	t0,0(s1)
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:52
+9fc00a20:	03e00008 	jr	ra
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n3_movn.S:53
+9fc00a24:	00000000 	nop
 	...
 
-9fc00a00 <n4_movz_test>:
+9fc00a30 <n4_movz_test>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:7
-9fc00a00:	26100001 	addiu	s0,s0,1
+9fc00a30:	26100001 	addiu	s0,s0,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:8
-9fc00a04:	24120000 	li	s2,0
+9fc00a34:	24120000 	li	s2,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:10
-9fc00a08:	3c03bef0 	lui	v1,0xbef0
-9fc00a0c:	2463beef 	addiu	v1,v1,-16657
+9fc00a38:	3c03bef0 	lui	v1,0xbef0
+9fc00a3c:	2463beef 	addiu	v1,v1,-16657
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:11
-9fc00a10:	3c08cfd0 	lui	t0,0xcfd0
-9fc00a14:	2508cfcf 	addiu	t0,t0,-12337
+9fc00a40:	3c08cfd0 	lui	t0,0xcfd0
+9fc00a44:	2508cfcf 	addiu	t0,t0,-12337
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:13
-9fc00a18:	3c040000 	lui	a0,0x0
-9fc00a1c:	24840000 	addiu	a0,a0,0
+9fc00a48:	3c040000 	lui	a0,0x0
+9fc00a4c:	24840000 	addiu	a0,a0,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:15
-9fc00a20:	00601021 	move	v0,v1
+9fc00a50:	00601021 	move	v0,v1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:16
-9fc00a24:	0104100b 	movn	v0,t0,a0
+9fc00a54:	0104100b 	movn	v0,t0,a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:17
-9fc00a28:	14480012 	bne	v0,t0,9fc00a74 <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:19
-9fc00a2c:	3c040000 	lui	a0,0x0
-9fc00a30:	24840001 	addiu	a0,a0,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:21
-9fc00a34:	00601021 	move	v0,v1
+9fc00a58:	14480016 	bne	v0,t0,9fc00ab4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:18
+9fc00a5c:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:20
+9fc00a60:	3c040000 	lui	a0,0x0
+9fc00a64:	24840001 	addiu	a0,a0,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:22
-9fc00a38:	0104100b 	movn	v0,t0,a0
+9fc00a68:	00601021 	move	v0,v1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:23
-9fc00a3c:	1443000d 	bne	v0,v1,9fc00a74 <inst_error>
+9fc00a6c:	0104100b 	movn	v0,t0,a0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:24
+9fc00a70:	14430010 	bne	v0,v1,9fc00ab4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:25
-9fc00a40:	3c040000 	lui	a0,0x0
-9fc00a44:	2484ffff 	addiu	a0,a0,-1
+9fc00a74:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:27
-9fc00a48:	00601021 	move	v0,v1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:28
-9fc00a4c:	0104100b 	movn	v0,t0,a0
+9fc00a78:	3c040000 	lui	a0,0x0
+9fc00a7c:	2484ffff 	addiu	a0,a0,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:29
-9fc00a50:	14430008 	bne	v0,v1,9fc00a74 <inst_error>
+9fc00a80:	00601021 	move	v0,v1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:30
+9fc00a84:	0104100b 	movn	v0,t0,a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:31
-9fc00a54:	3c041235 	lui	a0,0x1235
-9fc00a58:	2484bf00 	addiu	a0,a0,-16640
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:33
-9fc00a5c:	00601021 	move	v0,v1
+9fc00a88:	1443000a 	bne	v0,v1,9fc00ab4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:32
+9fc00a8c:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:34
-9fc00a60:	0104100b 	movn	v0,t0,a0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:35
-9fc00a64:	14430003 	bne	v0,v1,9fc00a74 <inst_error>
+9fc00a90:	3c041235 	lui	a0,0x1235
+9fc00a94:	2484bf00 	addiu	a0,a0,-16640
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:36
+9fc00a98:	00601021 	move	v0,v1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:37
-9fc00a68:	16400002 	bnez	s2,9fc00a74 <inst_error>
+9fc00a9c:	0104100b 	movn	v0,t0,a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:38
-9fc00a6c:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:40
-9fc00a70:	26730001 	addiu	s3,s3,1
+9fc00aa0:	14430004 	bne	v0,v1,9fc00ab4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:39
+9fc00aa4:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:41
+9fc00aa8:	16400002 	bnez	s2,9fc00ab4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:42
+9fc00aac:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:44
+9fc00ab0:	26730001 	addiu	s3,s3,1
 
-9fc00a74 <inst_error>:
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:43
-9fc00a74:	00104e00 	sll	t1,s0,0x18
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:45
-9fc00a78:	01334025 	or	t0,t1,s3
+9fc00ab4 <inst_error>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:47
-9fc00a7c:	ae280000 	sw	t0,0(s1)
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:48
-9fc00a80:	03e00008 	jr	ra
+9fc00ab4:	00104e00 	sll	t1,s0,0x18
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:49
-9fc00a84:	00000000 	nop
+9fc00ab8:	01334025 	or	t0,t1,s3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:51
+9fc00abc:	ae280000 	sw	t0,0(s1)
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:52
+9fc00ac0:	03e00008 	jr	ra
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n4_movz.S:53
+9fc00ac4:	00000000 	nop
 	...
 
-9fc00a90 <n5_mul_test>:
+9fc00ad0 <n5_mul_test>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:7
-9fc00a90:	26100001 	addiu	s0,s0,1
+9fc00ad0:	26100001 	addiu	s0,s0,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:8
-9fc00a94:	24120000 	li	s2,0
+9fc00ad4:	24120000 	li	s2,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:10
-9fc00a98:	3c080000 	lui	t0,0x0
-9fc00a9c:	25080000 	addiu	t0,t0,0
+9fc00ad8:	3c080000 	lui	t0,0x0
+9fc00adc:	25080000 	addiu	t0,t0,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:11
-9fc00aa0:	3c090000 	lui	t1,0x0
-9fc00aa4:	25290000 	addiu	t1,t1,0
+9fc00ae0:	3c090000 	lui	t1,0x0
+9fc00ae4:	25290000 	addiu	t1,t1,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:12
-9fc00aa8:	3c030000 	lui	v1,0x0
-9fc00aac:	24630000 	addiu	v1,v1,0
+9fc00ae8:	3c030000 	lui	v1,0x0
+9fc00aec:	24630000 	addiu	v1,v1,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:13
-9fc00ab0:	71091002 	mul	v0,t0,t1
+9fc00af0:	71091002 	mul	v0,t0,t1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:14
-9fc00ab4:	00000000 	nop
+9fc00af4:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:15
-9fc00ab8:	14430060 	bne	v0,v1,9fc00c3c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:17
-9fc00abc:	3c080000 	lui	t0,0x0
-9fc00ac0:	2508007e 	addiu	t0,t0,126
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:18
-9fc00ac4:	3c090000 	lui	t1,0x0
-9fc00ac8:	25290000 	addiu	t1,t1,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:19
-9fc00acc:	3c030000 	lui	v1,0x0
-9fc00ad0:	24630000 	addiu	v1,v1,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:20
-9fc00ad4:	71091002 	mul	v0,t0,t1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:21
-9fc00ad8:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:22
-9fc00adc:	14430057 	bne	v0,v1,9fc00c3c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:24
-9fc00ae0:	3c080000 	lui	t0,0x0
-9fc00ae4:	25080000 	addiu	t0,t0,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:25
-9fc00ae8:	3c090000 	lui	t1,0x0
-9fc00aec:	2529007e 	addiu	t1,t1,126
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:26
-9fc00af0:	3c030000 	lui	v1,0x0
-9fc00af4:	24630000 	addiu	v1,v1,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:27
-9fc00af8:	71091002 	mul	v0,t0,t1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:28
+9fc00af8:	1443006a 	bne	v0,v1,9fc00ca4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:16
 9fc00afc:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:29
-9fc00b00:	1443004e 	bne	v0,v1,9fc00c3c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:31
-9fc00b04:	3c080000 	lui	t0,0x0
-9fc00b08:	25080001 	addiu	t0,t0,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:32
-9fc00b0c:	3c090000 	lui	t1,0x0
-9fc00b10:	2529007e 	addiu	t1,t1,126
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:33
-9fc00b14:	3c030000 	lui	v1,0x0
-9fc00b18:	2463007e 	addiu	v1,v1,126
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:34
-9fc00b1c:	71091002 	mul	v0,t0,t1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:35
-9fc00b20:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:36
-9fc00b24:	14430045 	bne	v0,v1,9fc00c3c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:38
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:18
+9fc00b00:	3c080000 	lui	t0,0x0
+9fc00b04:	2508007e 	addiu	t0,t0,126
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:19
+9fc00b08:	3c090000 	lui	t1,0x0
+9fc00b0c:	25290000 	addiu	t1,t1,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:20
+9fc00b10:	3c030000 	lui	v1,0x0
+9fc00b14:	24630000 	addiu	v1,v1,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:21
+9fc00b18:	71091002 	mul	v0,t0,t1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:22
+9fc00b1c:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:23
+9fc00b20:	14430060 	bne	v0,v1,9fc00ca4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:24
+9fc00b24:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:26
 9fc00b28:	3c080000 	lui	t0,0x0
-9fc00b2c:	2508ffff 	addiu	t0,t0,-1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:39
+9fc00b2c:	25080000 	addiu	t0,t0,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:27
 9fc00b30:	3c090000 	lui	t1,0x0
 9fc00b34:	2529007e 	addiu	t1,t1,126
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:40
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:28
 9fc00b38:	3c030000 	lui	v1,0x0
-9fc00b3c:	2463ff82 	addiu	v1,v1,-126
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:41
+9fc00b3c:	24630000 	addiu	v1,v1,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:29
 9fc00b40:	71091002 	mul	v0,t0,t1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:42
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:30
 9fc00b44:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:31
+9fc00b48:	14430056 	bne	v0,v1,9fc00ca4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:32
+9fc00b4c:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:34
+9fc00b50:	3c080000 	lui	t0,0x0
+9fc00b54:	25080001 	addiu	t0,t0,1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:35
+9fc00b58:	3c090000 	lui	t1,0x0
+9fc00b5c:	2529007e 	addiu	t1,t1,126
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:36
+9fc00b60:	3c030000 	lui	v1,0x0
+9fc00b64:	2463007e 	addiu	v1,v1,126
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:37
+9fc00b68:	71091002 	mul	v0,t0,t1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:38
+9fc00b6c:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:39
+9fc00b70:	1443004c 	bne	v0,v1,9fc00ca4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:40
+9fc00b74:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:42
+9fc00b78:	3c080000 	lui	t0,0x0
+9fc00b7c:	2508ffff 	addiu	t0,t0,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:43
-9fc00b48:	1443003c 	bne	v0,v1,9fc00c3c <inst_error>
+9fc00b80:	3c090000 	lui	t1,0x0
+9fc00b84:	2529007e 	addiu	t1,t1,126
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:44
+9fc00b88:	3c030000 	lui	v1,0x0
+9fc00b8c:	2463ff82 	addiu	v1,v1,-126
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:45
-9fc00b4c:	3c080000 	lui	t0,0x0
-9fc00b50:	25080026 	addiu	t0,t0,38
+9fc00b90:	71091002 	mul	v0,t0,t1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:46
-9fc00b54:	3c090000 	lui	t1,0x0
-9fc00b58:	2529007e 	addiu	t1,t1,126
+9fc00b94:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:47
-9fc00b5c:	3c030000 	lui	v1,0x0
-9fc00b60:	246312b4 	addiu	v1,v1,4788
+9fc00b98:	14430042 	bne	v0,v1,9fc00ca4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:48
-9fc00b64:	71091002 	mul	v0,t0,t1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:49
-9fc00b68:	00000000 	nop
+9fc00b9c:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:50
-9fc00b6c:	14430033 	bne	v0,v1,9fc00c3c <inst_error>
+9fc00ba0:	3c080000 	lui	t0,0x0
+9fc00ba4:	25080026 	addiu	t0,t0,38
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:51
+9fc00ba8:	3c090000 	lui	t1,0x0
+9fc00bac:	2529007e 	addiu	t1,t1,126
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:52
-9fc00b70:	3c080000 	lui	t0,0x0
-9fc00b74:	25080026 	addiu	t0,t0,38
+9fc00bb0:	3c030000 	lui	v1,0x0
+9fc00bb4:	246312b4 	addiu	v1,v1,4788
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:53
-9fc00b78:	3c090000 	lui	t1,0x0
-9fc00b7c:	2529007e 	addiu	t1,t1,126
+9fc00bb8:	71091002 	mul	v0,t0,t1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:54
-9fc00b80:	3c030000 	lui	v1,0x0
-9fc00b84:	246312b4 	addiu	v1,v1,4788
+9fc00bbc:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:55
-9fc00b88:	71091002 	mul	v0,t0,t1
+9fc00bc0:	14430038 	bne	v0,v1,9fc00ca4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:56
-9fc00b8c:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:57
-9fc00b90:	1443002a 	bne	v0,v1,9fc00c3c <inst_error>
+9fc00bc4:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:58
+9fc00bc8:	3c080000 	lui	t0,0x0
+9fc00bcc:	25080026 	addiu	t0,t0,38
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:59
-9fc00b94:	3c080001 	lui	t0,0x1
-9fc00b98:	2508ffff 	addiu	t0,t0,-1
+9fc00bd0:	3c090000 	lui	t1,0x0
+9fc00bd4:	2529007e 	addiu	t1,t1,126
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:60
-9fc00b9c:	3c090001 	lui	t1,0x1
-9fc00ba0:	2529ffff 	addiu	t1,t1,-1
+9fc00bd8:	3c030000 	lui	v1,0x0
+9fc00bdc:	246312b4 	addiu	v1,v1,4788
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:61
-9fc00ba4:	3c03fffe 	lui	v1,0xfffe
-9fc00ba8:	24630001 	addiu	v1,v1,1
+9fc00be0:	71091002 	mul	v0,t0,t1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:62
-9fc00bac:	71091002 	mul	v0,t0,t1
+9fc00be4:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:63
-9fc00bb0:	00000000 	nop
+9fc00be8:	1443002e 	bne	v0,v1,9fc00ca4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:64
-9fc00bb4:	14430021 	bne	v0,v1,9fc00c3c <inst_error>
+9fc00bec:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:66
-9fc00bb8:	3c080010 	lui	t0,0x10
-9fc00bbc:	2508fff0 	addiu	t0,t0,-16
+9fc00bf0:	3c080001 	lui	t0,0x1
+9fc00bf4:	2508ffff 	addiu	t0,t0,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:67
-9fc00bc0:	3c090010 	lui	t1,0x10
-9fc00bc4:	2529fff0 	addiu	t1,t1,-16
+9fc00bf8:	3c090001 	lui	t1,0x1
+9fc00bfc:	2529ffff 	addiu	t1,t1,-1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:68
+9fc00c00:	3c03fffe 	lui	v1,0xfffe
+9fc00c04:	24630001 	addiu	v1,v1,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:69
-9fc00bc8:	3c0b0000 	lui	t3,0x0
-9fc00bcc:	256b00ff 	addiu	t3,t3,255
+9fc00c08:	71091002 	mul	v0,t0,t1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:70
-9fc00bd0:	3c03fe00 	lui	v1,0xfe00
-9fc00bd4:	24630100 	addiu	v1,v1,256
+9fc00c0c:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:71
-9fc00bd8:	71091002 	mul	v0,t0,t1
+9fc00c10:	14430024 	bne	v0,v1,9fc00ca4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:72
-9fc00bdc:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:73
-9fc00be0:	14430016 	bne	v0,v1,9fc00c3c <inst_error>
+9fc00c14:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:74
-9fc00be4:	00004810 	mfhi	t1
+9fc00c18:	3c080010 	lui	t0,0x10
+9fc00c1c:	2508fff0 	addiu	t0,t0,-16
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:75
-9fc00be8:	152b0014 	bne	t1,t3,9fc00c3c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:76
-9fc00bec:	00005012 	mflo	t2
+9fc00c20:	3c090010 	lui	t1,0x10
+9fc00c24:	2529fff0 	addiu	t1,t1,-16
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:77
-9fc00bf0:	15430012 	bne	t2,v1,9fc00c3c <inst_error>
+9fc00c28:	3c0b0000 	lui	t3,0x0
+9fc00c2c:	256b00ff 	addiu	t3,t3,255
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:78
+9fc00c30:	3c03fe00 	lui	v1,0xfe00
+9fc00c34:	24630100 	addiu	v1,v1,256
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:79
-9fc00bf4:	3c080000 	lui	t0,0x0
-9fc00bf8:	25089b25 	addiu	t0,t0,-25819
+9fc00c38:	71091002 	mul	v0,t0,t1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:80
-9fc00bfc:	3c09007d 	lui	t1,0x7d
-9fc00c00:	2529ffeb 	addiu	t1,t1,-21
+9fc00c3c:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:81
+9fc00c40:	14430018 	bne	v0,v1,9fc00ca4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:82
-9fc00c04:	3c0b0000 	lui	t3,0x0
-9fc00c08:	256bffec 	addiu	t3,t3,-20
+9fc00c44:	00004810 	mfhi	t1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:83
-9fc00c0c:	3c031194 	lui	v1,0x1194
-9fc00c10:	24635f07 	addiu	v1,v1,24327
+9fc00c48:	152b0016 	bne	t1,t3,9fc00ca4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:84
-9fc00c14:	71091002 	mul	v0,t0,t1
+9fc00c4c:	00005012 	mflo	t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:85
-9fc00c18:	00000000 	nop
+9fc00c50:	15430014 	bne	t2,v1,9fc00ca4 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:86
-9fc00c1c:	14430007 	bne	v0,v1,9fc00c3c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:87
-9fc00c20:	00004810 	mfhi	t1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:88
-9fc00c24:	152b0005 	bne	t1,t3,9fc00c3c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:89
-9fc00c28:	00005012 	mflo	t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:90
-9fc00c2c:	15430003 	bne	t2,v1,9fc00c3c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:92
-9fc00c30:	16400002 	bnez	s2,9fc00c3c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:93
-9fc00c34:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:95
-9fc00c38:	26730001 	addiu	s3,s3,1
-
-9fc00c3c <inst_error>:
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:98
-9fc00c3c:	00104e00 	sll	t1,s0,0x18
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:99
-9fc00c40:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:100
-9fc00c44:	01334025 	or	t0,t1,s3
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:101
-9fc00c48:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:102
-9fc00c4c:	ae280000 	sw	t0,0(s1)
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:103
-9fc00c50:	03e00008 	jr	ra
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:104
 9fc00c54:	00000000 	nop
-	...
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:88
+9fc00c58:	3c080000 	lui	t0,0x0
+9fc00c5c:	25089b25 	addiu	t0,t0,-25819
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:89
+9fc00c60:	3c09007d 	lui	t1,0x7d
+9fc00c64:	2529ffeb 	addiu	t1,t1,-21
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:91
+9fc00c68:	3c0b0000 	lui	t3,0x0
+9fc00c6c:	256bffec 	addiu	t3,t3,-20
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:92
+9fc00c70:	3c031194 	lui	v1,0x1194
+9fc00c74:	24635f07 	addiu	v1,v1,24327
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:93
+9fc00c78:	71091002 	mul	v0,t0,t1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:94
+9fc00c7c:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:95
+9fc00c80:	14430008 	bne	v0,v1,9fc00ca4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:96
+9fc00c84:	00004810 	mfhi	t1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:97
+9fc00c88:	152b0006 	bne	t1,t3,9fc00ca4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:98
+9fc00c8c:	00005012 	mflo	t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:99
+9fc00c90:	15430004 	bne	t2,v1,9fc00ca4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:100
+9fc00c94:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:102
+9fc00c98:	16400002 	bnez	s2,9fc00ca4 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:103
+9fc00c9c:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:105
+9fc00ca0:	26730001 	addiu	s3,s3,1
 
-9fc00c60 <n6_madd_test>:
+9fc00ca4 <inst_error>:
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:108
+9fc00ca4:	00104e00 	sll	t1,s0,0x18
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:109
+9fc00ca8:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:110
+9fc00cac:	01334025 	or	t0,t1,s3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:111
+9fc00cb0:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:112
+9fc00cb4:	ae280000 	sw	t0,0(s1)
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:113
+9fc00cb8:	03e00008 	jr	ra
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n5_mul.S:114
+9fc00cbc:	00000000 	nop
+
+9fc00cc0 <n6_madd_test>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:7
-9fc00c60:	26100001 	addiu	s0,s0,1
+9fc00cc0:	26100001 	addiu	s0,s0,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:8
-9fc00c64:	24120000 	li	s2,0
+9fc00cc4:	24120000 	li	s2,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:10
-9fc00c68:	3c040000 	lui	a0,0x0
-9fc00c6c:	24840000 	addiu	a0,a0,0
+9fc00cc8:	3c040000 	lui	a0,0x0
+9fc00ccc:	24840000 	addiu	a0,a0,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:11
-9fc00c70:	00800011 	mthi	a0
+9fc00cd0:	00800011 	mthi	a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:12
-9fc00c74:	00800013 	mtlo	a0
+9fc00cd4:	00800013 	mtlo	a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:13
-9fc00c78:	00001010 	mfhi	v0
+9fc00cd8:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:14
-9fc00c7c:	14440053 	bne	v0,a0,9fc00dcc <inst_error>
+9fc00cdc:	1444005a 	bne	v0,a0,9fc00e48 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:15
-9fc00c80:	00001012 	mflo	v0
+9fc00ce0:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:16
-9fc00c84:	14440051 	bne	v0,a0,9fc00dcc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:18
-9fc00c88:	3c090000 	lui	t1,0x0
-9fc00c8c:	2529ffff 	addiu	t1,t1,-1
+9fc00ce4:	14440058 	bne	v0,a0,9fc00e48 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:17
+9fc00ce8:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:19
-9fc00c90:	3c0a0000 	lui	t2,0x0
-9fc00c94:	254a0001 	addiu	t2,t2,1
+9fc00cec:	3c090000 	lui	t1,0x0
+9fc00cf0:	2529ffff 	addiu	t1,t1,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:20
-9fc00c98:	3c0b0000 	lui	t3,0x0
-9fc00c9c:	256bffff 	addiu	t3,t3,-1
+9fc00cf4:	3c0a0000 	lui	t2,0x0
+9fc00cf8:	254a0001 	addiu	t2,t2,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:21
-9fc00ca0:	3c0c0000 	lui	t4,0x0
-9fc00ca4:	258cffff 	addiu	t4,t4,-1
+9fc00cfc:	3c0b0000 	lui	t3,0x0
+9fc00d00:	256bffff 	addiu	t3,t3,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:22
-9fc00ca8:	712a0000 	madd	t1,t2
+9fc00d04:	3c0c0000 	lui	t4,0x0
+9fc00d08:	258cffff 	addiu	t4,t4,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:23
-9fc00cac:	00001010 	mfhi	v0
+9fc00d0c:	712a0000 	madd	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:24
-9fc00cb0:	144b0046 	bne	v0,t3,9fc00dcc <inst_error>
+9fc00d10:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:25
-9fc00cb4:	00001012 	mflo	v0
+9fc00d14:	144b004c 	bne	v0,t3,9fc00e48 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:26
-9fc00cb8:	144c0044 	bne	v0,t4,9fc00dcc <inst_error>
+9fc00d18:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:27
+9fc00d1c:	144c004a 	bne	v0,t4,9fc00e48 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:28
-9fc00cbc:	3c090000 	lui	t1,0x0
-9fc00cc0:	25290001 	addiu	t1,t1,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:29
-9fc00cc4:	3c0a0000 	lui	t2,0x0
-9fc00cc8:	254a0001 	addiu	t2,t2,1
+9fc00d20:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:30
-9fc00ccc:	3c0b0000 	lui	t3,0x0
-9fc00cd0:	256b0000 	addiu	t3,t3,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:31
-9fc00cd4:	3c0c0000 	lui	t4,0x0
-9fc00cd8:	258c0000 	addiu	t4,t4,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:32
-9fc00cdc:	712a0000 	madd	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:33
-9fc00ce0:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:34
-9fc00ce4:	144b0039 	bne	v0,t3,9fc00dcc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:35
-9fc00ce8:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:36
-9fc00cec:	144c0037 	bne	v0,t4,9fc00dcc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:38
-9fc00cf0:	3c090000 	lui	t1,0x0
-9fc00cf4:	25290003 	addiu	t1,t1,3
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:39
-9fc00cf8:	3c0a0000 	lui	t2,0x0
-9fc00cfc:	254a0004 	addiu	t2,t2,4
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:40
-9fc00d00:	3c0b0000 	lui	t3,0x0
-9fc00d04:	256b0000 	addiu	t3,t3,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:41
-9fc00d08:	3c0c0000 	lui	t4,0x0
-9fc00d0c:	258c000c 	addiu	t4,t4,12
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:42
-9fc00d10:	712a0000 	madd	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:43
-9fc00d14:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:44
-9fc00d18:	144b002c 	bne	v0,t3,9fc00dcc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:45
-9fc00d1c:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:46
-9fc00d20:	144c002a 	bne	v0,t4,9fc00dcc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:48
 9fc00d24:	3c090000 	lui	t1,0x0
-9fc00d28:	25293051 	addiu	t1,t1,12369
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:49
-9fc00d2c:	3c0a0002 	lui	t2,0x2
-9fc00d30:	254a81fc 	addiu	t2,t2,-32260
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:50
+9fc00d28:	25290001 	addiu	t1,t1,1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:31
+9fc00d2c:	3c0a0000 	lui	t2,0x0
+9fc00d30:	254a0001 	addiu	t2,t2,1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:32
 9fc00d34:	3c0b0000 	lui	t3,0x0
 9fc00d38:	256b0000 	addiu	t3,t3,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:51
-9fc00d3c:	3c0c48d9 	lui	t4,0x48d9
-9fc00d40:	258c60c8 	addiu	t4,t4,24776
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:52
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:33
+9fc00d3c:	3c0c0000 	lui	t4,0x0
+9fc00d40:	258c0000 	addiu	t4,t4,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:34
 9fc00d44:	712a0000 	madd	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:53
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:35
 9fc00d48:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:54
-9fc00d4c:	144b001f 	bne	v0,t3,9fc00dcc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:55
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:36
+9fc00d4c:	144b003e 	bne	v0,t3,9fc00e48 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:37
 9fc00d50:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:38
+9fc00d54:	144c003c 	bne	v0,t4,9fc00e48 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:39
+9fc00d58:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:41
+9fc00d5c:	3c090000 	lui	t1,0x0
+9fc00d60:	25290003 	addiu	t1,t1,3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:42
+9fc00d64:	3c0a0000 	lui	t2,0x0
+9fc00d68:	254a0004 	addiu	t2,t2,4
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:43
+9fc00d6c:	3c0b0000 	lui	t3,0x0
+9fc00d70:	256b0000 	addiu	t3,t3,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:44
+9fc00d74:	3c0c0000 	lui	t4,0x0
+9fc00d78:	258c000c 	addiu	t4,t4,12
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:45
+9fc00d7c:	712a0000 	madd	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:46
+9fc00d80:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:47
+9fc00d84:	144b0030 	bne	v0,t3,9fc00e48 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:48
+9fc00d88:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:49
+9fc00d8c:	144c002e 	bne	v0,t4,9fc00e48 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:50
+9fc00d90:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:52
+9fc00d94:	3c090000 	lui	t1,0x0
+9fc00d98:	25293051 	addiu	t1,t1,12369
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:53
+9fc00d9c:	3c0a0002 	lui	t2,0x2
+9fc00da0:	254a81fc 	addiu	t2,t2,-32260
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:54
+9fc00da4:	3c0b0000 	lui	t3,0x0
+9fc00da8:	256b0000 	addiu	t3,t3,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:55
+9fc00dac:	3c0c48d9 	lui	t4,0x48d9
+9fc00db0:	258c60c8 	addiu	t4,t4,24776
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:56
-9fc00d54:	144c001d 	bne	v0,t4,9fc00dcc <inst_error>
+9fc00db4:	712a0000 	madd	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:57
+9fc00db8:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:58
-9fc00d58:	3c094000 	lui	t1,0x4000
-9fc00d5c:	25290000 	addiu	t1,t1,0
+9fc00dbc:	144b0022 	bne	v0,t3,9fc00e48 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:59
-9fc00d60:	3c0a0000 	lui	t2,0x0
-9fc00d64:	254a0080 	addiu	t2,t2,128
+9fc00dc0:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:60
-9fc00d68:	3c0b0000 	lui	t3,0x0
-9fc00d6c:	256b0020 	addiu	t3,t3,32
+9fc00dc4:	144c0020 	bne	v0,t4,9fc00e48 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:61
-9fc00d70:	3c0c48d9 	lui	t4,0x48d9
-9fc00d74:	258c60c8 	addiu	t4,t4,24776
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:62
-9fc00d78:	712a0000 	madd	t1,t2
+9fc00dc8:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:63
-9fc00d7c:	00001010 	mfhi	v0
+9fc00dcc:	3c094000 	lui	t1,0x4000
+9fc00dd0:	25290000 	addiu	t1,t1,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:64
-9fc00d80:	144b0012 	bne	v0,t3,9fc00dcc <inst_error>
+9fc00dd4:	3c0a0000 	lui	t2,0x0
+9fc00dd8:	254a0080 	addiu	t2,t2,128
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:65
-9fc00d84:	00001012 	mflo	v0
+9fc00ddc:	3c0b0000 	lui	t3,0x0
+9fc00de0:	256b0020 	addiu	t3,t3,32
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:66
-9fc00d88:	144c0010 	bne	v0,t4,9fc00dcc <inst_error>
+9fc00de4:	3c0c48d9 	lui	t4,0x48d9
+9fc00de8:	258c60c8 	addiu	t4,t4,24776
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:67
+9fc00dec:	712a0000 	madd	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:68
-9fc00d8c:	3c090002 	lui	t1,0x2
-9fc00d90:	2529869f 	addiu	t1,t1,-31073
+9fc00df0:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:69
-9fc00d94:	3c0a0002 	lui	t2,0x2
-9fc00d98:	254a869f 	addiu	t2,t2,-31073
+9fc00df4:	144b0014 	bne	v0,t3,9fc00e48 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:70
-9fc00d9c:	3c0b0000 	lui	t3,0x0
-9fc00da0:	256b0022 	addiu	t3,t3,34
+9fc00df8:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:71
-9fc00da4:	3c0c9ce2 	lui	t4,0x9ce2
-9fc00da8:	258c3789 	addiu	t4,t4,14217
+9fc00dfc:	144c0012 	bne	v0,t4,9fc00e48 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:72
-9fc00dac:	712a0000 	madd	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:73
-9fc00db0:	00001010 	mfhi	v0
+9fc00e00:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:74
-9fc00db4:	144b0005 	bne	v0,t3,9fc00dcc <inst_error>
+9fc00e04:	3c090002 	lui	t1,0x2
+9fc00e08:	2529869f 	addiu	t1,t1,-31073
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:75
-9fc00db8:	00001012 	mflo	v0
+9fc00e0c:	3c0a0002 	lui	t2,0x2
+9fc00e10:	254a869f 	addiu	t2,t2,-31073
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:76
-9fc00dbc:	144c0003 	bne	v0,t4,9fc00dcc <inst_error>
+9fc00e14:	3c0b0000 	lui	t3,0x0
+9fc00e18:	256b0022 	addiu	t3,t3,34
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:77
+9fc00e1c:	3c0c9ce2 	lui	t4,0x9ce2
+9fc00e20:	258c3789 	addiu	t4,t4,14217
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:78
-9fc00dc0:	16400002 	bnez	s2,9fc00dcc <inst_error>
+9fc00e24:	712a0000 	madd	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:79
-9fc00dc4:	00000000 	nop
+9fc00e28:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:80
+9fc00e2c:	144b0006 	bne	v0,t3,9fc00e48 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:81
-9fc00dc8:	26730001 	addiu	s3,s3,1
-
-9fc00dcc <inst_error>:
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:84
-9fc00dcc:	00104e00 	sll	t1,s0,0x18
+9fc00e30:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:82
+9fc00e34:	144c0004 	bne	v0,t4,9fc00e48 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:83
+9fc00e38:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:85
+9fc00e3c:	16400002 	bnez	s2,9fc00e48 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:86
-9fc00dd0:	01334025 	or	t0,t1,s3
+9fc00e40:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:88
-9fc00dd4:	ae280000 	sw	t0,0(s1)
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:89
-9fc00dd8:	03e00008 	jr	ra
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:90
-9fc00ddc:	00000000 	nop
+9fc00e44:	26730001 	addiu	s3,s3,1
 
-9fc00de0 <n7_maddu_test>:
+9fc00e48 <inst_error>:
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:91
+9fc00e48:	00104e00 	sll	t1,s0,0x18
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:93
+9fc00e4c:	01334025 	or	t0,t1,s3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:95
+9fc00e50:	ae280000 	sw	t0,0(s1)
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:96
+9fc00e54:	03e00008 	jr	ra
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n6_madd.S:97
+9fc00e58:	00000000 	nop
+9fc00e5c:	00000000 	nop
+
+9fc00e60 <n7_maddu_test>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:7
-9fc00de0:	26100001 	addiu	s0,s0,1
+9fc00e60:	26100001 	addiu	s0,s0,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:8
-9fc00de4:	24120000 	li	s2,0
+9fc00e64:	24120000 	li	s2,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:10
-9fc00de8:	3c040000 	lui	a0,0x0
-9fc00dec:	24840000 	addiu	a0,a0,0
+9fc00e68:	3c040000 	lui	a0,0x0
+9fc00e6c:	24840000 	addiu	a0,a0,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:11
-9fc00df0:	00800011 	mthi	a0
+9fc00e70:	00800011 	mthi	a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:12
-9fc00df4:	00800013 	mtlo	a0
+9fc00e74:	00800013 	mtlo	a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:13
-9fc00df8:	00001010 	mfhi	v0
+9fc00e78:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:14
-9fc00dfc:	14440053 	bne	v0,a0,9fc00f4c <inst_error>
+9fc00e7c:	1444005a 	bne	v0,a0,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:15
-9fc00e00:	00001012 	mflo	v0
+9fc00e80:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:16
-9fc00e04:	14440051 	bne	v0,a0,9fc00f4c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:18
-9fc00e08:	3c090000 	lui	t1,0x0
-9fc00e0c:	2529ffff 	addiu	t1,t1,-1
+9fc00e84:	14440058 	bne	v0,a0,9fc00fe8 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:17
+9fc00e88:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:19
-9fc00e10:	3c0a0000 	lui	t2,0x0
-9fc00e14:	254a0001 	addiu	t2,t2,1
+9fc00e8c:	3c090000 	lui	t1,0x0
+9fc00e90:	2529ffff 	addiu	t1,t1,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:20
-9fc00e18:	3c0b0000 	lui	t3,0x0
-9fc00e1c:	256b0000 	addiu	t3,t3,0
+9fc00e94:	3c0a0000 	lui	t2,0x0
+9fc00e98:	254a0001 	addiu	t2,t2,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:21
-9fc00e20:	3c0c0000 	lui	t4,0x0
-9fc00e24:	258cffff 	addiu	t4,t4,-1
+9fc00e9c:	3c0b0000 	lui	t3,0x0
+9fc00ea0:	256b0000 	addiu	t3,t3,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:22
-9fc00e28:	712a0001 	maddu	t1,t2
+9fc00ea4:	3c0c0000 	lui	t4,0x0
+9fc00ea8:	258cffff 	addiu	t4,t4,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:23
-9fc00e2c:	00001010 	mfhi	v0
+9fc00eac:	712a0001 	maddu	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:24
-9fc00e30:	144b0046 	bne	v0,t3,9fc00f4c <inst_error>
+9fc00eb0:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:25
-9fc00e34:	00001012 	mflo	v0
+9fc00eb4:	144b004c 	bne	v0,t3,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:26
-9fc00e38:	144c0044 	bne	v0,t4,9fc00f4c <inst_error>
+9fc00eb8:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:27
+9fc00ebc:	144c004a 	bne	v0,t4,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:28
-9fc00e3c:	3c090000 	lui	t1,0x0
-9fc00e40:	25290001 	addiu	t1,t1,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:29
-9fc00e44:	3c0a0000 	lui	t2,0x0
-9fc00e48:	254a0001 	addiu	t2,t2,1
+9fc00ec0:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:30
-9fc00e4c:	3c0b0000 	lui	t3,0x0
-9fc00e50:	256b0001 	addiu	t3,t3,1
+9fc00ec4:	3c090000 	lui	t1,0x0
+9fc00ec8:	25290001 	addiu	t1,t1,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:31
-9fc00e54:	3c0c0000 	lui	t4,0x0
-9fc00e58:	258c0000 	addiu	t4,t4,0
+9fc00ecc:	3c0a0000 	lui	t2,0x0
+9fc00ed0:	254a0001 	addiu	t2,t2,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:32
-9fc00e5c:	712a0001 	maddu	t1,t2
+9fc00ed4:	3c0b0000 	lui	t3,0x0
+9fc00ed8:	256b0001 	addiu	t3,t3,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:33
-9fc00e60:	00001010 	mfhi	v0
+9fc00edc:	3c0c0000 	lui	t4,0x0
+9fc00ee0:	258c0000 	addiu	t4,t4,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:34
-9fc00e64:	144b0039 	bne	v0,t3,9fc00f4c <inst_error>
+9fc00ee4:	712a0001 	maddu	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:35
-9fc00e68:	00001012 	mflo	v0
+9fc00ee8:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:36
-9fc00e6c:	144c0037 	bne	v0,t4,9fc00f4c <inst_error>
+9fc00eec:	144b003e 	bne	v0,t3,9fc00fe8 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:37
+9fc00ef0:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:38
-9fc00e70:	3c090000 	lui	t1,0x0
-9fc00e74:	25290003 	addiu	t1,t1,3
+9fc00ef4:	144c003c 	bne	v0,t4,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:39
-9fc00e78:	3c0a0000 	lui	t2,0x0
-9fc00e7c:	254a0004 	addiu	t2,t2,4
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:40
-9fc00e80:	3c0b0000 	lui	t3,0x0
-9fc00e84:	256b0001 	addiu	t3,t3,1
+9fc00ef8:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:41
-9fc00e88:	3c0c0000 	lui	t4,0x0
-9fc00e8c:	258c000c 	addiu	t4,t4,12
+9fc00efc:	3c090000 	lui	t1,0x0
+9fc00f00:	25290003 	addiu	t1,t1,3
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:42
-9fc00e90:	712a0001 	maddu	t1,t2
+9fc00f04:	3c0a0000 	lui	t2,0x0
+9fc00f08:	254a0004 	addiu	t2,t2,4
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:43
-9fc00e94:	00001010 	mfhi	v0
+9fc00f0c:	3c0b0000 	lui	t3,0x0
+9fc00f10:	256b0001 	addiu	t3,t3,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:44
-9fc00e98:	144b002c 	bne	v0,t3,9fc00f4c <inst_error>
+9fc00f14:	3c0c0000 	lui	t4,0x0
+9fc00f18:	258c000c 	addiu	t4,t4,12
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:45
-9fc00e9c:	00001012 	mflo	v0
+9fc00f1c:	712a0001 	maddu	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:46
-9fc00ea0:	144c002a 	bne	v0,t4,9fc00f4c <inst_error>
+9fc00f20:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:47
+9fc00f24:	144b0030 	bne	v0,t3,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:48
-9fc00ea4:	3c090000 	lui	t1,0x0
-9fc00ea8:	25293051 	addiu	t1,t1,12369
+9fc00f28:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:49
-9fc00eac:	3c0a0002 	lui	t2,0x2
-9fc00eb0:	254a81fc 	addiu	t2,t2,-32260
+9fc00f2c:	144c002e 	bne	v0,t4,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:50
-9fc00eb4:	3c0b0000 	lui	t3,0x0
-9fc00eb8:	256b0001 	addiu	t3,t3,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:51
-9fc00ebc:	3c0c48d9 	lui	t4,0x48d9
-9fc00ec0:	258c60c8 	addiu	t4,t4,24776
+9fc00f30:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:52
-9fc00ec4:	712a0001 	maddu	t1,t2
+9fc00f34:	3c090000 	lui	t1,0x0
+9fc00f38:	25293051 	addiu	t1,t1,12369
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:53
-9fc00ec8:	00001010 	mfhi	v0
+9fc00f3c:	3c0a0002 	lui	t2,0x2
+9fc00f40:	254a81fc 	addiu	t2,t2,-32260
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:54
-9fc00ecc:	144b001f 	bne	v0,t3,9fc00f4c <inst_error>
+9fc00f44:	3c0b0000 	lui	t3,0x0
+9fc00f48:	256b0001 	addiu	t3,t3,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:55
-9fc00ed0:	00001012 	mflo	v0
+9fc00f4c:	3c0c48d9 	lui	t4,0x48d9
+9fc00f50:	258c60c8 	addiu	t4,t4,24776
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:56
-9fc00ed4:	144c001d 	bne	v0,t4,9fc00f4c <inst_error>
+9fc00f54:	712a0001 	maddu	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:57
+9fc00f58:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:58
-9fc00ed8:	3c094000 	lui	t1,0x4000
-9fc00edc:	25290000 	addiu	t1,t1,0
+9fc00f5c:	144b0022 	bne	v0,t3,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:59
-9fc00ee0:	3c0a0000 	lui	t2,0x0
-9fc00ee4:	254a0080 	addiu	t2,t2,128
+9fc00f60:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:60
-9fc00ee8:	3c0b0000 	lui	t3,0x0
-9fc00eec:	256b0021 	addiu	t3,t3,33
+9fc00f64:	144c0020 	bne	v0,t4,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:61
-9fc00ef0:	3c0c48d9 	lui	t4,0x48d9
-9fc00ef4:	258c60c8 	addiu	t4,t4,24776
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:62
-9fc00ef8:	712a0001 	maddu	t1,t2
+9fc00f68:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:63
-9fc00efc:	00001010 	mfhi	v0
+9fc00f6c:	3c094000 	lui	t1,0x4000
+9fc00f70:	25290000 	addiu	t1,t1,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:64
-9fc00f00:	144b0012 	bne	v0,t3,9fc00f4c <inst_error>
+9fc00f74:	3c0a0000 	lui	t2,0x0
+9fc00f78:	254a0080 	addiu	t2,t2,128
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:65
-9fc00f04:	00001012 	mflo	v0
+9fc00f7c:	3c0b0000 	lui	t3,0x0
+9fc00f80:	256b0021 	addiu	t3,t3,33
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:66
-9fc00f08:	144c0010 	bne	v0,t4,9fc00f4c <inst_error>
+9fc00f84:	3c0c48d9 	lui	t4,0x48d9
+9fc00f88:	258c60c8 	addiu	t4,t4,24776
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:67
+9fc00f8c:	712a0001 	maddu	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:68
-9fc00f0c:	3c090002 	lui	t1,0x2
-9fc00f10:	2529869f 	addiu	t1,t1,-31073
+9fc00f90:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:69
-9fc00f14:	3c0a0002 	lui	t2,0x2
-9fc00f18:	254a869f 	addiu	t2,t2,-31073
+9fc00f94:	144b0014 	bne	v0,t3,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:70
-9fc00f1c:	3c0b0000 	lui	t3,0x0
-9fc00f20:	256b0023 	addiu	t3,t3,35
+9fc00f98:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:71
-9fc00f24:	3c0c9ce2 	lui	t4,0x9ce2
-9fc00f28:	258c3789 	addiu	t4,t4,14217
+9fc00f9c:	144c0012 	bne	v0,t4,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:72
-9fc00f2c:	712a0001 	maddu	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:73
-9fc00f30:	00001010 	mfhi	v0
+9fc00fa0:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:74
-9fc00f34:	144b0005 	bne	v0,t3,9fc00f4c <inst_error>
+9fc00fa4:	3c090002 	lui	t1,0x2
+9fc00fa8:	2529869f 	addiu	t1,t1,-31073
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:75
-9fc00f38:	00001012 	mflo	v0
+9fc00fac:	3c0a0002 	lui	t2,0x2
+9fc00fb0:	254a869f 	addiu	t2,t2,-31073
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:76
-9fc00f3c:	144c0003 	bne	v0,t4,9fc00f4c <inst_error>
+9fc00fb4:	3c0b0000 	lui	t3,0x0
+9fc00fb8:	256b0023 	addiu	t3,t3,35
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:77
+9fc00fbc:	3c0c9ce2 	lui	t4,0x9ce2
+9fc00fc0:	258c3789 	addiu	t4,t4,14217
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:78
-9fc00f40:	16400002 	bnez	s2,9fc00f4c <inst_error>
+9fc00fc4:	712a0001 	maddu	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:79
-9fc00f44:	00000000 	nop
+9fc00fc8:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:80
+9fc00fcc:	144b0006 	bne	v0,t3,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:81
-9fc00f48:	26730001 	addiu	s3,s3,1
-
-9fc00f4c <inst_error>:
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:84
-9fc00f4c:	00104e00 	sll	t1,s0,0x18
+9fc00fd0:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:82
+9fc00fd4:	144c0004 	bne	v0,t4,9fc00fe8 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:83
+9fc00fd8:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:85
+9fc00fdc:	16400002 	bnez	s2,9fc00fe8 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:86
-9fc00f50:	01334025 	or	t0,t1,s3
+9fc00fe0:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:88
-9fc00f54:	ae280000 	sw	t0,0(s1)
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:89
-9fc00f58:	03e00008 	jr	ra
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:90
-9fc00f5c:	00000000 	nop
+9fc00fe4:	26730001 	addiu	s3,s3,1
 
-9fc00f60 <n8_msub_test>:
+9fc00fe8 <inst_error>:
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:91
+9fc00fe8:	00104e00 	sll	t1,s0,0x18
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:93
+9fc00fec:	01334025 	or	t0,t1,s3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:95
+9fc00ff0:	ae280000 	sw	t0,0(s1)
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:96
+9fc00ff4:	03e00008 	jr	ra
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n7_maddu.S:97
+9fc00ff8:	00000000 	nop
+9fc00ffc:	00000000 	nop
+
+9fc01000 <n8_msub_test>:
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:7
-9fc00f60:	26100001 	addiu	s0,s0,1
+9fc01000:	26100001 	addiu	s0,s0,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:8
-9fc00f64:	24120000 	li	s2,0
+9fc01004:	24120000 	li	s2,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:10
-9fc00f68:	3c040000 	lui	a0,0x0
-9fc00f6c:	24840000 	addiu	a0,a0,0
+9fc01008:	3c040000 	lui	a0,0x0
+9fc0100c:	24840000 	addiu	a0,a0,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:11
-9fc00f70:	00800011 	mthi	a0
+9fc01010:	00800011 	mthi	a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:12
-9fc00f74:	00800013 	mtlo	a0
+9fc01014:	00800013 	mtlo	a0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:13
-9fc00f78:	00001010 	mfhi	v0
+9fc01018:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:14
-9fc00f7c:	14440053 	bne	v0,a0,9fc010cc <inst_error>
+9fc0101c:	1444005a 	bne	v0,a0,9fc01188 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:15
-9fc00f80:	00001012 	mflo	v0
+9fc01020:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:16
-9fc00f84:	14440051 	bne	v0,a0,9fc010cc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:18
-9fc00f88:	3c090000 	lui	t1,0x0
-9fc00f8c:	2529ffff 	addiu	t1,t1,-1
+9fc01024:	14440058 	bne	v0,a0,9fc01188 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:17
+9fc01028:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:19
-9fc00f90:	3c0a0000 	lui	t2,0x0
-9fc00f94:	254a0001 	addiu	t2,t2,1
+9fc0102c:	3c090000 	lui	t1,0x0
+9fc01030:	2529ffff 	addiu	t1,t1,-1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:20
-9fc00f98:	3c0b0000 	lui	t3,0x0
-9fc00f9c:	256b0000 	addiu	t3,t3,0
+9fc01034:	3c0a0000 	lui	t2,0x0
+9fc01038:	254a0001 	addiu	t2,t2,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:21
-9fc00fa0:	3c0c0000 	lui	t4,0x0
-9fc00fa4:	258c0001 	addiu	t4,t4,1
+9fc0103c:	3c0b0000 	lui	t3,0x0
+9fc01040:	256b0000 	addiu	t3,t3,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:22
-9fc00fa8:	712a0004 	msub	t1,t2
+9fc01044:	3c0c0000 	lui	t4,0x0
+9fc01048:	258c0001 	addiu	t4,t4,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:23
-9fc00fac:	00001010 	mfhi	v0
+9fc0104c:	712a0004 	msub	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:24
-9fc00fb0:	144b0046 	bne	v0,t3,9fc010cc <inst_error>
+9fc01050:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:25
-9fc00fb4:	00001012 	mflo	v0
+9fc01054:	144b004c 	bne	v0,t3,9fc01188 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:26
-9fc00fb8:	144c0044 	bne	v0,t4,9fc010cc <inst_error>
+9fc01058:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:27
+9fc0105c:	144c004a 	bne	v0,t4,9fc01188 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:28
-9fc00fbc:	3c090000 	lui	t1,0x0
-9fc00fc0:	25290001 	addiu	t1,t1,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:29
-9fc00fc4:	3c0a0000 	lui	t2,0x0
-9fc00fc8:	254a0001 	addiu	t2,t2,1
+9fc01060:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:30
-9fc00fcc:	3c0b0000 	lui	t3,0x0
-9fc00fd0:	256b0000 	addiu	t3,t3,0
+9fc01064:	3c090000 	lui	t1,0x0
+9fc01068:	25290001 	addiu	t1,t1,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:31
-9fc00fd4:	3c0c0000 	lui	t4,0x0
-9fc00fd8:	258c0000 	addiu	t4,t4,0
+9fc0106c:	3c0a0000 	lui	t2,0x0
+9fc01070:	254a0001 	addiu	t2,t2,1
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:32
-9fc00fdc:	712a0004 	msub	t1,t2
+9fc01074:	3c0b0000 	lui	t3,0x0
+9fc01078:	256b0000 	addiu	t3,t3,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:33
-9fc00fe0:	00001010 	mfhi	v0
+9fc0107c:	3c0c0000 	lui	t4,0x0
+9fc01080:	258c0000 	addiu	t4,t4,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:34
-9fc00fe4:	144b0039 	bne	v0,t3,9fc010cc <inst_error>
+9fc01084:	712a0004 	msub	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:35
-9fc00fe8:	00001012 	mflo	v0
+9fc01088:	00001010 	mfhi	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:36
-9fc00fec:	144c0037 	bne	v0,t4,9fc010cc <inst_error>
+9fc0108c:	144b003e 	bne	v0,t3,9fc01188 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:37
+9fc01090:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:38
-9fc00ff0:	3c090000 	lui	t1,0x0
-9fc00ff4:	25290003 	addiu	t1,t1,3
+9fc01094:	144c003c 	bne	v0,t4,9fc01188 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:39
-9fc00ff8:	3c0a0000 	lui	t2,0x0
-9fc00ffc:	254afffc 	addiu	t2,t2,-4
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:40
-9fc01000:	3c0b0000 	lui	t3,0x0
-9fc01004:	256b0000 	addiu	t3,t3,0
+9fc01098:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:41
-9fc01008:	3c0c0000 	lui	t4,0x0
-9fc0100c:	258c000c 	addiu	t4,t4,12
+9fc0109c:	3c090000 	lui	t1,0x0
+9fc010a0:	25290003 	addiu	t1,t1,3
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:42
-9fc01010:	712a0004 	msub	t1,t2
+9fc010a4:	3c0a0000 	lui	t2,0x0
+9fc010a8:	254afffc 	addiu	t2,t2,-4
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:43
-9fc01014:	00001010 	mfhi	v0
+9fc010ac:	3c0b0000 	lui	t3,0x0
+9fc010b0:	256b0000 	addiu	t3,t3,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:44
-9fc01018:	144b002c 	bne	v0,t3,9fc010cc <inst_error>
+9fc010b4:	3c0c0000 	lui	t4,0x0
+9fc010b8:	258c000c 	addiu	t4,t4,12
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:45
-9fc0101c:	00001012 	mflo	v0
+9fc010bc:	712a0004 	msub	t1,t2
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:46
-9fc01020:	144c002a 	bne	v0,t4,9fc010cc <inst_error>
+9fc010c0:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:47
+9fc010c4:	144b0030 	bne	v0,t3,9fc01188 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:48
-9fc01024:	3c090000 	lui	t1,0x0
-9fc01028:	25293051 	addiu	t1,t1,12369
+9fc010c8:	00001012 	mflo	v0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:49
-9fc0102c:	3c0afffe 	lui	t2,0xfffe
-9fc01030:	254a7e04 	addiu	t2,t2,32260
+9fc010cc:	144c002e 	bne	v0,t4,9fc01188 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:50
-9fc01034:	3c0b0000 	lui	t3,0x0
-9fc01038:	256b0000 	addiu	t3,t3,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:51
-9fc0103c:	3c0c48d9 	lui	t4,0x48d9
-9fc01040:	258c60c8 	addiu	t4,t4,24776
+9fc010d0:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:52
-9fc01044:	712a0004 	msub	t1,t2
+9fc010d4:	3c090000 	lui	t1,0x0
+9fc010d8:	25293051 	addiu	t1,t1,12369
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:53
-9fc01048:	00001010 	mfhi	v0
+9fc010dc:	3c0afffe 	lui	t2,0xfffe
+9fc010e0:	254a7e04 	addiu	t2,t2,32260
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:54
-9fc0104c:	144b001f 	bne	v0,t3,9fc010cc <inst_error>
+9fc010e4:	3c0b0000 	lui	t3,0x0
+9fc010e8:	256b0000 	addiu	t3,t3,0
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:55
-9fc01050:	00001012 	mflo	v0
+9fc010ec:	3c0c48d9 	lui	t4,0x48d9
+9fc010f0:	258c60c8 	addiu	t4,t4,24776
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:56
-9fc01054:	144c001d 	bne	v0,t4,9fc010cc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:58
-9fc01058:	3c094000 	lui	t1,0x4000
-9fc0105c:	25290000 	addiu	t1,t1,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:59
-9fc01060:	3c0a0000 	lui	t2,0x0
-9fc01064:	254a0080 	addiu	t2,t2,128
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:60
-9fc01068:	3c0b8000 	lui	t3,0x8000
-9fc0106c:	256b001f 	addiu	t3,t3,31
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:61
-9fc01070:	3c0cb727 	lui	t4,0xb727
-9fc01074:	258c9f38 	addiu	t4,t4,-24776
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:62
-9fc01078:	712a0004 	msub	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:63
-9fc0107c:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:64
-9fc01080:	144b0012 	bne	v0,t3,9fc010cc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:65
-9fc01084:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:66
-9fc01088:	144c0010 	bne	v0,t4,9fc010cc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:68
-9fc0108c:	3c090002 	lui	t1,0x2
-9fc01090:	2529869f 	addiu	t1,t1,-31073
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:69
-9fc01094:	3c0afffe 	lui	t2,0xfffe
-9fc01098:	254a7961 	addiu	t2,t2,31073
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:70
-9fc0109c:	3c0b8000 	lui	t3,0x8000
-9fc010a0:	256b001d 	addiu	t3,t3,29
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:71
-9fc010a4:	3c0c631e 	lui	t4,0x631e
-9fc010a8:	258cc877 	addiu	t4,t4,-14217
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:72
-9fc010ac:	712a0004 	msub	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:73
-9fc010b0:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:74
-9fc010b4:	144b0005 	bne	v0,t3,9fc010cc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:75
-9fc010b8:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:76
-9fc010bc:	144c0003 	bne	v0,t4,9fc010cc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:78
-9fc010c0:	16400002 	bnez	s2,9fc010cc <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:79
-9fc010c4:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:81
-9fc010c8:	26730001 	addiu	s3,s3,1
-
-9fc010cc <inst_error>:
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:84
-9fc010cc:	00104e00 	sll	t1,s0,0x18
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:86
-9fc010d0:	01334025 	or	t0,t1,s3
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:88
-9fc010d4:	ae280000 	sw	t0,0(s1)
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:89
-9fc010d8:	03e00008 	jr	ra
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:90
-9fc010dc:	00000000 	nop
-
-9fc010e0 <n9_msubu_test>:
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:7
-9fc010e0:	26100001 	addiu	s0,s0,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:8
-9fc010e4:	24120000 	li	s2,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:10
-9fc010e8:	3c040000 	lui	a0,0x0
-9fc010ec:	24840000 	addiu	a0,a0,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:11
-9fc010f0:	00800011 	mthi	a0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:12
-9fc010f4:	00800013 	mtlo	a0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:13
+9fc010f4:	712a0004 	msub	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:57
 9fc010f8:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:14
-9fc010fc:	14440053 	bne	v0,a0,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:15
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:58
+9fc010fc:	144b0022 	bne	v0,t3,9fc01188 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:59
 9fc01100:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:16
-9fc01104:	14440051 	bne	v0,a0,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:18
-9fc01108:	3c090000 	lui	t1,0x0
-9fc0110c:	2529ffff 	addiu	t1,t1,-1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:19
-9fc01110:	3c0a0000 	lui	t2,0x0
-9fc01114:	254a0001 	addiu	t2,t2,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:20
-9fc01118:	3c0b0000 	lui	t3,0x0
-9fc0111c:	256b0000 	addiu	t3,t3,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:21
-9fc01120:	3c0c0000 	lui	t4,0x0
-9fc01124:	258c0001 	addiu	t4,t4,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:22
-9fc01128:	712a0005 	msubu	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:23
-9fc0112c:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:24
-9fc01130:	144b0046 	bne	v0,t3,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:25
-9fc01134:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:26
-9fc01138:	144c0044 	bne	v0,t4,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:28
-9fc0113c:	3c090000 	lui	t1,0x0
-9fc01140:	25290001 	addiu	t1,t1,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:29
-9fc01144:	3c0a0000 	lui	t2,0x0
-9fc01148:	254a0001 	addiu	t2,t2,1
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:30
-9fc0114c:	3c0b0000 	lui	t3,0x0
-9fc01150:	256b0000 	addiu	t3,t3,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:31
-9fc01154:	3c0c0000 	lui	t4,0x0
-9fc01158:	258c0000 	addiu	t4,t4,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:32
-9fc0115c:	712a0005 	msubu	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:33
-9fc01160:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:34
-9fc01164:	144b0039 	bne	v0,t3,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:35
-9fc01168:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:36
-9fc0116c:	144c0037 	bne	v0,t4,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:38
-9fc01170:	3c090000 	lui	t1,0x0
-9fc01174:	25290003 	addiu	t1,t1,3
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:39
-9fc01178:	3c0a0000 	lui	t2,0x0
-9fc0117c:	254afffc 	addiu	t2,t2,-4
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:40
-9fc01180:	3c0b0000 	lui	t3,0x0
-9fc01184:	256b0000 	addiu	t3,t3,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:41
-9fc01188:	3c0c0000 	lui	t4,0x0
-9fc0118c:	258c000c 	addiu	t4,t4,12
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:42
-9fc01190:	712a0005 	msubu	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:43
-9fc01194:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:44
-9fc01198:	144b002c 	bne	v0,t3,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:45
-9fc0119c:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:46
-9fc011a0:	144c002a 	bne	v0,t4,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:48
-9fc011a4:	3c090000 	lui	t1,0x0
-9fc011a8:	25293051 	addiu	t1,t1,12369
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:49
-9fc011ac:	3c0afffe 	lui	t2,0xfffe
-9fc011b0:	254a7e04 	addiu	t2,t2,32260
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:50
-9fc011b4:	3c0b0000 	lui	t3,0x0
-9fc011b8:	256b0000 	addiu	t3,t3,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:51
-9fc011bc:	3c0c48d9 	lui	t4,0x48d9
-9fc011c0:	258c60c8 	addiu	t4,t4,24776
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:52
-9fc011c4:	712a0005 	msubu	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:53
-9fc011c8:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:54
-9fc011cc:	144b001f 	bne	v0,t3,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:55
-9fc011d0:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:56
-9fc011d4:	144c001d 	bne	v0,t4,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:58
-9fc011d8:	3c094000 	lui	t1,0x4000
-9fc011dc:	25290000 	addiu	t1,t1,0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:59
-9fc011e0:	3c0a0000 	lui	t2,0x0
-9fc011e4:	254a0080 	addiu	t2,t2,128
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:60
-9fc011e8:	3c0b0000 	lui	t3,0x0
-9fc011ec:	256bffe0 	addiu	t3,t3,-32
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:61
-9fc011f0:	3c0c48d9 	lui	t4,0x48d9
-9fc011f4:	258c60c8 	addiu	t4,t4,24776
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:62
-9fc011f8:	712a0005 	msubu	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:63
-9fc011fc:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:64
-9fc01200:	144b0012 	bne	v0,t3,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:65
-9fc01204:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:66
-9fc01208:	144c0010 	bne	v0,t4,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:68
-9fc0120c:	3c090002 	lui	t1,0x2
-9fc01210:	2529869f 	addiu	t1,t1,-31073
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:69
-9fc01214:	3c0afffe 	lui	t2,0xfffe
-9fc01218:	254a7961 	addiu	t2,t2,31073
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:70
-9fc0121c:	3c0b0000 	lui	t3,0x0
-9fc01220:	256bffe2 	addiu	t3,t3,-30
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:71
-9fc01224:	3c0c9ce2 	lui	t4,0x9ce2
-9fc01228:	258c3789 	addiu	t4,t4,14217
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:72
-9fc0122c:	712a0005 	msubu	t1,t2
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:73
-9fc01230:	00001010 	mfhi	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:74
-9fc01234:	144b0005 	bne	v0,t3,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:75
-9fc01238:	00001012 	mflo	v0
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:76
-9fc0123c:	144c0003 	bne	v0,t4,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:78
-9fc01240:	16400002 	bnez	s2,9fc0124c <inst_error>
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:79
-9fc01244:	00000000 	nop
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:81
-9fc01248:	26730001 	addiu	s3,s3,1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:60
+9fc01104:	144c0020 	bne	v0,t4,9fc01188 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:61
+9fc01108:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:63
+9fc0110c:	3c094000 	lui	t1,0x4000
+9fc01110:	25290000 	addiu	t1,t1,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:64
+9fc01114:	3c0a0000 	lui	t2,0x0
+9fc01118:	254a0080 	addiu	t2,t2,128
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:65
+9fc0111c:	3c0b8000 	lui	t3,0x8000
+9fc01120:	256b001f 	addiu	t3,t3,31
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:66
+9fc01124:	3c0cb727 	lui	t4,0xb727
+9fc01128:	258c9f38 	addiu	t4,t4,-24776
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:67
+9fc0112c:	712a0004 	msub	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:68
+9fc01130:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:69
+9fc01134:	144b0014 	bne	v0,t3,9fc01188 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:70
+9fc01138:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:71
+9fc0113c:	144c0012 	bne	v0,t4,9fc01188 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:72
+9fc01140:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:74
+9fc01144:	3c090002 	lui	t1,0x2
+9fc01148:	2529869f 	addiu	t1,t1,-31073
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:75
+9fc0114c:	3c0afffe 	lui	t2,0xfffe
+9fc01150:	254a7961 	addiu	t2,t2,31073
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:76
+9fc01154:	3c0b8000 	lui	t3,0x8000
+9fc01158:	256b001d 	addiu	t3,t3,29
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:77
+9fc0115c:	3c0c631e 	lui	t4,0x631e
+9fc01160:	258cc877 	addiu	t4,t4,-14217
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:78
+9fc01164:	712a0004 	msub	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:79
+9fc01168:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:80
+9fc0116c:	144b0006 	bne	v0,t3,9fc01188 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:81
+9fc01170:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:82
+9fc01174:	144c0004 	bne	v0,t4,9fc01188 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:83
+9fc01178:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:85
+9fc0117c:	16400002 	bnez	s2,9fc01188 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:86
+9fc01180:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:88
+9fc01184:	26730001 	addiu	s3,s3,1
 
-9fc0124c <inst_error>:
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:84
-9fc0124c:	00104e00 	sll	t1,s0,0x18
+9fc01188 <inst_error>:
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:91
+9fc01188:	00104e00 	sll	t1,s0,0x18
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:93
+9fc0118c:	01334025 	or	t0,t1,s3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:95
+9fc01190:	ae280000 	sw	t0,0(s1)
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:96
+9fc01194:	03e00008 	jr	ra
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n8_msub.S:97
+9fc01198:	00000000 	nop
+9fc0119c:	00000000 	nop
+
+9fc011a0 <n9_msubu_test>:
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:7
+9fc011a0:	26100001 	addiu	s0,s0,1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:8
+9fc011a4:	24120000 	li	s2,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:10
+9fc011a8:	3c040000 	lui	a0,0x0
+9fc011ac:	24840000 	addiu	a0,a0,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:11
+9fc011b0:	00800011 	mthi	a0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:12
+9fc011b4:	00800013 	mtlo	a0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:13
+9fc011b8:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:14
+9fc011bc:	1444005a 	bne	v0,a0,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:15
+9fc011c0:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:16
+9fc011c4:	14440058 	bne	v0,a0,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:17
+9fc011c8:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:19
+9fc011cc:	3c090000 	lui	t1,0x0
+9fc011d0:	2529ffff 	addiu	t1,t1,-1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:20
+9fc011d4:	3c0a0000 	lui	t2,0x0
+9fc011d8:	254a0001 	addiu	t2,t2,1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:21
+9fc011dc:	3c0b0000 	lui	t3,0x0
+9fc011e0:	256b0000 	addiu	t3,t3,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:22
+9fc011e4:	3c0c0000 	lui	t4,0x0
+9fc011e8:	258c0001 	addiu	t4,t4,1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:23
+9fc011ec:	712a0005 	msubu	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:24
+9fc011f0:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:25
+9fc011f4:	144b004c 	bne	v0,t3,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:26
+9fc011f8:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:27
+9fc011fc:	144c004a 	bne	v0,t4,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:28
+9fc01200:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:30
+9fc01204:	3c090000 	lui	t1,0x0
+9fc01208:	25290001 	addiu	t1,t1,1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:31
+9fc0120c:	3c0a0000 	lui	t2,0x0
+9fc01210:	254a0001 	addiu	t2,t2,1
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:32
+9fc01214:	3c0b0000 	lui	t3,0x0
+9fc01218:	256b0000 	addiu	t3,t3,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:33
+9fc0121c:	3c0c0000 	lui	t4,0x0
+9fc01220:	258c0000 	addiu	t4,t4,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:34
+9fc01224:	712a0005 	msubu	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:35
+9fc01228:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:36
+9fc0122c:	144b003e 	bne	v0,t3,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:37
+9fc01230:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:38
+9fc01234:	144c003c 	bne	v0,t4,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:39
+9fc01238:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:41
+9fc0123c:	3c090000 	lui	t1,0x0
+9fc01240:	25290003 	addiu	t1,t1,3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:42
+9fc01244:	3c0a0000 	lui	t2,0x0
+9fc01248:	254afffc 	addiu	t2,t2,-4
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:43
+9fc0124c:	3c0b0000 	lui	t3,0x0
+9fc01250:	256b0000 	addiu	t3,t3,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:44
+9fc01254:	3c0c0000 	lui	t4,0x0
+9fc01258:	258c000c 	addiu	t4,t4,12
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:45
+9fc0125c:	712a0005 	msubu	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:46
+9fc01260:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:47
+9fc01264:	144b0030 	bne	v0,t3,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:48
+9fc01268:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:49
+9fc0126c:	144c002e 	bne	v0,t4,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:50
+9fc01270:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:52
+9fc01274:	3c090000 	lui	t1,0x0
+9fc01278:	25293051 	addiu	t1,t1,12369
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:53
+9fc0127c:	3c0afffe 	lui	t2,0xfffe
+9fc01280:	254a7e04 	addiu	t2,t2,32260
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:54
+9fc01284:	3c0b0000 	lui	t3,0x0
+9fc01288:	256b0000 	addiu	t3,t3,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:55
+9fc0128c:	3c0c48d9 	lui	t4,0x48d9
+9fc01290:	258c60c8 	addiu	t4,t4,24776
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:56
+9fc01294:	712a0005 	msubu	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:57
+9fc01298:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:58
+9fc0129c:	144b0022 	bne	v0,t3,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:59
+9fc012a0:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:60
+9fc012a4:	144c0020 	bne	v0,t4,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:61
+9fc012a8:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:63
+9fc012ac:	3c094000 	lui	t1,0x4000
+9fc012b0:	25290000 	addiu	t1,t1,0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:64
+9fc012b4:	3c0a0000 	lui	t2,0x0
+9fc012b8:	254a0080 	addiu	t2,t2,128
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:65
+9fc012bc:	3c0b0000 	lui	t3,0x0
+9fc012c0:	256bffe0 	addiu	t3,t3,-32
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:66
+9fc012c4:	3c0c48d9 	lui	t4,0x48d9
+9fc012c8:	258c60c8 	addiu	t4,t4,24776
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:67
+9fc012cc:	712a0005 	msubu	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:68
+9fc012d0:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:69
+9fc012d4:	144b0014 	bne	v0,t3,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:70
+9fc012d8:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:71
+9fc012dc:	144c0012 	bne	v0,t4,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:72
+9fc012e0:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:74
+9fc012e4:	3c090002 	lui	t1,0x2
+9fc012e8:	2529869f 	addiu	t1,t1,-31073
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:75
+9fc012ec:	3c0afffe 	lui	t2,0xfffe
+9fc012f0:	254a7961 	addiu	t2,t2,31073
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:76
+9fc012f4:	3c0b0000 	lui	t3,0x0
+9fc012f8:	256bffe2 	addiu	t3,t3,-30
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:77
+9fc012fc:	3c0c9ce2 	lui	t4,0x9ce2
+9fc01300:	258c3789 	addiu	t4,t4,14217
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:78
+9fc01304:	712a0005 	msubu	t1,t2
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:79
+9fc01308:	00001010 	mfhi	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:80
+9fc0130c:	144b0006 	bne	v0,t3,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:81
+9fc01310:	00001012 	mflo	v0
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:82
+9fc01314:	144c0004 	bne	v0,t4,9fc01328 <inst_error>
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:83
+9fc01318:	00000000 	nop
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:85
+9fc0131c:	16400002 	bnez	s2,9fc01328 <inst_error>
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:86
-9fc01250:	01334025 	or	t0,t1,s3
+9fc01320:	00000000 	nop
 /home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:88
-9fc01254:	ae280000 	sw	t0,0(s1)
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:89
-9fc01258:	03e00008 	jr	ra
-/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:90
-9fc0125c:	00000000 	nop
-inst_error():
-9fc01260:	9e3f7f70 	0x9e3f7f70
+9fc01324:	26730001 	addiu	s3,s3,1
+
+9fc01328 <inst_error>:
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:91
+9fc01328:	00104e00 	sll	t1,s0,0x18
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:93
+9fc0132c:	01334025 	or	t0,t1,s3
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:95
+9fc01330:	ae280000 	sw	t0,0(s1)
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:96
+9fc01334:	03e00008 	jr	ra
+/home/zymelaii/workspace/ReMIPS/test/testcase/func_extra/inst/n9_msubu.S:97
+9fc01338:	00000000 	nop
+9fc0133c:	00000000 	nop
+9fc01340:	9e3f7f70 	0x9e3f7f70
 	...

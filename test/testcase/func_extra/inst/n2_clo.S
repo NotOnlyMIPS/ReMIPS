@@ -11,16 +11,19 @@ LEAF(n2_clo_test)
     LI(v1, 0)               # out: 0
     clo v0, a1
     bne v0, v1, inst_error
+    nop
 
     LI(a1, 0xefffefff)      # in:  0xefffefff
     LI(v1, 3)               # out: 3
     clo v0, a1
     bne v0, v1, inst_error
+    nop
 
     LI(a1, 0xfffffffe)      # in:  0xfffffffe
     LI(v1, 31)              # out: 31
     clo v0, a1
     bne v0, v1, inst_error
+    nop
 ###detect exception
     bne s2, zero, inst_error
     nop
