@@ -89,7 +89,7 @@ LEAF(n5_mul_test)
     LI(t1, 0x7cffeb)        # in:  0x7cffeb
                             # out: 0xffffffec11945f07
     LI(t3, 0xffffffec)      # out: 0xffffffec
-    LI(v1, 0x11945f07)      # out: 0x11945f07
+    LI(v1, 0xc11945f7)      # out: 0xc11945f7
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error

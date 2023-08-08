@@ -62,8 +62,8 @@ LEAF(n8_msub_test)
 
     LI(t1, 0x40000000)      # in:  0x40000000
     LI(t2, 0x80)            # in:  0x80
-    LI(t3, 0x8000001f)      # out: 0x8000001f
-    LI(t4, 0xb7269f38)      # out: 0xb7269f38
+    LI(t3, 0xffffffe0)      # out: 0xffffffe0
+    LI(t4, 0x48d960c8)      # out: 0x48d960c8
     msub t1, t2
     mfhi v0
     bne v0, t3, inst_error
@@ -72,9 +72,9 @@ LEAF(n8_msub_test)
     nop
 
     LI(t1, 99999)           # in:  99999
-    LI(t2, -99999)          # in: -99999
-    LI(t3, 0x8000001d)      # out: 0x8000001d
-    LI(t4, 0x631dc877)      # out: 0x631dc877
+    LI(t2, -99999)          # in:  -99999
+    LI(t3, 0xffffffe2)      # out: 0xffffffe2
+    LI(t4, 0x9ce23789)      # out: 0x9ce23789
     msub t1, t2
     mfhi v0
     bne v0, t3, inst_error
