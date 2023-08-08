@@ -37,6 +37,8 @@ assign func = inst[ 5: 0];
 assign imm  = inst[15: 0];
 assign jidx = inst[25: 0];
 
+// logic use_src1, use_src2;
+
 // exception
 always_comb begin
     exception_d = exception;
@@ -67,12 +69,11 @@ end
 
 always_comb begin
     inst_d = '0;
-    inst_d.src1 = rs;
-    inst_d.src2 = rt;
-    inst_d.dest = rd;
     inst_d.sel  = sel;
     inst_d.imm  = imm;
     inst_d.jidx = jidx;
+
+    inst_d.use_old_dest = operation == OP_MOVN || operation == OP_MOVZ;
     
     inst_d.cache_op  = Cache_Code_EMPTY;
 
@@ -193,12 +194,14 @@ always_comb begin
         OP_LUI,
         /* count bits */
         OP_CLZ, OP_CLO,
-        /* conditional move */
-        OP_MOVN, OP_MOVZ,
         /* HI/LO move */
         OP_MFHI, OP_MFLO, OP_MTHI, OP_MTLO: begin
             inst_d.is_alu1_op = !is_inst2;
             inst_d.is_alu2_op =  is_inst2;
+        end
+        /* conditional move */
+        OP_MOVN, OP_MOVZ:begin
+            inst_d.is_alu1_op = 1'b1;
         end
         /* multiplication and division */
         OP_MULT, OP_MULTU, OP_DIV, OP_DIVU,
@@ -252,20 +255,26 @@ always_comb begin
         OP_BEQ, OP_BNE,
         OP_LWL, OP_LWR,
         OP_SB, OP_SH, OP_SWL, OP_SW, OP_SWR: begin
-            inst_d.use_src1 = 1'b1;
-            inst_d.use_src2 = 1'b1;
+            // use_src1 = 1'b1;
+            // use_src2 = 1'b1;
+            inst_d.src1 = rs;
+            inst_d.src2 = rt;
         end
         OP_TGE, OP_TGEU, OP_TLT, OP_TLTU, OP_TEQ, OP_TNE: begin
-            inst_d.use_src1 = 1'b1;
-            inst_d.use_src2 = 1'b1;
+            // use_src1 = 1'b1;
+            // use_src2 = 1'b1;
+            inst_d.src1 = rs;
+            inst_d.src2 = rt;
         end
         OP_MFHI: begin
-            inst_d.use_src1 = 1'b1;
+            // use_src1 = 1'b1;
             inst_d.src1 = `REG_HI;
+            inst_d.src2 = '0;
         end
         OP_MFLO: begin
-            inst_d.use_src1 = 1'b1;
+            // use_src1 = 1'b1;
             inst_d.src1 = `REG_LO;
+            inst_d.src2 = '0;
         end
         OP_ADDI, OP_ADDIU, OP_SUBI, OP_SUBIU,
         OP_SLTI, OP_SLTIU,
@@ -279,19 +288,29 @@ always_comb begin
         OP_TGEI, OP_TGEIU, OP_TLTI, OP_TLTIU, OP_TEQI, OP_TNEI,
         OP_CACHE
         : begin
-            inst_d.use_src1 = 1'b1;
+            // use_src1 = 1'b1;
+            inst_d.src1 = rs;
+            inst_d.src2 = '0;
         end
         OP_SLL, OP_SRL, OP_SRA: begin
-            inst_d.use_src2 = 1'b1;
+            // use_src2 = 1'b1;
+            inst_d.src1 = '0;
+            inst_d.src2 = rt;
         end
         OP_MTC0: begin
-            inst_d.use_src2 = 1'b1;
+            // use_src2 = 1'b1;
+            inst_d.src1 = '0;
+            inst_d.src2 = rt;
         end
         OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU: begin
-            inst_d.use_src1 = 1'b1;
-            inst_d.use_src2 = 1'b1;
+            // use_src1 = 1'b1;
+            // use_src2 = 1'b1;
             inst_d.src1 = !is_inst2 ? `REG_HI : rs;
             inst_d.src2 = !is_inst2 ? `REG_LO : rt;
+        end
+        default: begin
+            inst_d.src1 = '0;
+            inst_d.src2 = '0;
         end
     endcase
 
@@ -354,6 +373,10 @@ always_comb begin
         OP_BLTZAL, OP_BGEZAL, OP_JAL: begin
             inst_d.rf_we = 1'b1;
             inst_d.dest = `REG_RA;
+        end
+        default: begin
+            inst_d.rf_we = 1'b0;
+            inst_d.dest  = 0;
         end
     endcase
 

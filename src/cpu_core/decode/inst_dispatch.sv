@@ -21,6 +21,7 @@ module inst_dispatch (
     // inst1
     input  logic  inst1_src1_ready,
     input  logic  inst1_src2_ready,
+    input  logic  inst1_old_dest_ready,
     input  reg_addr_t  inst1_phy_src1,
     input  reg_addr_t  inst1_phy_src2,
     input  reg_addr_t  inst1_phy_dest,
@@ -35,6 +36,7 @@ module inst_dispatch (
     // inst2
     input  logic  inst2_src1_ready,
     input  logic  inst2_src2_ready,
+    input  logic  inst2_old_dest_ready,
     input  reg_addr_t  inst2_phy_src1,
     input  reg_addr_t  inst2_phy_src2,
     input  reg_addr_t  inst2_phy_dest,
@@ -92,6 +94,7 @@ assign pre_issue_inst1.pc    = inst1_pc;
 
 assign pre_issue_inst1.src1_ready = inst1_src1_ready;
 assign pre_issue_inst1.src2_ready = inst1_src2_ready;
+assign pre_issue_inst1.old_dest_ready = inst1_old_dest_ready;
 assign pre_issue_inst1.phy_src1   = inst1_phy_src1;
 assign pre_issue_inst1.phy_src2   = inst1_phy_src2;
 assign pre_issue_inst1.phy_dest   = inst1_phy_dest;
@@ -114,6 +117,7 @@ assign pre_issue_inst2.pc    = inst2_pc;
 
 assign pre_issue_inst2.src1_ready = inst2_src1_ready;
 assign pre_issue_inst2.src2_ready = inst2_src2_ready;
+assign pre_issue_inst2.old_dest_ready = inst2_old_dest_ready;
 assign pre_issue_inst2.phy_src1   = inst2_phy_src1;
 assign pre_issue_inst2.phy_src2   = inst2_phy_src2;
 assign pre_issue_inst2.phy_dest   = inst2_phy_dest;

@@ -307,8 +307,9 @@ typedef struct packed {
 typedef struct packed {
     operation_t  operation;
 
-    logic        use_src1;
-    logic        use_src2;
+    // logic        use_src1;
+    // logic        use_src2;
+    logic        use_old_dest;
     reg_addr_t   src1;
     reg_addr_t   src2;
     // reg_addr_t      rd;
@@ -367,6 +368,7 @@ typedef struct packed {
     virt_t      pc;
     logic    src1_ready;
     logic    src2_ready;
+    logic    old_dest_ready;
     reg_addr_t phy_src1;
     reg_addr_t phy_src2;
     reg_addr_t phy_dest;
@@ -390,6 +392,7 @@ typedef struct packed {
     virt_t     pc;
     logic      src1_ready;
     logic      src2_ready;
+    logic      old_dest_ready;
     reg_addr_t phy_src1;
     reg_addr_t phy_src2;
     reg_addr_t phy_dest;

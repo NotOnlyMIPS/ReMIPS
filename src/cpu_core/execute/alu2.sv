@@ -55,7 +55,7 @@ end
 
 decoded_inst_t inst, inst_r;
 reg_addr_t phy_dest, phy_dest_r;
-uint32_t src1_value, src2_value, old_value;
+uint32_t src1_value, src2_value;
 uint32_t src1_value_r, src2_value_r, old_value_r;
 logic [3:0] rob_entry_num;
 logic [3:0] rob_entry_num_r;
@@ -78,7 +78,7 @@ always_ff @(posedge clk) begin
         phy_dest   <= 'b0;
         src1_value <= 'b0;
         src2_value <= 'b0;
-        old_value  <= 'b0;
+        // old_value  <= 'b0;
         rob_entry_num <= 'b0;
     end
     else if(data_out_we) begin
@@ -86,7 +86,7 @@ always_ff @(posedge clk) begin
         phy_dest      <= use_buffer_data? phy_dest_r     : issue_inst.phy_dest;
         src1_value    <= use_buffer_data? src1_value_r   : issue_inst.src1_value;
         src2_value    <= use_buffer_data? src2_value_r   : issue_inst.src2_value;
-        old_value     <= use_buffer_data? old_value_r    : issue_inst.old_value;
+        // old_value     <= use_buffer_data? old_value_r    : issue_inst.old_value;
         rob_entry_num <= use_buffer_data? rob_entry_num_r: issue_inst.rob_entry_num;
     end
 
@@ -95,7 +95,7 @@ always_ff @(posedge clk) begin
         phy_dest_r      <= 'b0;
         src1_value_r    <= 'b0;
         src2_value_r    <= 'b0;
-        old_value_r     <= 'b0;
+        // old_value_r     <= 'b0;
         rob_entry_num_r <= 'b0;
     end
     else if(data_buffer_we) begin
@@ -103,7 +103,7 @@ always_ff @(posedge clk) begin
         phy_dest_r      <= issue_inst.phy_dest;
         src1_value_r    <= issue_inst.src1_value;
         src2_value_r    <= issue_inst.src2_value;
-        old_value_r     <= issue_inst.old_value;
+        // old_value_r     <= issue_inst.old_value;
         rob_entry_num_r <= issue_inst.rob_entry_num;
     end
 end
@@ -126,8 +126,8 @@ logic op_lui;   //立即数置于高半部分
 logic op_clz;
 logic op_clo;
 
-logic op_movn;
-logic op_movz;
+// logic op_movn;
+// logic op_movz;
 
 logic op_mfhi;
 logic op_mflo;
@@ -163,8 +163,8 @@ assign op_lui  = inst.operation == OP_LUI;
 assign op_clz  = inst.operation == OP_CLZ;
 assign op_clo  = inst.operation == OP_CLO;
 
-assign op_movn = inst.operation == OP_MOVN;
-assign op_movz = inst.operation == OP_MOVZ;
+// assign op_movn = inst.operation == OP_MOVN;
+// assign op_movz = inst.operation == OP_MOVZ;
 
 assign op_mfhi = inst.operation == OP_MFHI;
 assign op_mflo = inst.operation == OP_MFLO;
@@ -184,7 +184,7 @@ uint64_t sr64_result;
 uint32_t sr_result;
 uint32_t clo_result;
 uint32_t clz_result;
-uint32_t cond_move_result;
+// uint32_t cond_move_result;
 
 // 32-bit adder
 wire [32:0] adder_a;
@@ -242,13 +242,13 @@ count_bit count_clo(
     .count(clo_result)
 );
 
-// conditional move
-always_comb begin
-    cond_move_result = old_value;
-    if(op_movz && src2_value == 0 
-    || op_movn && src2_value != 0)
-        cond_move_result = src1_value;
-end
+// // conditional move
+// always_comb begin
+//     cond_move_result = old_value;
+//     if(op_movz && src2_value == 0 
+//     || op_movn && src2_value != 0)
+//         cond_move_result = src1_value;
+// end
 
 // final result mux
 assign alu_result = ({32{op_add|op_addu|op_sub|op_subu  }} & add_sub_result)
@@ -263,7 +263,7 @@ assign alu_result = ({32{op_add|op_addu|op_sub|op_subu  }} & add_sub_result)
                   | ({32{op_srl|op_sra                  }} & sr_result)
                   | ({32{op_clz                         }} & clz_result)
                   | ({32{op_clo                         }} & clo_result)
-                  | ({32{op_movn|op_movz                }} & cond_move_result)
+                //   | ({32{op_movn|op_movz                }} & cond_move_result)
                   | ({32{op_mfhi|op_mflo|op_mthi|op_mtlo}} & src1_value);
 
 // exception

@@ -300,13 +300,13 @@ always_comb begin
     dest_waw_hazard = 0;
     if(map_stage_valid) begin
         if(map_inst1.valid && map_inst2.valid) begin
-            if(map_inst2.inst.use_src1 && map_inst1.inst.rf_we && map_inst2.inst.src1 == map_inst1.inst.dest) begin
+            if(map_inst2.inst.src1 != 0 && map_inst1.inst.rf_we && map_inst2.inst.src1 == map_inst1.inst.dest) begin
                 src1_raw_hazard = 1;
             end
-            if(map_inst2.inst.use_src2 && map_inst1.inst.rf_we && map_inst2.inst.src2 == map_inst1.inst.dest) begin
+            if(map_inst2.inst.src2 != 0 && map_inst1.inst.rf_we && map_inst2.inst.src2 == map_inst1.inst.dest) begin
                 src2_raw_hazard = 1;
             end
-            if(map_inst1.inst.rf_we && map_inst2.inst.rf_we && map_inst1.inst.dest == map_inst2.inst.dest) begin
+            if(map_inst1.inst.dest != 0 && map_inst1.inst.rf_we && map_inst2.inst.rf_we && map_inst1.inst.dest == map_inst2.inst.dest) begin
                 dest_waw_hazard = 1;
             end
         end
@@ -360,8 +360,8 @@ RAT rat (
 
 
 // busy table
-logic inst1_src1_ready, inst1_src2_ready;
-logic inst2_src1_ready, inst2_src2_ready;
+logic inst1_src1_ready, inst1_src2_ready, inst1_old_dest_ready;
+logic inst2_src1_ready, inst2_src2_ready, inst2_old_dest_ready;
 
 busy_table busy_table_u (
     .clk,
@@ -371,16 +371,24 @@ busy_table busy_table_u (
 
     .inst1_src1(inst1_phy_src1),
     .inst1_src2(inst1_phy_src2),
+    .inst1_use_old_dest(map_inst1.valid && map_inst1.inst.use_old_dest),
+    .inst1_old_dest,
     .inst2_src1(inst2_phy_src1),
     .inst2_src2(inst2_phy_src2),
+    .inst2_use_old_dest(map_inst2.valid && map_inst2.inst.use_old_dest),
+    .inst2_old_dest,
 
     .src1_raw_hazard,
     .src2_raw_hazard,
+    .dest_waw_hazard,
 
     .inst1_src1_ready,
     .inst1_src2_ready,
+    .inst1_old_dest_ready,
+
     .inst2_src1_ready,
     .inst2_src2_ready,
+    .inst2_old_dest_ready,
 
     // map
     .map_inst1_rf_we(map_inst1.valid && map_inst1.inst.rf_we),
@@ -420,6 +428,7 @@ inst_dispatch inst_dispatch_u (
     // inst1
     .inst1_src1_ready,
     .inst1_src2_ready,
+    .inst1_old_dest_ready,
     .inst1_phy_src1,
     .inst1_phy_src2,
     .inst1_phy_dest,
@@ -434,6 +443,7 @@ inst_dispatch inst_dispatch_u (
     // inst2
     .inst2_src1_ready,
     .inst2_src2_ready,
+    .inst2_old_dest_ready,
     .inst2_phy_src1,
     .inst2_phy_src2,
     .inst2_phy_dest,
