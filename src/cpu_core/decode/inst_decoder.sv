@@ -84,8 +84,8 @@ always_comb begin
             unique case(rt)
                 5'b00000: operation = OP_BLTZ;
                 5'b00001: operation = OP_BGEZ;
-                5'b00010: operation = OP_BLTZL;
-                5'b00011: operation = OP_BGEZL;
+                // 5'b00010: operation = OP_BLTZL;
+                // 5'b00011: operation = OP_BGEZL;
                 5'b01000: operation = OP_TGEI;
                 5'b01001: operation = OP_TGEIU;
                 5'b01010: operation = OP_TLTI;
@@ -143,14 +143,14 @@ always_comb begin
             6'b011100: begin // SPECIAL2
             unique case(func)
                 /* multiplication and division */
-                6'b000010: operation = OP_MADD;
-                6'b000011: operation = OP_MADDU;
-                6'b000100: operation = OP_MUL;
-                6'b000110: operation = OP_MSUB;
-                6'b000111: operation = OP_MSUBU;
+                6'b000000: operation = OP_MADD;
+                6'b000001: operation = OP_MADDU;
+                6'b000010: operation = OP_MUL;
+                6'b000100: operation = OP_MSUB;
+                6'b000101: operation = OP_MSUBU;
                 /* count bits */
-                6'b001000: operation = OP_CLZ;
-                6'b001001: operation = OP_CLO;
+                6'b100000: operation = OP_CLZ;
+                6'b100001: operation = OP_CLO;
                 /* invalid */
                 default:   operation = OP_INVALID;
             endcase

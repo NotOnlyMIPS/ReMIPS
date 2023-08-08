@@ -7,7 +7,7 @@ module execute_stage(
     input  flush,
 
     // output logic alu1_allowin,
-    // output logic alu2_allowin,
+    output logic alu2_allowin,
     output logic mul_div_allowin,
     // output logic bru_allowin,
     output logic agu_allowin,
@@ -46,7 +46,7 @@ module execute_stage(
     input  uint32_t    cp0_rdata,
 
     // TLB op
-    output logic [2:0] tlb_op,
+    output logic [3:0] tlb_op,
 
     // Cache up
     output logic         cache_op_valid,
@@ -99,9 +99,9 @@ assign alu1_to_cs_allowin    = 1'b1;
 assign bru_to_cs_allowin     = 1'b1;
 assign mul_div_to_cs_allowin = !alu1_to_valid && !bru_to_valid && !alu2_to_valid && !agu_to_valid && !spu_to_valid;
 
-assign alu2_to_cs_allowin    = 1'b1;
-assign agu_to_cs_allowin     = !alu2_to_valid && !spu_to_valid;
-assign spu_to_cs_allowin      = 1'b1;
+assign alu2_to_cs_allowin    = !agu_to_valid;
+assign agu_to_cs_allowin     = 1'b1;
+assign spu_to_cs_allowin     = 1'b1;
 
 // commit
 execute_to_commit_bus_t alu1_to_commit_bus;
@@ -125,9 +125,9 @@ always_comb begin
 
     if(!mul_div_to_cs_allowin)begin
         execute_to_commit_bus1 = alu1_to_valid ? alu1_to_commit_bus : bru_to_commit_bus;
-        execute_to_commit_bus2 = spu_to_valid   ? spu_to_commit_bus   :
-                                 alu2_to_valid ? alu2_to_commit_bus :
-                                                 agu_to_commit_bus  ;
+        execute_to_commit_bus2 = spu_to_valid   ? spu_to_commit_bus :
+                                 agu_to_valid   ? agu_to_commit_bus :
+                                                  alu2_to_commit_bus;
     end
     else begin
         execute_to_commit_bus1 = mul_div_to_commit_bus1;
@@ -189,15 +189,15 @@ bru bru_u (
 );
 
 // alu2
-alu alu2 (
+alu2 alu2_u (
     .clk,
     .reset,
     .flush,
 
     .issue_to_alu_valid(issue_to_alu2_valid),
-    // .alu_allowin       (alu2_allowin       ),
+    .alu_allowin       (alu2_allowin       ),
 
-    // .cs_allowin        (alu2_to_cs_allowin ),
+    .cs_allowin        (alu2_to_cs_allowin ),
     .alu_to_valid      (alu2_to_valid      ),
 
     .issue_inst         (issue_to_execute_bus2),

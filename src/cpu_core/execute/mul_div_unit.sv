@@ -54,10 +54,10 @@ always_ff @(posedge clk) begin
         mul_div_valid <= issue_to_mul_div_valid;
         inst1         <= issue_inst1.inst;
         inst2         <= issue_inst2.inst;
-        src1_value    <= issue_inst1.src1_value;
-        src2_value    <= issue_inst1.src2_value;
-        hi            <= issue_inst2.src1_value;
-        lo            <= issue_inst2.src2_value;
+        src1_value    <= issue_inst2.src1_value;
+        src2_value    <= issue_inst2.src2_value;
+        hi            <= issue_inst1.src1_value;
+        lo            <= issue_inst1.src2_value;
         phy_dest1     <= issue_inst1.phy_dest;
         phy_dest2     <= issue_inst2.phy_dest;
         rob_entry_num1 <= issue_inst1.rob_entry_num;

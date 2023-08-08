@@ -1,15 +1,15 @@
 `include "../cpu.svh"
 
-module alu(
+module alu2(
     input clk,
     input reset,
 
     input flush,
 
     input  logic issue_to_alu_valid,
-    // output logic alu_allowin,
+    output logic alu_allowin,
 
-    // input  logic cs_allowin,
+    input  logic cs_allowin,
     output logic alu_to_valid,
 
     input  issue_to_execute_bus_t issue_inst,
@@ -20,21 +20,60 @@ module alu(
 
 );
 
+typedef enum logic [1:0] { 
+    ALU_EMPTY,
+    ALU_BUSY,
+    ALU_FULL
+} alu_state_t;
+
 // control code
 logic alu_valid;
-logic [3:0] rob_entry_num;
+alu_state_t alu_state, alu_state_next;
+logic push, pop;
+logic data_out_we, data_buffer_we, use_buffer_data;
 
-decoded_inst_t inst;
-reg_addr_t phy_dest;
+assign alu_valid    = alu_state != ALU_EMPTY;
+assign alu_allowin  = alu_state == ALU_EMPTY;
+assign alu_to_valid = alu_state != ALU_EMPTY;
+
+assign push = issue_to_alu_valid && alu_state != ALU_FULL;
+assign pop  = alu_to_valid && cs_allowin;
+
+assign data_out_we = (alu_state == ALU_EMPTY &&  push && !pop)
+                  || (alu_state == ALU_BUSY  &&  push &&  pop)
+                  || (alu_state == ALU_FULL  && !push &&  pop);
+assign data_buffer_we  = alu_state == ALU_BUSY &&  push && !pop; 
+assign use_buffer_data = alu_state == ALU_FULL && !push &&  pop;
+
+always_comb begin
+    unique case(alu_state)
+        ALU_EMPTY: alu_state_next = push ? ALU_BUSY : ALU_EMPTY;
+        ALU_BUSY : alu_state_next = push ? (pop ? ALU_BUSY : ALU_FULL) : (pop ? ALU_EMPTY : ALU_BUSY);
+        ALU_FULL : alu_state_next = pop  ? ALU_BUSY : ALU_FULL;
+    endcase
+end
+
+decoded_inst_t inst, inst_r;
+reg_addr_t phy_dest, phy_dest_r;
 uint32_t src1_value, src2_value, old_value;
+uint32_t src1_value_r, src2_value_r, old_value_r;
+logic [3:0] rob_entry_num;
+logic [3:0] rob_entry_num_r;
 exception_t exception;
+exception_t exception_r;
 
 // assign alu_allowin  = cs_allowin || !alu_valid;
-assign alu_to_valid = alu_valid;
+// assign alu_to_valid = alu_valid;
 
 always_ff @(posedge clk) begin
     if(reset || flush) begin
-        alu_valid  <= 1'b0;
+        alu_state <= ALU_EMPTY;
+    end
+    else if(push || pop) begin
+        alu_state <= alu_state_next;
+    end
+
+    if(reset || flush) begin
         inst       <= 'b0;
         phy_dest   <= 'b0;
         src1_value <= 'b0;
@@ -42,14 +81,30 @@ always_ff @(posedge clk) begin
         old_value  <= 'b0;
         rob_entry_num <= 'b0;
     end
-    else begin
-        alu_valid  <= issue_to_alu_valid;
-        inst       <= issue_inst.inst;
-        phy_dest   <= issue_inst.phy_dest;
-        src1_value <= issue_inst.src1_value;
-        src2_value <= issue_inst.src2_value;
-        old_value  <= issue_inst.old_value;
-        rob_entry_num <= issue_inst.rob_entry_num;
+    else if(data_out_we) begin
+        inst          <= use_buffer_data? inst_r         : issue_inst.inst;
+        phy_dest      <= use_buffer_data? phy_dest_r     : issue_inst.phy_dest;
+        src1_value    <= use_buffer_data? src1_value_r   : issue_inst.src1_value;
+        src2_value    <= use_buffer_data? src2_value_r   : issue_inst.src2_value;
+        old_value     <= use_buffer_data? old_value_r    : issue_inst.old_value;
+        rob_entry_num <= use_buffer_data? rob_entry_num_r: issue_inst.rob_entry_num;
+    end
+
+    if(reset || flush) begin
+        inst_r          <= 'b0;
+        phy_dest_r      <= 'b0;
+        src1_value_r    <= 'b0;
+        src2_value_r    <= 'b0;
+        old_value_r     <= 'b0;
+        rob_entry_num_r <= 'b0;
+    end
+    else if(data_buffer_we) begin
+        inst_r          <= issue_inst.inst;
+        phy_dest_r      <= issue_inst.phy_dest;
+        src1_value_r    <= issue_inst.src1_value;
+        src2_value_r    <= issue_inst.src2_value;
+        old_value_r     <= issue_inst.old_value;
+        rob_entry_num_r <= issue_inst.rob_entry_num;
     end
 end
 

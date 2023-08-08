@@ -97,7 +97,7 @@ uint32_t agu_result;
 // exception
 exception_t addr_ex, tlb_ex;
 
-assign agu_readygo = (agu_stage == AGU_store || agu_stage == AGU_store_done ) && (mem_wr || addr_ex.ex)
+assign agu_readygo = (agu_stage == AGU_store) && mem_wr || addr_ex.ex
                   ||  agu_stage == AGU_done;
 // assign agu_allowin = !agu_valid || agu_readygo && cs_allowin;
 assign agu_allowin = !agu_valid || cs_allowin && (agu_readygo || mem_wr);
@@ -117,9 +117,8 @@ always_ff @(posedge clk) begin
     end
     else begin
         case(agu_stage) 
-            AGU_addr:        agu_stage <= agu_valid   ? (mem_wr ? AGU_store : AGU_request) : AGU_addr;
-            AGU_store:       agu_stage <= agu_readygo ? (cs_allowin ? AGU_addr : AGU_store_done) : AGU_request;
-            AGU_store_done:  agu_stage <= cs_allowin  ? AGU_addr : AGU_store_done;
+            AGU_addr:        agu_stage <= agu_valid && !addr_ex.ex ? (mem_wr ? AGU_store : AGU_request) : AGU_addr;
+            AGU_store:       agu_stage <= agu_readygo ? AGU_addr : AGU_request;
             AGU_request:     agu_stage <= !select_store && dcache_addr_ok && !data_cancel ? AGU_response : AGU_request;
             AGU_response:    agu_stage <= dcache_data_ok && !data_cancel ? AGU_done : AGU_response;
             AGU_done :       agu_stage <= cs_allowin ? AGU_addr : AGU_done;
@@ -208,18 +207,11 @@ assign mem_wdata = op_sb  ? {4{rt_value[7:0]}} :
                                           mem_addr[0] ? {rt_value[23: 0],  8'h0} :  rt_value                :
                             rt_value;
 
-always_ff @(posedge clk) begin
-    if(reset || flush) begin
-        mem_addr <= 32'h0;
-    end
-    else if(agu_stage == AGU_addr) begin
-        mem_addr <= rs_value + imm_value;
-    end
-end
+assign mem_addr = rs_value + imm_value;
 
 always_comb begin
     addr_ex = 'b0;
-    if((agu_stage == AGU_store || agu_stage == AGU_store_done)) begin
+    if(agu_stage == AGU_addr && agu_valid) begin
         if((op_lh || op_lhu) && mem_addr[0] 
         ||  op_lw && mem_addr[1:0]) begin
             addr_ex.ex       = 1'b1;

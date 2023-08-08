@@ -12,7 +12,7 @@ module issue_stage (
     // input  logic alu1_allowin,
     // input  logic bru_allowin,
     input  logic mul_div_allowin,
-    // input  logic alu2_allowin,
+    input  logic alu2_allowin,
     input  logic agu_allowin,
     input  logic agu_pre_allowin,
     // input  logic sp_allowin,
@@ -70,7 +70,6 @@ logic select_mul_div_valid;
 logic [2:0] select_mul_div_num;
 logic select_exe1_valid, select_exe2_valid;
 logic [2:0] select_exe1_num, select_exe2_num;
-
 
 assign issue_queue_full = (issue_queue_num_full == ISSUE_QUEUE_SIZE || issue_queue_num_full == ISSUE_QUEUE_SIZE-1);
 
@@ -201,7 +200,7 @@ always_comb begin
     select_exe2_num = 3'd0;
     for(int i=0; i<ISSUE_QUEUE_SIZE; i++) begin
         if(issue_queue[i].valid &&
-          (issue_queue[i].inst.is_alu2_op
+          (issue_queue[i].inst.is_alu2_op && alu2_allowin
         || issue_queue[i].inst.is_load_store_op && agu_allowin && issue_queue[i].pre_store_ready && !agu_busy
         && !(agu_pre_allowin && issue_inst2.valid && issue_inst2.inst.is_alu2_op)
         || issue_queue[i].inst.is_sp_op)
@@ -233,13 +232,13 @@ always_comb begin
     select_inst1_dest = 6'd0;
     select_inst2_dest = 6'd0;
     if(select_inst1_valid && issue_queue[select_inst1_num].inst.rf_we
-    && !issue_queue[select_inst1_num].inst.is_mul_div_op
-    && !issue_queue[select_inst1_num].inst.is_load_store_op) begin
+    && !issue_queue[select_inst1_num].inst.is_mul_div_op) begin
         select_inst1_dest = issue_queue[select_inst1_num].phy_dest;
     end
     if(select_inst2_valid && issue_queue[select_inst2_num].inst.rf_we
     && !issue_queue[select_inst2_num].inst.is_mul_div_op
-    && !issue_queue[select_inst2_num].inst.is_load_store_op) begin
+    && !issue_queue[select_inst2_num].inst.is_load_store_op
+    && !issue_queue[select_inst2_num].inst.is_sp_op) begin
         select_inst2_dest = issue_queue[select_inst2_num].phy_dest;
     end
 end
@@ -256,13 +255,14 @@ always_comb begin
         else begin
             if(select_inst1_valid && issue_queue[i].valid && issue_queue[i].phy_src1 == select_inst1_dest
             && !issue_queue[select_inst1_num].inst.is_mul_div_op 
-            && !issue_queue[select_inst1_num].inst.is_load_store_op
+            // && !issue_queue[select_inst1_num].inst.is_load_store_op
             || select_inst2_valid && issue_queue[i].valid && issue_queue[i].phy_src1 == select_inst2_dest
             && !issue_queue[select_inst2_num].inst.is_mul_div_op
             && !issue_queue[select_inst2_num].inst.is_load_store_op
+            && !issue_queue[select_inst2_num].inst.is_sp_op
             || issue_inst1.valid  && issue_queue[i].valid && issue_queue[i].phy_src1 == issue_inst1.phy_dest
             && !issue_inst1.inst.is_mul_div_op
-            && !issue_inst1.inst.is_load_store_op
+            // && !issue_inst1.inst.is_load_store_op
             || issue_inst2.valid  && issue_queue[i].valid && issue_queue[i].phy_src1 == issue_inst2.phy_dest
             && !issue_inst2.inst.is_mul_div_op
             && !issue_inst2.inst.is_load_store_op
@@ -272,10 +272,11 @@ always_comb begin
             end
             if(select_inst1_valid && issue_queue[i].valid && issue_queue[i].phy_src2 == select_inst1_dest
             && !issue_queue[select_inst1_num].inst.is_mul_div_op
-            && !issue_queue[select_inst1_num].inst.is_load_store_op
+            // && !issue_queue[select_inst1_num].inst.is_load_store_op
             || select_inst2_valid && issue_queue[i].valid && issue_queue[i].phy_src2 == select_inst2_dest
             && !issue_queue[select_inst2_num].inst.is_mul_div_op
             && !issue_queue[select_inst2_num].inst.is_load_store_op
+            && !issue_queue[select_inst2_num].inst.is_sp_op
             || issue_inst1.valid  && issue_queue[i].valid && issue_queue[i].phy_src2 == issue_inst1.phy_dest
             && !issue_inst1.inst.is_mul_div_op
             && !issue_inst1.inst.is_load_store_op
@@ -306,6 +307,7 @@ assign select_to_issue_bus1.pc    = issue_queue[select_inst1_num].pc;
 assign select_to_issue_bus1.phy_src1 = issue_queue[select_inst1_num].phy_src1;
 assign select_to_issue_bus1.phy_src2 = issue_queue[select_inst1_num].phy_src2;
 assign select_to_issue_bus1.phy_dest = issue_queue[select_inst1_num].phy_dest;
+assign select_to_issue_bus1.old_dest = issue_queue[select_inst1_num].old_dest;
 assign select_to_issue_bus1.inst     = issue_queue[select_inst1_num].inst    ;
 
 assign select_to_issue_bus1.rob_entry_num = issue_queue[select_inst1_num].rob_entry_num;
@@ -324,6 +326,7 @@ assign select_to_issue_bus2.pc    = issue_queue[select_inst2_num].pc;
 assign select_to_issue_bus2.phy_src1 = issue_queue[select_inst2_num].phy_src1;
 assign select_to_issue_bus2.phy_src2 = issue_queue[select_inst2_num].phy_src2;
 assign select_to_issue_bus2.phy_dest = issue_queue[select_inst2_num].phy_dest;
+assign select_to_issue_bus2.old_dest = issue_queue[select_inst2_num].old_dest;
 assign select_to_issue_bus2.inst     = issue_queue[select_inst2_num].inst    ;
 
 assign select_to_issue_bus2.rob_entry_num = issue_queue[select_inst2_num].rob_entry_num;
@@ -355,6 +358,7 @@ end
 
 // regfile
 uint32_t inst1_rdata1, inst1_rdata2, inst2_rdata1, inst2_rdata2;
+uint32_t inst1_rdata_old, inst2_rdata_old;
 
 regfile regfile_u (
     .clk,
@@ -362,15 +366,19 @@ regfile regfile_u (
     // read
     .inst1_raddr1(issue_inst1.phy_src1),
     .inst1_raddr2(issue_inst1.phy_src2),
+    .inst1_raddr_old(issue_inst1.old_dest),
 
     .inst1_rdata1,
     .inst1_rdata2,
+    .inst1_rdata_old,
 
     .inst2_raddr1(issue_inst2.phy_src1),
     .inst2_raddr2(issue_inst2.phy_src2),
+    .inst2_raddr_old(issue_inst2.old_dest),
 
     .inst2_rdata1,
     .inst2_rdata2,
+    .inst2_rdata_old,
 
     // write
     .inst1_we    (writeback_to_rf_bus1.rf_we   ),
@@ -517,6 +525,7 @@ assign issue_to_execute_bus1.phy_dest   = issue_inst1.phy_dest;
 assign issue_to_execute_bus1.inst       = issue_inst1.inst;
 assign issue_to_execute_bus1.src1_value = inst1_src1_value;
 assign issue_to_execute_bus1.src2_value = inst1_src2_value;
+assign issue_to_execute_bus1.old_value  = inst1_rdata_old;
 
 assign issue_to_execute_bus1.rob_entry_num = issue_inst1.rob_entry_num;
 
@@ -534,6 +543,7 @@ assign issue_to_execute_bus2.phy_dest   = issue_inst2.phy_dest;
 assign issue_to_execute_bus2.inst       = issue_inst2.inst;
 assign issue_to_execute_bus2.src1_value = inst2_src1_value;
 assign issue_to_execute_bus2.src2_value = inst2_src2_value;
+assign issue_to_execute_bus2.old_value  = inst2_rdata_old;
 
 assign issue_to_execute_bus2.rob_entry_num = issue_inst2.rob_entry_num;
 

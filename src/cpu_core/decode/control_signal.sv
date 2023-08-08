@@ -133,6 +133,24 @@ always_comb begin
         OP_JR, OP_JALR: begin
             inst_d.operation = OP_JR;
         end
+        OP_TEQ, OP_TEQI: begin
+            inst_d.operation = OP_TEQ;
+        end
+        OP_TNE, OP_TNEI: begin
+            inst_d.operation = OP_TNE;
+        end
+        OP_TGE, OP_TGEI: begin
+            inst_d.operation = OP_TGE;
+        end
+        OP_TLT, OP_TLTI: begin
+            inst_d.operation = OP_TLT;
+        end
+        OP_TGEU, OP_TGEIU: begin
+            inst_d.operation = OP_TGEU;
+        end
+        OP_TLTU, OP_TLTIU: begin
+            inst_d.operation = OP_TLTU;
+        end
         default: begin
             inst_d.operation = operation;
         end
@@ -237,8 +255,7 @@ always_comb begin
             inst_d.use_src1 = 1'b1;
             inst_d.use_src2 = 1'b1;
         end
-        OP_TGE, OP_TGEU, OP_TLT, OP_TLTU, OP_TEQ, OP_TNE,
-        OP_TGEI, OP_TGEIU, OP_TLTI, OP_TLTIU, OP_TEQI, OP_TNEI: begin
+        OP_TGE, OP_TGEU, OP_TLT, OP_TLTU, OP_TEQ, OP_TNE: begin
             inst_d.use_src1 = 1'b1;
             inst_d.use_src2 = 1'b1;
         end
@@ -259,6 +276,7 @@ always_comb begin
         OP_BLTZ, OP_BGEZ, OP_BLEZ, OP_BGTZ,
         OP_BLTZAL, OP_BGEZAL,
         OP_LB, OP_LH, OP_LW, OP_LBU, OP_LHU,
+        OP_TGEI, OP_TGEIU, OP_TLTI, OP_TLTIU, OP_TEQI, OP_TNEI,
         OP_CACHE
         : begin
             inst_d.use_src1 = 1'b1;
@@ -272,8 +290,8 @@ always_comb begin
         OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU: begin
             inst_d.use_src1 = 1'b1;
             inst_d.use_src2 = 1'b1;
-            inst_d.src1 = is_inst2 ? `REG_HI : rs;
-            inst_d.src2 = is_inst2 ? `REG_LO : rt;
+            inst_d.src1 = !is_inst2 ? `REG_HI : rs;
+            inst_d.src2 = !is_inst2 ? `REG_LO : rt;
         end
     endcase
 
@@ -281,6 +299,7 @@ always_comb begin
         OP_SLL, OP_SRL, OP_SRA: inst_d.src1_is_sa = 1'b1;
     endcase
     case(operation)
+        OP_TGEI, OP_TGEIU, OP_TLTI, OP_TLTIU, OP_TEQI, OP_TNEI,
         OP_ADDI, OP_ADDIU, OP_SLTI, OP_SLTIU: begin
             inst_d.src2_is_simm = 1'b1;
         end
@@ -329,8 +348,8 @@ always_comb begin
             inst_d.dest  = is_inst2 ? `REG_LO : `REG_HI;
         end
         OP_MUL: begin
-            inst_d.rf_we = !is_inst2;
-            inst_d.dest  = is_inst2 ? 0 : rd;
+            inst_d.rf_we = is_inst2;
+            inst_d.dest  = !is_inst2 ? 0 : rd;
         end
         OP_BLTZAL, OP_BGEZAL, OP_JAL: begin
             inst_d.rf_we = 1'b1;

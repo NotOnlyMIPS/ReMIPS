@@ -20,7 +20,7 @@ module spu (
     input  phys_t data_paddr,
 
     // TLB op
-    output logic [2:0] tlb_op,
+    output logic [3:0] tlb_op,
 
     // Cache up
     output logic         cache_op_valid,
@@ -71,12 +71,6 @@ logic op_tlt;
 logic op_tge;
 logic op_tltu;
 logic op_tgeu;
-logic op_tgei;
-logic op_tgeiu;
-logic op_tlti;
-logic op_tltiu;
-logic op_teqi;
-logic op_tnei;
 
 logic op_mfc0;
 logic op_mtc0;
@@ -96,12 +90,6 @@ assign op_tlt   = inst.operation == OP_TLT;
 assign op_tge   = inst.operation == OP_TGE;
 assign op_tltu  = inst.operation == OP_TLTU;
 assign op_tgeu  = inst.operation == OP_TGEU;
-assign op_tgei  = inst.operation == OP_TGEI;
-assign op_tgeiu = inst.operation == OP_TGEIU;
-assign op_tlti  = inst.operation == OP_TLTI;
-assign op_tltiu = inst.operation == OP_TLTIU;
-assign op_teqi  = inst.operation == OP_TEQI;
-assign op_tnei  = inst.operation == OP_TNEI;
 
 assign op_mfc0  = inst.operation == OP_MFC0;
 assign op_mtc0  = inst.operation == OP_MTC0;
@@ -123,8 +111,8 @@ assign cp0_addr  = inst.cp0_addr;
 assign cp0_wdata = src2_value;
 
 // TLB op
-assign tlb_op = {3{spu_valid}} & {
-                // op_tlbwr,
+assign tlb_op = {4{spu_valid}} & {
+                op_tlbwr,
                 op_tlbwi,
                 op_tlbr,
                 op_tlbp};
@@ -148,9 +136,30 @@ always_ff @(posedge clk) begin
     end
 end
 
+// trap
+uint32_t trap_src1, trap_src2;
+logic trap_valid;
+
+assign trap_src1 = src1_value;
+assign trap_src2 = inst.src2_is_simm ? {{16{inst.imm[15]}}, inst.imm} : src2_value;
+
+assign trap_valid = spu_valid && ( (op_teq && (trap_src1 == trap_src2))
+                                 ||(op_tne && (trap_src1 != trap_src2))
+                                 ||(op_tlt && ($signed(trap_src1) < $signed(trap_src2)))
+                                 ||(op_tge && ($signed(trap_src1) >= $signed(trap_src2)))
+                                 ||(op_tltu && (trap_src1 < trap_src2))
+                                 ||(op_tgeu && (trap_src1 >= trap_src2)) );
+
 // exception
 exception_t exception;
-assign exception = '0;
+
+always_comb begin
+    exception = '0;
+    if(spu_valid && trap_valid) begin
+        exception.ex = 1'b1;
+        exception.exccode = `EXCCODE_TR;
+    end
+end
 
 uint32_t spu_result;
 

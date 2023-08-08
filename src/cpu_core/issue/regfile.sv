@@ -6,13 +6,17 @@ module regfile(
     // read
     input  reg_addr_t inst1_raddr1,
     input  reg_addr_t inst1_raddr2,
+    input  reg_addr_t inst1_raddr_old,
     output uint32_t   inst1_rdata1,
     output uint32_t   inst1_rdata2,
+    output uint32_t   inst1_rdata_old,
 
     input  reg_addr_t inst2_raddr1,
     input  reg_addr_t inst2_raddr2,
+    input  reg_addr_t inst2_raddr_old,
     output uint32_t   inst2_rdata1,
     output uint32_t   inst2_rdata2,
+    output uint32_t   inst2_rdata_old,
 
     // write
     input  logic[3:0] inst1_we,
@@ -46,8 +50,10 @@ end
 // read
 assign inst1_rdata1 = (inst1_raddr1 == 6'd0) ? 32'd0 : regs[inst1_raddr1];
 assign inst1_rdata2 = (inst1_raddr2 == 6'd0) ? 32'd0 : regs[inst1_raddr2];
+assign inst1_rdata_old = (inst1_raddr_old == 6'd0) ? 32'd0 : regs[inst1_raddr_old];
 
 assign inst2_rdata1 = (inst2_raddr1 == 6'd0) ? 32'd0 : regs[inst2_raddr1];
 assign inst2_rdata2 = (inst2_raddr2 == 6'd0) ? 32'd0 : regs[inst2_raddr2];
+assign inst2_rdata_old = (inst2_raddr_old == 6'd0) ? 32'd0 : regs[inst2_raddr_old];
 
 endmodule

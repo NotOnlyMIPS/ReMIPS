@@ -30,11 +30,16 @@
 `define TLBOP_TLBP   2'd0
 `define TLBOP_TLBR   2'd1
 `define TLBOP_TLBWI  2'd2
+`define TLBOP_TLBWR  2'd3
 
 // coprocesser register
 `define CR_INDEX     0
+`define CR_RANDOM    1
 `define CR_ENTRYLO0  2
 `define CR_ENTRYLO1  3
+`define CR_CONTEXT   4
+`define CR_PAGEMASK  5
+`define CR_WIRED     6
 `define CR_BADVADDR  8
 `define CR_COUNT     9
 `define CR_ENTRYHI  10
@@ -365,6 +370,7 @@ typedef struct packed {
     reg_addr_t phy_src1;
     reg_addr_t phy_src2;
     reg_addr_t phy_dest;
+    reg_addr_t old_dest;
     decoded_inst_t inst;
 
     logic [3:0] rob_entry_num;
@@ -387,7 +393,7 @@ typedef struct packed {
     reg_addr_t phy_src1;
     reg_addr_t phy_src2;
     reg_addr_t phy_dest;
-    // reg_addr_t old_dest;
+    reg_addr_t old_dest;
     decoded_inst_t inst;
 
     logic [3:0] rob_entry_num;
@@ -412,7 +418,7 @@ typedef struct packed {
     reg_addr_t phy_src1;
     reg_addr_t phy_src2;
     reg_addr_t phy_dest;
-    // reg_addr_t old_dest;
+    reg_addr_t old_dest;
     decoded_inst_t inst;
 
     logic [3:0] rob_entry_num;
@@ -440,6 +446,7 @@ typedef struct packed {
 
     uint32_t   src1_value;
     uint32_t   src2_value;
+    uint32_t   old_value;
 
     logic [3:0] rob_entry_num;
 
@@ -524,6 +531,7 @@ typedef struct packed {
 typedef struct packed {
     logic bd;
     logic ti;
+    logic [1:0] ce;
     logic [7:0] ip;
     logic [4:0] exccode;
 } cp0_cause_t;

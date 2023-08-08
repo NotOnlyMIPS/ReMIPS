@@ -95,6 +95,7 @@ assign pre_issue_inst1.src2_ready = inst1_src2_ready;
 assign pre_issue_inst1.phy_src1   = inst1_phy_src1;
 assign pre_issue_inst1.phy_src2   = inst1_phy_src2;
 assign pre_issue_inst1.phy_dest   = inst1_phy_dest;
+assign pre_issue_inst1.old_dest   = inst1_old_dest;
 assign pre_issue_inst1.inst       = inst1_inst;
 
 assign pre_issue_inst1.rob_entry_num = rob_tail_o;
@@ -116,6 +117,7 @@ assign pre_issue_inst2.src2_ready = inst2_src2_ready;
 assign pre_issue_inst2.phy_src1   = inst2_phy_src1;
 assign pre_issue_inst2.phy_src2   = inst2_phy_src2;
 assign pre_issue_inst2.phy_dest   = inst2_phy_dest;
+assign pre_issue_inst2.old_dest   = inst2_old_dest;
 assign pre_issue_inst2.inst       = inst2_inst;
 
 assign pre_issue_inst2.rob_entry_num = inst1_valid ? rob_tail_o + 1 : rob_tail_o;

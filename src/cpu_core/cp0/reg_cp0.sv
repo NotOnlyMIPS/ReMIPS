@@ -8,7 +8,7 @@ module reg_cp0 (
     output [ 5:0] cp0_hw,
     output [ 1:0] cp0_sw,
     // C0_TLB_Interface
-    input  logic [2:0]  tlb_op,
+    input  logic [3:0]  tlb_op,
 
     output logic[7:0]   tlb_asid,
     output tlb_index_t  tlbrw_index,
@@ -95,6 +95,15 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
+    if(reset) begin
+        cp0_cause.ce <= '0;
+    end
+    else if(exception.ex && exception.exccode == `EXCCODE_CpU) begin
+        cp0_cause.ce <= 2'b01;
+    end
+end
+
+always @(posedge clk) begin
     if(reset)
         cp0_cause.ip[7:2] <= 6'b0;
     else begin
@@ -115,7 +124,7 @@ always @(posedge clk) begin
         cp0_cause.exccode <= exception.exccode;
 end
 
-assign cp0_cause_out = {cp0_cause.bd, cp0_cause.ti, 14'b0, cp0_cause.ip, 1'b0, cp0_cause.exccode, 2'b0};
+assign cp0_cause_out = {cp0_cause.bd, cp0_cause.ti, cp0_cause.ce, 12'b0, cp0_cause.ip, 1'b0, cp0_cause.exccode, 2'b0};
 
 //CP0_EPC: CR_EPC, SEL 0
 virt_t cp0_epc;
@@ -160,11 +169,16 @@ end
 assign count_eq_compare = cp0_count == cp0_compare;
 
 //TLB
-logic [31:0] cp0_entry_hi, cp0_entry_lo0, cp0_entry_lo1, cp0_index;
+uint32_t cp0_context;
+uint32_t cp0_entry_hi, cp0_entry_lo0, cp0_entry_lo1, cp0_index;
+uint32_t cp0_random, cp0_wired, cp0_pagemask;
+logic [3:0] cp0_random_add1;
+
+assign cp0_random_add1 = cp0_random[3:0] + 1'b1;
 
 assign tlb_asid    = cp0_entry_hi[7:0];
-assign tlbrw_index = cp0_index[$clog2(`TLB_ENTRIES_NUM)-1:0];
-assign tlbrw_we    = tlb_op[`TLBOP_TLBWI];
+assign tlbrw_index = tlb_op[`TLBOP_TLBWR] ? cp0_random[$clog2(`TLB_ENTRIES_NUM)-1:0] : cp0_index[$clog2(`TLB_ENTRIES_NUM)-1:0];
+assign tlbrw_we    = tlb_op[`TLBOP_TLBWI] | tlb_op[`TLBOP_TLBWR];
 assign tlbrw_wdata = {
     cp0_entry_lo0[ 5: 3],
     cp0_entry_lo1[ 5: 3],
@@ -234,7 +248,46 @@ always @(posedge clk) begin
         cp0_index <= tlbp_index;
     else if(cp0_we && cp0_addr == `CR_INDEX)
         cp0_index <= {{(32-$clog2(`TLB_ENTRIES_NUM)){1'b0}},cp0_wdata[$clog2(`TLB_ENTRIES_NUM)-1:0]};
+
+    // Context
+    if(reset) begin
+        cp0_context <= '0;
+    end
+    else if(cp0_we && cp0_addr == `CR_CONTEXT) begin
+        cp0_context[31:23] <= cp0_wdata[31:23];
+    end
+    else if(exception.ex && (exception.exccode == `EXCCODE_TLBL
+                        || exception.exccode == `EXCCODE_TLBS
+                        || exception.exccode == `EXCCODE_MOD)) begin
+        cp0_context[31:13] <= exception.badvaddr[31:13];
+    end
+    
+    // PageMask
+    if(reset) begin
+        cp0_pagemask <= '0;
+    end
+    
+    // Wired
+    if(reset) begin
+        cp0_wired <= '0;
+    end
+    else if(cp0_we && cp0_addr == `CR_WIRED) begin
+        cp0_wired[2:0] <= cp0_wdata[2:0];
+    end
+
+    // Random
+    if(reset) begin
+        cp0_random <= `TLB_ENTRIES_NUM-1;
+    end
+    else if(cp0_we && cp0_addr == `CR_WIRED) begin
+        cp0_random <= `TLB_ENTRIES_NUM-1;
+    end
+    else begin
+        cp0_random <= (cp0_random_add1 >= cp0_wired) ? {28'b0, cp0_random_add1} : cp0_wired;
+    end
+
 end
+
 
 // Cache TagLo
 logic [31:0] cp0_tag_lo;
@@ -323,19 +376,25 @@ end
 assign kseg0_uncached = (cp0_config0[2:0] != 3'd3);
 
 // WB_C0_Interface
-assign cp0_rdata = ({32{cp0_addr==`CR_BADVADDR}} & cp0_badvaddr   )
+assign cp0_rdata = ({32{cp0_addr==`CR_INDEX   }} & cp0_index      )
+                 | ({32{cp0_addr==`CR_RANDOM  }} & cp0_random     )
+                 | ({32{cp0_addr==`CR_ENTRYLO0}} & cp0_entry_lo0  )
+                 | ({32{cp0_addr==`CR_ENTRYLO1}} & cp0_entry_lo1  )
+                 | ({32{cp0_addr==`CR_CONTEXT }} & cp0_context    )
+                 | ({32{cp0_addr==`CR_PAGEMASK}} & cp0_pagemask   )
+                 | ({32{cp0_addr==`CR_WIRED   }} & cp0_wired      )
+                 | ({32{cp0_addr==`CR_BADVADDR}} & cp0_badvaddr   )
                  | ({32{cp0_addr==`CR_COUNT   }} & cp0_count      )
+                 | ({32{cp0_addr==`CR_ENTRYHI }} & cp0_entry_hi   )
                  | ({32{cp0_addr==`CR_COMPARE }} & cp0_compare    )
                  | ({32{cp0_addr==`CR_STATUS  }} & cp0_status_out )
                  | ({32{cp0_addr==`CR_CAUSE   }} & cp0_cause_out  )
                  | ({32{cp0_addr==`CR_EPC     }} & cp0_epc        )
-                 | ({32{cp0_addr==`CR_INDEX   }} & cp0_index      )
-                 | ({32{cp0_addr==`CR_ENTRYHI }} & cp0_entry_hi   )
-                 | ({32{cp0_addr==`CR_ENTRYLO0}} & cp0_entry_lo0  )
-                 | ({32{cp0_addr==`CR_ENTRYLO1}} & cp0_entry_lo1  )
-                 | ({32{cp0_addr==`CR_TAGLO   }} & cp0_tag_lo     )
+                 | ({32{cp0_addr==`CR_PRID    }} & cp0_prid       )
+                 | ({32{cp0_addr==`CR_EBASE   }} & cp0_ebase      )
                  | ({32{cp0_addr==`CR_CONFIG0 }} & cp0_config0    )
-                 | ({32{cp0_addr==`CR_CONFIG1 }} & cp0_config1    );
+                 | ({32{cp0_addr==`CR_CONFIG1 }} & cp0_config1    )
+                 | ({32{cp0_addr==`CR_TAGLO   }} & cp0_tag_lo     );
 
 assign {cp0_hw, cp0_sw} = {8{~cp0_status.exl}} & {8{cp0_status.ie}} & cp0_cause.ip & cp0_status.im;
 
