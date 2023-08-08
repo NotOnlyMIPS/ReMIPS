@@ -105,6 +105,8 @@ assign bht_hit = (fetch_to_bpu_bus.pc[31:10] == r_entry.tag);
 assign valid   = (state == `IDLE) && (r_entry.br_type != Branch_None) && fetch_to_bpu_bus.valid;
 
 always_comb begin
+    is_taken = 1'b0;
+    target   = '0;
     if(~bht_hit) begin
         target = pc_add8;
         is_taken = 1'b0;
@@ -190,8 +192,38 @@ ras ras_instance(
     .reset,
     .push_req  (bpu_verify_result.predict_entry.br_type == Branch_Call  ),
     .pop_req   (bpu_verify_result.predict_entry.br_type == Branch_Return),
-    .push_data ({1'b1, bpu_verify_result.pc + 8}),
+    .push_data ((bpu_verify_result.pc+8)),
     .ras_top   (ras_data)
 );
+
+// logic push_req, pop_req;
+// virt_t push_data;
+
+// always_comb begin
+//     push_req  = 1'b0;
+//     pop_req   = 1'b0;
+//     push_data = '0;
+//     if(valid) begin
+//         push_req  = r_entry.br_type == Branch_Call;
+//         pop_req   = r_entry.br_type == Branch_Return;
+//         push_data = fetch_to_bpu_bus.pc + 32'h8;
+//     end
+// end
+
+// ras ras_instance(
+//     .clk,
+//     .reset,
+
+//     .flush(~bpu_verify_result.predict_sucess && verify_valid),
+
+//     .push_req,
+//     .pop_req,
+//     .push_data,
+
+//     .commit_push_req  (bpu_verify_result.predict_entry.br_type == Branch_Call  ),
+//     .commit_pop_req   (bpu_verify_result.predict_entry.br_type == Branch_Return),
+//     .commit_push_data ((bpu_verify_result.pc + 8)),
+//     .ras_top   (ras_data)
+// );
 
 endmodule

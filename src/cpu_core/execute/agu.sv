@@ -8,6 +8,7 @@ module agu (
 
     input  logic issue_to_agu_valid,
     output logic agu_allowin,
+    output logic agu_pre_allowin,
 
     input  logic cs_allowin,
     output logic agu_to_valid,
@@ -98,14 +99,16 @@ exception_t addr_ex, tlb_ex;
 
 assign agu_readygo = (agu_stage == AGU_store || agu_stage == AGU_store_done ) && (mem_wr || addr_ex.ex)
                   ||  agu_stage == AGU_done;
-assign agu_allowin = !agu_valid || agu_readygo && cs_allowin;
+// assign agu_allowin = !agu_valid || agu_readygo && cs_allowin;
+assign agu_allowin = !agu_valid || cs_allowin && (agu_readygo || mem_wr);
+assign agu_pre_allowin = agu_stage == AGU_addr && agu_valid && mem_wr;
 assign agu_to_valid = agu_valid && agu_readygo;
 
 always_ff @(posedge clk) begin
     if(reset || flush) begin
         agu_valid <= 1'b0;
     end
-    else if(agu_allowin) begin
+    else if(!agu_valid || cs_allowin && agu_readygo) begin
         agu_valid <= issue_to_agu_valid;
     end
 
@@ -114,7 +117,7 @@ always_ff @(posedge clk) begin
     end
     else begin
         case(agu_stage) 
-            AGU_addr:        agu_stage <= agu_valid   ? AGU_store : AGU_addr;
+            AGU_addr:        agu_stage <= agu_valid   ? (mem_wr ? AGU_store : AGU_request) : AGU_addr;
             AGU_store:       agu_stage <= agu_readygo ? (cs_allowin ? AGU_addr : AGU_store_done) : AGU_request;
             AGU_store_done:  agu_stage <= cs_allowin  ? AGU_addr : AGU_store_done;
             AGU_request:     agu_stage <= !select_store && dcache_addr_ok && !data_cancel ? AGU_response : AGU_request;
@@ -136,7 +139,7 @@ always_ff @(posedge clk) begin
         store_num     <= '0;
         pre_store     <= '0;
     end
-    else if(agu_allowin) begin
+    else if(!agu_valid || cs_allowin && agu_readygo) begin
         phy_dest  <= issue_inst.phy_dest;
         rs_value  <= issue_inst.src1_value;
         rt_value  <= issue_inst.src2_value;

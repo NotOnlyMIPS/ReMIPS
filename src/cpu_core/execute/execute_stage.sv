@@ -11,6 +11,7 @@ module execute_stage(
     output logic mul_div_allowin,
     // output logic bru_allowin,
     output logic agu_allowin,
+    output logic agu_pre_allowin,
     // output logic sp_allowin,
 
     // MMU
@@ -213,6 +214,7 @@ agu agu_u (
 
     .issue_to_agu_valid(issue_to_agu_valid),
     .agu_allowin       (agu_allowin       ),
+    .agu_pre_allowin   (agu_pre_allowin   ),
 
     .cs_allowin        (agu_to_cs_allowin ),
     .agu_to_valid,

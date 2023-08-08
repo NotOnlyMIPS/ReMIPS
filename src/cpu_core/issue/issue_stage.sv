@@ -14,6 +14,7 @@ module issue_stage (
     input  logic mul_div_allowin,
     // input  logic alu2_allowin,
     input  logic agu_allowin,
+    input  logic agu_pre_allowin,
     // input  logic sp_allowin,
 
     // bypass
@@ -29,6 +30,9 @@ module issue_stage (
     output select_to_busy_table_bus_t select_to_busy_table_bus2,
 
     // writeback
+    input  writeback_to_busytable_bus_t writeback_to_busytable_bus1,
+    input  writeback_to_busytable_bus_t writeback_to_busytable_bus2,
+    
     input  writeback_to_rf_bus_t writeback_to_rf_bus1,
     input  writeback_to_rf_bus_t writeback_to_rf_bus2,
 
@@ -49,8 +53,8 @@ logic select_to_issue_valid;
 logic issue_stage_valid;
 
 // issue queue
-(*mark_debug = "true"*) issue_entry_t issue_queue[ISSUE_QUEUE_SIZE-1:0]; // debug
-// issue_entry_t issue_queue[ISSUE_QUEUE_SIZE-1:0]; // alu1, mul_div, branch; alu2, load_store, spcial
+// (*mark_debug = "true"*) issue_entry_t issue_queue[ISSUE_QUEUE_SIZE-1:0]; // debug
+issue_entry_t issue_queue[ISSUE_QUEUE_SIZE-1:0]; // alu1, mul_div, branch; alu2, load_store, spcial
 issue_entry_t issue_queue_bus[ISSUE_QUEUE_SIZE-1:0]; 
 logic issue_queue_full;
 logic [3:0] issue_queue_num_full, issue_queue_num_tail, issue_queue_num_valid;
@@ -88,20 +92,22 @@ always_ff @(posedge clk) begin
         end
 
         // compress
-        for(int i=0; i<issue_queue_tail; i++) begin
-            if(i < ISSUE_QUEUE_SIZE-2) begin
-                issue_queue[i] <= compress_entry_num[i  ] == 2'd0 ? issue_queue_bus[i  ] :
-                                  compress_entry_num[i+1] == 2'd1 ? issue_queue_bus[i+1] :
-                                  compress_entry_num[i+2] == 2'd2 ? issue_queue_bus[i+2] :
-                                                                    'b0;
-            end
-            else if(i < ISSUE_QUEUE_SIZE-1) begin
-                issue_queue[i] <= compress_entry_num[i  ] == 2'd0 ? issue_queue_bus[i  ] :
-                                  compress_entry_num[i+1] == 2'd1 ? issue_queue_bus[i+1] :
-                                                                    'b0;
-            end
-            else begin
-                issue_queue[i] <= issue_queue_bus[i];
+        for(int i=0; i<ISSUE_QUEUE_SIZE; i++) begin
+            if(i < issue_queue_tail) begin
+                if(i < ISSUE_QUEUE_SIZE-2) begin
+                    issue_queue[i] <= compress_entry_num[i  ] == 2'd0 ? issue_queue_bus[i  ] :
+                                    compress_entry_num[i+1] == 2'd1 ? issue_queue_bus[i+1] :
+                                    compress_entry_num[i+2] == 2'd2 ? issue_queue_bus[i+2] :
+                                                                        'b0;
+                end
+                else if(i < ISSUE_QUEUE_SIZE-1) begin
+                    issue_queue[i] <= compress_entry_num[i  ] == 2'd0 ? issue_queue_bus[i  ] :
+                                    compress_entry_num[i+1] == 2'd1 ? issue_queue_bus[i+1] :
+                                                                        'b0;
+                end
+                else begin
+                    issue_queue[i] <= issue_queue_bus[i];
+                end
             end
         end
     end
@@ -197,6 +203,7 @@ always_comb begin
         if(issue_queue[i].valid &&
           (issue_queue[i].inst.is_alu2_op
         || issue_queue[i].inst.is_load_store_op && agu_allowin && issue_queue[i].pre_store_ready && !agu_busy
+        && !(agu_pre_allowin && issue_inst2.valid && issue_inst2.inst.is_alu2_op)
         || issue_queue[i].inst.is_sp_op)
         && issue_queue[i].src1_ready && issue_queue[i].src2_ready) begin
             select_exe2_valid = 1'b1;
@@ -259,8 +266,8 @@ always_comb begin
             || issue_inst2.valid  && issue_queue[i].valid && issue_queue[i].phy_src1 == issue_inst2.phy_dest
             && !issue_inst2.inst.is_mul_div_op
             && !issue_inst2.inst.is_load_store_op
-            || writeback_to_rf_bus1.rf_we && issue_queue[i].valid && issue_queue[i].phy_src1 == writeback_to_rf_bus1.dest
-            || writeback_to_rf_bus2.rf_we && issue_queue[i].valid && issue_queue[i].phy_src1 == writeback_to_rf_bus2.dest) begin
+            || issue_queue[i].valid && issue_queue[i].phy_src1 == writeback_to_busytable_bus1.dest
+            || issue_queue[i].valid && issue_queue[i].phy_src1 == writeback_to_busytable_bus2.dest) begin
                 issue_queue_bus[i].src1_ready = 1'b1;
             end
             if(select_inst1_valid && issue_queue[i].valid && issue_queue[i].phy_src2 == select_inst1_dest
@@ -275,8 +282,8 @@ always_comb begin
             || issue_inst2.valid  && issue_queue[i].valid && issue_queue[i].phy_src2 == issue_inst2.phy_dest
             && !issue_inst2.inst.is_mul_div_op
             && !issue_inst2.inst.is_load_store_op
-            || writeback_to_rf_bus1.rf_we && issue_queue[i].valid && issue_queue[i].phy_src2 == writeback_to_rf_bus1.dest
-            || writeback_to_rf_bus2.rf_we && issue_queue[i].valid && issue_queue[i].phy_src2 == writeback_to_rf_bus2.dest) begin
+            || issue_queue[i].valid && issue_queue[i].phy_src2 == writeback_to_busytable_bus1.dest
+            || issue_queue[i].valid && issue_queue[i].phy_src2 == writeback_to_busytable_bus2.dest) begin
                 issue_queue_bus[i].src2_ready = 1'b1;
             end
 

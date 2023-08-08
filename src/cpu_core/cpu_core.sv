@@ -50,7 +50,7 @@ execute_to_commit_bus_t execute_to_commit_bus1, execute_to_commit_bus2;
 logic pfs_to_valid, fs_to_valid, ds_to_is_valid, ds_to_rob_valid;
 logic fs_allowin, ds_allowin, is_allowin, cs_allowin;
 // logic alu1_allowin, bru_allowin, mul_div_allowin, alu2_allowin, agu_allowin, sp_allowin;
-logic mul_div_allowin, agu_allowin;
+logic mul_div_allowin, agu_allowin, agu_pre_allowin;
 
 // BPU
 bpu_to_prefetch_bus_t bpu_predict_result;
@@ -333,6 +333,7 @@ issue_stage u_issue_stage (
     .mul_div_allowin,
     // .alu2_allowin,
     .agu_allowin,
+    .agu_pre_allowin,
     // .sp_allowin,
     
     // bypass
@@ -342,6 +343,10 @@ issue_stage u_issue_stage (
     
     // store num
     .select_store_ready,
+
+    // wakeup
+    .writeback_to_busytable_bus1,
+    .writeback_to_busytable_bus2,
 
     // select
     .select_to_busy_table_bus1,
@@ -372,6 +377,7 @@ execute_stage u_execute_stage (
     .mul_div_allowin,
     // .bru_allowin,
     .agu_allowin,
+    .agu_pre_allowin,
     // .sp_allowin,
 
     // mmu

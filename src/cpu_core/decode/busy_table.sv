@@ -76,16 +76,24 @@ always_comb begin
     inst2_src1_ready = !src1_raw_hazard;
     inst2_src2_ready = !src2_raw_hazard;
 
-    if(inst1_src1 != 0 && busy_table[inst1_src1] == 1'b1) begin
+    if(inst1_src1 != 0 && busy_table[inst1_src1] == 1'b1
+    && inst1_src1 != sel_inst1_dest && inst1_src1 != sel_inst2_dest
+    && inst1_src1 != wb_inst1_dest  && inst1_src1 != wb_inst2_dest) begin
         inst1_src1_ready = 1'b0;
     end
-    if(inst1_src2 != 0 && busy_table[inst1_src2] == 1'b1) begin
+    if(inst1_src2 != 0 && busy_table[inst1_src2] == 1'b1
+    && inst1_src2 != sel_inst1_dest && inst1_src2 != sel_inst2_dest
+    && inst1_src2 != wb_inst1_dest  && inst1_src2 != wb_inst2_dest) begin
         inst1_src2_ready = 1'b0;
     end
-    if(inst2_src1 != 0 && busy_table[inst2_src1] == 1'b1) begin
+    if(inst2_src1 != 0 && busy_table[inst2_src1] == 1'b1
+    && inst2_src1 != sel_inst1_dest && inst2_src1 != sel_inst2_dest
+    && inst2_src1 != wb_inst1_dest  && inst2_src1 != wb_inst2_dest) begin
         inst2_src1_ready = 1'b0;
     end
-    if(inst2_src2 != 0 && busy_table[inst2_src2] == 1'b1) begin
+    if(inst2_src2 != 0 && busy_table[inst2_src2] == 1'b1
+    && inst2_src2 != sel_inst1_dest && inst2_src2 != sel_inst2_dest
+    && inst2_src2 != wb_inst1_dest  && inst2_src2 != wb_inst2_dest) begin
         inst2_src2_ready = 1'b0;
     end
 end
