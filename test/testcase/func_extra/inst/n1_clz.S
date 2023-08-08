@@ -26,7 +26,7 @@ LEAF(n1_clz_test)
     nop
 
     LI(a1, 0x00007f00)      # in:  0x00007f00
-    LI(v1, 0)               # out: 17
+    LI(v1, 17)              # out: 17
     clz v0, a1
     bne v0, v1, inst_error
     nop
