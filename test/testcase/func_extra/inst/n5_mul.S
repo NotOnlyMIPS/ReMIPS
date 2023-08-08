@@ -33,7 +33,7 @@ LEAF(n5_mul_test)
 
     LI(t0, 1)               # in:  1
     LI(t1, 126)             # in:  126
-    LI(v1, 126)             # out: 0
+    LI(v1, 126)             # out: 126
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
@@ -79,10 +79,6 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
-    mfhi t1
-    bne t1, t3, inst_error
-    mflo t2
-    bne t2, v1, inst_error
     nop
 
     LI(t0, 0xffff9b25)      # in:  0xffff9b25
@@ -93,10 +89,6 @@ LEAF(n5_mul_test)
     mul v0, t0, t1
     nop
     bne v0, v1, inst_error
-    mfhi t1
-    bne t1, t3, inst_error
-    mflo t2
-    bne t2, v1, inst_error
     nop
 ###detect exception
     bne s2, zero, inst_error
