@@ -11,7 +11,6 @@ module store_buffer #(
     output logic            load_wait,
 
     input  logic            valid,
-    input  logic            wr,
     input  logic [3:0]      buffer_we,
     input  logic [2:0]      buffer_size,
     input  virt_t           data_addr,
@@ -48,7 +47,7 @@ always_ff @( posedge clk ) begin : store_buffer_write
         end
         store_buffer_tail <= '0;
     end 
-    else if( valid & wr & !store_buffer[store_buffer_tail].valid) begin
+    else if( valid & !store_buffer[store_buffer_tail].valid) begin
         store_buffer[store_buffer_tail].valid <= 1'b1   ;
         store_buffer[store_buffer_tail].wstrb <= buffer_we;
         store_buffer[store_buffer_tail].size  <= buffer_size;

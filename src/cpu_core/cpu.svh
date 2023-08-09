@@ -453,6 +453,7 @@ typedef struct packed {
 
     logic [3:0] rob_entry_num;
 
+    logic       is_store_op;
     logic [3:0] pre_store;
     logic [3:0] store_num;
 

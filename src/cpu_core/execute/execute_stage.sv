@@ -7,11 +7,10 @@ module execute_stage(
     input  flush,
 
     // output logic alu1_allowin,
-    output logic alu2_allowin,
+    // output logic alu2_allowin,
     output logic mul_div_allowin,
     // output logic bru_allowin,
     output logic agu_allowin,
-    output logic agu_pre_allowin,
     // output logic sp_allowin,
 
     // MMU
@@ -99,8 +98,8 @@ assign alu1_to_cs_allowin    = 1'b1;
 assign bru_to_cs_allowin     = 1'b1;
 assign mul_div_to_cs_allowin = !alu1_to_valid && !bru_to_valid && !alu2_to_valid && !agu_to_valid && !spu_to_valid;
 
-assign alu2_to_cs_allowin    = !agu_to_valid;
-assign agu_to_cs_allowin     = 1'b1;
+assign alu2_to_cs_allowin    = 1'b1;
+assign agu_to_cs_allowin     = !alu2_to_valid;
 assign spu_to_cs_allowin     = 1'b1;
 
 // commit
@@ -111,6 +110,44 @@ execute_to_commit_bus_t mul_div_to_commit_bus2;
 execute_to_commit_bus_t bru_to_commit_bus;
 execute_to_commit_bus_t agu_to_commit_bus;
 execute_to_commit_bus_t spu_to_commit_bus;
+
+logic agu_store_to_valid, agu_load_to_valid;
+execute_to_commit_bus_t agu_commit_queue[7:0];
+execute_to_commit_bus_t agu_store_to_commit_bus, agu_load_to_commit_bus;
+logic [2:0] agu_commit_queue_head, agu_commit_queue_tail, agu_commit_queue_tail_next;
+
+assign agu_to_valid = agu_commit_queue_head != agu_commit_queue_tail;
+assign agu_to_commit_bus = agu_commit_queue[agu_commit_queue_head];
+
+always_ff @(posedge clk) begin
+    if(reset || flush) begin
+        agu_commit_queue_head <= 'b0;
+        agu_commit_queue_tail <= 'b0;
+        agu_commit_queue_tail_next <= 3'd1;
+    end
+    else begin
+        if(agu_to_cs_allowin && agu_commit_queue_head != agu_commit_queue_tail) begin
+            agu_commit_queue_head <= agu_commit_queue_head + 3'b1;
+        end
+
+        if(agu_store_to_valid && agu_load_to_valid) begin
+            agu_commit_queue_tail      <= agu_commit_queue_tail + 3'd2;
+            agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd2;
+            agu_commit_queue[agu_commit_queue_tail]      <= agu_store_to_commit_bus;
+            agu_commit_queue[agu_commit_queue_tail_next] <= agu_load_to_commit_bus;
+        end
+        else if(agu_store_to_valid) begin
+            agu_commit_queue_tail <= agu_commit_queue_tail + 3'd1;
+            agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd1;
+            agu_commit_queue[agu_commit_queue_tail] <= agu_store_to_commit_bus;
+        end
+        else if(agu_load_to_valid) begin
+            agu_commit_queue_tail <= agu_commit_queue_tail + 3'd1;
+            agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd1;
+            agu_commit_queue[agu_commit_queue_tail] <= agu_load_to_commit_bus;
+        end
+    end
+end
 
 // MMU
 logic spu_data_valid;
@@ -125,9 +162,10 @@ always_comb begin
 
     if(!mul_div_to_cs_allowin)begin
         execute_to_commit_bus1 = alu1_to_valid ? alu1_to_commit_bus : bru_to_commit_bus;
-        execute_to_commit_bus2 = spu_to_valid   ? spu_to_commit_bus :
-                                 agu_to_valid   ? agu_to_commit_bus :
-                                                  alu2_to_commit_bus;
+        execute_to_commit_bus2 = spu_to_valid  ? spu_to_commit_bus :
+                                 alu2_to_valid ? alu2_to_commit_bus:
+                                 agu_to_valid  ? agu_to_commit_bus :
+                                                 'b0;
     end
     else begin
         execute_to_commit_bus1 = mul_div_to_commit_bus1;
@@ -195,9 +233,9 @@ alu2 alu2_u (
     .flush,
 
     .issue_to_alu_valid(issue_to_alu2_valid),
-    .alu_allowin       (alu2_allowin       ),
+    // .alu_allowin       (alu2_allowin       ),
 
-    .cs_allowin        (alu2_to_cs_allowin ),
+    // .cs_allowin        (alu2_to_cs_allowin ),
     .alu_to_valid      (alu2_to_valid      ),
 
     .issue_inst         (issue_to_execute_bus2),
@@ -214,10 +252,10 @@ agu agu_u (
 
     .issue_to_agu_valid(issue_to_agu_valid),
     .agu_allowin       (agu_allowin       ),
-    .agu_pre_allowin   (agu_pre_allowin   ),
 
-    .cs_allowin        (agu_to_cs_allowin ),
-    .agu_to_valid,
+    // .cs_allowin        (1'b1),
+    .agu_store_to_valid,
+    .agu_load_to_valid,
 
     .issue_inst         (issue_to_execute_bus2),
     
@@ -241,7 +279,8 @@ agu agu_u (
     .dcache_addr_ok,
     .dcache_data_ok,
 
-    .agu_to_commit_bus
+    .agu_store_to_commit_bus,
+    .agu_load_to_commit_bus
 );
 
 

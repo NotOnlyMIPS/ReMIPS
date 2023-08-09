@@ -91,7 +91,7 @@ logic        mul_add;
 logic        mul_sub;
 logic        is_signed;
 logic        negtive_result;
-logic [1:0]  mul_count;
+logic [2:0]  mul_count;
 logic        mul_ready;
 uint32_t     abs_src1, abs_src2;
 uint64_t     abs_prod;
@@ -109,19 +109,30 @@ assign negtive_result = is_signed && (src1_value[31] ^ src2_value[31]);
 assign abs_src1 = (is_signed && src1_value[31]) ? -src1_value : src1_value;
 assign abs_src2 = (is_signed && src2_value[31]) ? -src2_value : src2_value;
 
-assign mul_ready = mul_count == 3;
+assign mul_ready = mul_count == 4;
 
 always_ff @(posedge clk) begin
     if(reset || flush) begin
-        mul_count <= 2'b0;
+        mul_count <= 3'b0;
     end
     else begin
         unique case(mul_count) 
-            2'd0:       mul_count <= mul_op ? 2'd1 : 2'd0;
-            2'd1, 2'd2: mul_count <= mul_count + 2'd1;
-            2'd3:       mul_count <= cs_allowin ? 2'd0 : 2'd3;
-            default:    mul_count <= 2'd0;
+            3'd0:       mul_count <= mul_op ? 3'd1 : 3'd0;
+            3'd1,
+            3'd2,
+            3'd3:       mul_count <= mul_count + 3'd1;
+            3'd4:       mul_count <= cs_allowin ? 3'd0 : 3'd4;
+            default:    mul_count <= 3'd0;
         endcase
+    end
+
+    if(reset || flush) begin
+        mul_res <= 'b0;
+    end
+    else if(mul_count == 3) begin
+        mul_res <= mul_add ? {hi, lo} + mul_prod :
+                   mul_sub ? {hi, lo} - mul_prod :
+                             mul_prod;
     end
 end
 
@@ -133,9 +144,6 @@ multu u_multu (
 );
 
 assign mul_prod = negtive_result ? -abs_prod : abs_prod;
-assign mul_res  = mul_add ? {hi, lo} + mul_prod :
-                  mul_sub ? {hi, lo} - mul_prod :
-                            mul_prod;
 
 // div
 reg  [ 1:0] div_state;
@@ -153,6 +161,8 @@ wire        divu_res_tvalid  ;
 wire [63:0] div_res          ;
 wire [63:0] divu_res         ;
 
+uint64_t    divide_res;
+
 always @(posedge clk) begin
     if(reset || flush) begin
         div_state <= 2'b0;
@@ -165,6 +175,15 @@ always @(posedge clk) begin
             2'd2: div_state <= cs_allowin ? 2'd0 : 2'd2;
             default: div_state <= div_state;
         endcase
+    end
+
+    if(reset || flush) begin
+        divide_res <= 'b0;
+    end
+    else if(div_state == 2'd1 && (div_res_tvalid || divu_res_tvalid)) begin
+        divide_res <= op_div  ? div_res  :
+                      op_divu ? divu_res :
+                      'b0;
     end
 
     if(reset || div_res_tvalid || divu_res_tvalid) begin
@@ -211,9 +230,8 @@ assign mul_div_readygo = (op_div || op_divu) && (div_state == 2'd2)
 
 uint64_t hi_lo_result;
 
-assign hi_lo_result = ({64{op_div           }} & div_res )
-                    | ({64{op_divu          }} & divu_res)
-                    | ({64{mul_op           }} & mul_res );
+assign hi_lo_result = ({64{op_div|op_divu}} & divide_res)
+                    | ({64{mul_op        }} & mul_res   );
 
 // inst1
 assign mul_div_to_commit_bus1.valid = mul_div_to_valid;

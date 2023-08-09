@@ -1,15 +1,15 @@
 `include "../cpu.svh"
 
-module alu2(
+module new_alu2(
     input clk,
     input reset,
 
     input flush,
 
     input  logic issue_to_alu_valid,
-    // output logic alu_allowin,
+    output logic alu_allowin,
 
-    // input  logic cs_allowin,
+    input  logic cs_allowin,
     output logic alu_to_valid,
 
     input  issue_to_execute_bus_t issue_inst,
@@ -20,34 +20,103 @@ module alu2(
 
 );
 
+typedef enum logic [1:0] { 
+    ALU_EMPTY,
+    ALU_BUSY,
+    ALU_FULL1,
+    ALU_FULL2
+} alu_state_t;
+
 // control code
 logic alu_valid;
-logic [3:0] rob_entry_num;
+alu_state_t alu_state, alu_state_next;
+logic push, pop;
+logic data_out_we, data_buffer_we, use_buffer_data;
 
-decoded_inst_t inst;
-reg_addr_t phy_dest;
-uint32_t src1_value, src2_value, old_value;
+assign alu_valid    = alu_state != ALU_EMPTY;
+assign alu_allowin  = alu_state == ALU_EMPTY || alu_state == ALU_BUSY
+                  || (alu_state == ALU_FULL1 && !issue_to_alu_valid);
+assign alu_to_valid = alu_state != ALU_EMPTY;
+
+assign push = issue_to_alu_valid && alu_state != ALU_FULL2;
+assign pop  = alu_to_valid && cs_allowin;
+
+assign data_out_we = (alu_state == ALU_EMPTY && push)
+                  || (alu_state == ALU_BUSY  && push && pop)
+                  || (alu_state == ALU_FULL1 && pop)
+                  || (alu_state == ALU_FULL2 && pop);
+assign data_buffer_we  = (alu_state == ALU_BUSY  && push && !pop)
+                      || (alu_state == ALU_FULL1 && push && !pop);
+assign use_buffer_data = (alu_state == ALU_FULL1 && pop)
+                      || (alu_state == ALU_FULL2 && pop);
+
+always_comb begin
+    unique case(alu_state)
+        ALU_EMPTY: alu_state_next = push ? ALU_BUSY  : ALU_EMPTY;
+        ALU_BUSY : alu_state_next = push ? (pop ? ALU_BUSY : ALU_FULL1) : (pop ? ALU_EMPTY : ALU_BUSY);
+        ALU_FULL1: alu_state_next = push ? (pop ? ALU_FULL1: ALU_FULL2 ) : (pop ? ALU_BUSY : ALU_FULL1);
+        ALU_FULL2: alu_state_next = pop  ? ALU_FULL1 : ALU_FULL2;
+    endcase
+end
+
+decoded_inst_t inst, inst_r[1:0];
+reg_addr_t phy_dest, phy_dest_r[1:0];
+uint32_t src1_value, src2_value;
+uint32_t src1_value_r[1:0], src2_value_r[1:0], old_value_r[1:0];
+logic [3:0] rob_entry_num;
+logic [3:0] rob_entry_num_r[1:0];
 exception_t exception;
+logic buffer_head, buffer_tail;
 
 // assign alu_allowin  = cs_allowin || !alu_valid;
-assign alu_to_valid = alu_valid;
+// assign alu_to_valid = alu_valid;
 
 always_ff @(posedge clk) begin
     if(reset || flush) begin
-        alu_valid  <= 1'b0;
+        alu_state <= ALU_EMPTY;
+    end
+    else if(push || pop) begin
+        alu_state <= alu_state_next;
+    end
+
+    if(reset || flush) begin
         inst       <= 'b0;
         phy_dest   <= 'b0;
         src1_value <= 'b0;
         src2_value <= 'b0;
+        // old_value  <= 'b0;
         rob_entry_num <= 'b0;
+        buffer_head   <= 'b0;
     end
-    else begin
-        alu_valid  <= issue_to_alu_valid;
-        inst       <= issue_inst.inst;
-        phy_dest   <= issue_inst.phy_dest;
-        src1_value <= issue_inst.src1_value;
-        src2_value <= issue_inst.src2_value;
-        rob_entry_num <= issue_inst.rob_entry_num;
+    else if(data_out_we) begin
+        inst          <= use_buffer_data? inst_r[buffer_head]         : issue_inst.inst;
+        phy_dest      <= use_buffer_data? phy_dest_r[buffer_head]     : issue_inst.phy_dest;
+        src1_value    <= use_buffer_data? src1_value_r[buffer_head]   : issue_inst.src1_value;
+        src2_value    <= use_buffer_data? src2_value_r[buffer_head]   : issue_inst.src2_value;
+        // old_value     <= use_buffer_data? old_value_r[buffer_head]    : issue_inst.old_value;
+        rob_entry_num <= use_buffer_data? rob_entry_num_r[buffer_head]: issue_inst.rob_entry_num;
+        buffer_head   <= use_buffer_data? !buffer_head                : buffer_head;
+    end
+
+    if(reset || flush) begin
+        // for(int i = 0; i<=1; i=i+1) begin
+        //     inst_r[i]          <= 'b0;
+        //     phy_dest_r[i]      <= 'b0;
+        //     src1_value_r[i]    <= 'b0;
+        //     src2_value_r[i]    <= 'b0;
+        //     // old_value_r[i]     <= 'b0;
+        //     rob_entry_num_r[i] <= 'b0;
+        // end
+        buffer_tail <= 'b0;
+    end
+    else if(data_buffer_we) begin
+        inst_r[buffer_tail]          <= issue_inst.inst;
+        phy_dest_r[buffer_tail]      <= issue_inst.phy_dest;
+        src1_value_r[buffer_tail]    <= issue_inst.src1_value;
+        src2_value_r[buffer_tail]    <= issue_inst.src2_value;
+        // old_value_r[buffer_tail]     <= issue_inst.old_value;
+        rob_entry_num_r[buffer_tail] <= issue_inst.rob_entry_num;
+        buffer_tail <= !buffer_tail;
     end
 end
 
@@ -68,6 +137,9 @@ logic op_lui;   //立即数置于高半部分
 
 logic op_clz;
 logic op_clo;
+
+// logic op_movn;
+// logic op_movz;
 
 logic op_mfhi;
 logic op_mflo;
@@ -103,6 +175,9 @@ assign op_lui  = inst.operation == OP_LUI;
 assign op_clz  = inst.operation == OP_CLZ;
 assign op_clo  = inst.operation == OP_CLO;
 
+// assign op_movn = inst.operation == OP_MOVN;
+// assign op_movz = inst.operation == OP_MOVZ;
+
 assign op_mfhi = inst.operation == OP_MFHI;
 assign op_mflo = inst.operation == OP_MFLO;
 assign op_mtlo = inst.operation == OP_MTLO;
@@ -121,6 +196,7 @@ uint64_t sr64_result;
 uint32_t sr_result;
 uint32_t clo_result;
 uint32_t clz_result;
+// uint32_t cond_move_result;
 
 // 32-bit adder
 wire [32:0] adder_a;
@@ -178,6 +254,13 @@ count_bit count_clo(
     .count(clo_result)
 );
 
+// // conditional move
+// always_comb begin
+//     cond_move_result = old_value;
+//     if(op_movz && src2_value == 0 
+//     || op_movn && src2_value != 0)
+//         cond_move_result = src1_value;
+// end
 
 // final result mux
 assign alu_result = ({32{op_add|op_addu|op_sub|op_subu  }} & add_sub_result)
@@ -192,6 +275,7 @@ assign alu_result = ({32{op_add|op_addu|op_sub|op_subu  }} & add_sub_result)
                   | ({32{op_srl|op_sra                  }} & sr_result)
                   | ({32{op_clz                         }} & clz_result)
                   | ({32{op_clo                         }} & clo_result)
+                //   | ({32{op_movn|op_movz                }} & cond_move_result)
                   | ({32{op_mfhi|op_mflo|op_mthi|op_mtlo}} & src1_value);
 
 // exception

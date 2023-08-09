@@ -12,7 +12,7 @@ module issue_stage (
     // input  logic alu1_allowin,
     // input  logic bru_allowin,
     input  logic mul_div_allowin,
-    input  logic alu2_allowin,
+    // input  logic alu2_allowin,
     input  logic agu_allowin,
     input  logic agu_pre_allowin,
     // input  logic sp_allowin,
@@ -65,7 +65,7 @@ logic select_inst1_valid, select_inst2_valid;
 logic [2:0] select_inst1_num, select_inst2_num;
 reg_addr_t  select_inst1_dest, select_inst2_dest;
 
-logic mul_div_busy, agu_busy;
+logic mul_div_busy;
 logic select_mul_div_valid;
 logic [2:0] select_mul_div_num;
 logic select_exe1_valid, select_exe2_valid;
@@ -133,13 +133,13 @@ always_ff @(posedge clk) begin
         mul_div_busy <= 1'b1;
     end
 
-    if(reset || flush 
-    || agu_busy && !(issue_to_execute_bus2.inst.is_load_store_op && issue_to_execute_bus2.valid)) begin
-        agu_busy <= 1'b0;
-    end
-    else if(select_inst2_valid && issue_queue[select_inst2_num].inst.is_load_store_op) begin
-        agu_busy <= 1'b1;
-    end
+    // if(reset || flush 
+    // || agu_busy && !(issue_to_execute_bus2.inst.is_load_store_op && issue_to_execute_bus2.valid)) begin
+    //     agu_busy <= 1'b0;
+    // end
+    // else if(select_inst2_valid && issue_queue[select_inst2_num].inst.is_load_store_op) begin
+    //     agu_busy <= 1'b1;
+    // end
 end
 
 always_comb begin
@@ -200,9 +200,8 @@ always_comb begin
     select_exe2_num = 3'd0;
     for(int i=0; i<ISSUE_QUEUE_SIZE; i++) begin
         if(issue_queue[i].valid &&
-          (issue_queue[i].inst.is_alu2_op && alu2_allowin
-        || issue_queue[i].inst.is_load_store_op && agu_allowin && issue_queue[i].pre_store_ready && !agu_busy
-        && !(agu_pre_allowin && issue_inst2.valid && issue_inst2.inst.is_alu2_op)
+          (issue_queue[i].inst.is_alu2_op
+        || issue_queue[i].inst.is_load_store_op && agu_allowin && issue_queue[i].pre_store_ready
         || issue_queue[i].inst.is_sp_op)
         && issue_queue[i].src1_ready && issue_queue[i].src2_ready) begin
             select_exe2_valid = 1'b1;
@@ -579,6 +578,7 @@ assign issue_to_execute_bus1.old_value  = inst1_old_dest_value;
 
 assign issue_to_execute_bus1.rob_entry_num = issue_inst1.rob_entry_num;
 
+assign issue_to_execute_bus1.is_store_op = 1'b0;
 assign issue_to_execute_bus1.store_num = issue_inst1.store_num;
 assign issue_to_execute_bus1.pre_store = issue_inst1.pre_store;
 
@@ -597,6 +597,7 @@ assign issue_to_execute_bus2.old_value  = '0;
 
 assign issue_to_execute_bus2.rob_entry_num = issue_inst2.rob_entry_num;
 
+assign issue_to_execute_bus2.is_store_op = issue_inst2.is_store_op;
 assign issue_to_execute_bus2.store_num = issue_inst2.store_num;
 assign issue_to_execute_bus2.pre_store = issue_inst2.pre_store;
 

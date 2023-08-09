@@ -1,6 +1,6 @@
 `include "../cpu.svh"
 
-module agu (
+module old_agu (
     input  clk,
     input  reset,
 
