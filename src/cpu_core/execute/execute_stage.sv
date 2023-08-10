@@ -114,9 +114,9 @@ execute_to_commit_bus_t bru_to_commit_bus;
 execute_to_commit_bus_t agu_to_commit_bus;
 execute_to_commit_bus_t spu_to_commit_bus;
 
-logic agu_store_to_valid, agu_load_to_valid;
+logic agu_store_to_valid, agu_lookup_to_valid, agu_load_to_valid;
 execute_to_commit_bus_t agu_commit_queue[7:0];
-execute_to_commit_bus_t agu_store_to_commit_bus, agu_load_to_commit_bus;
+execute_to_commit_bus_t agu_store_to_commit_bus, agu_lookup_to_commit_bus, agu_load_to_commit_bus;
 logic [2:0] agu_commit_queue_head, agu_commit_queue_tail, agu_commit_queue_tail_next;
 
 assign agu_to_valid = agu_commit_queue_head != agu_commit_queue_tail;
@@ -133,16 +133,16 @@ always_ff @(posedge clk) begin
             agu_commit_queue_head <= agu_commit_queue_head + 3'b1;
         end
 
-        if(agu_store_to_valid && agu_load_to_valid) begin
+        if((agu_store_to_valid || agu_lookup_to_valid) && agu_load_to_valid) begin
             agu_commit_queue_tail      <= agu_commit_queue_tail + 3'd2;
             agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd2;
-            agu_commit_queue[agu_commit_queue_tail]      <= agu_store_to_commit_bus;
+            agu_commit_queue[agu_commit_queue_tail]      <= agu_store_to_valid ? agu_store_to_commit_bus : agu_lookup_to_commit_bus;
             agu_commit_queue[agu_commit_queue_tail_next] <= agu_load_to_commit_bus;
         end
-        else if(agu_store_to_valid) begin
+        else if(agu_store_to_valid || agu_lookup_to_valid) begin
             agu_commit_queue_tail <= agu_commit_queue_tail + 3'd1;
             agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd1;
-            agu_commit_queue[agu_commit_queue_tail] <= agu_store_to_commit_bus;
+            agu_commit_queue[agu_commit_queue_tail] <= agu_store_to_valid ? agu_store_to_commit_bus : agu_lookup_to_commit_bus;
         end
         else if(agu_load_to_valid) begin
             agu_commit_queue_tail <= agu_commit_queue_tail + 3'd1;
@@ -258,6 +258,7 @@ agu agu_u (
 
     // .cs_allowin        (1'b1),
     .agu_store_to_valid,
+    .agu_lookup_to_valid,
     .agu_load_to_valid,
 
     .issue_inst         (issue_to_execute_bus2),
@@ -286,6 +287,7 @@ agu agu_u (
     .dcache_data_ok,
 
     .agu_store_to_commit_bus,
+    .agu_lookup_to_commit_bus,
     .agu_load_to_commit_bus
 );
 

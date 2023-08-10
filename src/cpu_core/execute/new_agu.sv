@@ -12,6 +12,7 @@ module agu (
 
     // input  logic cs_allowin,
     output logic agu_store_to_valid,
+    output logic agu_lookup_to_valid,
     output logic agu_load_to_valid,
 
     input  issue_to_execute_bus_t issue_inst,
@@ -38,6 +39,7 @@ module agu (
     input  uint32_t    dcache_rdata,
 
     output execute_to_commit_bus_t agu_store_to_commit_bus,
+    output execute_to_commit_bus_t agu_lookup_to_commit_bus,
     output execute_to_commit_bus_t agu_load_to_commit_bus
 
 );
@@ -67,7 +69,7 @@ typedef enum logic [1:0] {
 // } Storebuffer_Req_State_t;
 
 // control
-logic agu_addr_valid, agu_store_valid, agu_load_req_valid, agu_load_resp_valid;
+logic agu_addr_valid, agu_store_valid, agu_load_req_valid, agu_load_resp_valid, agu_lookup_valid;
 logic agu_store_allowin, agu_load_req_allowin, agu_load_resp_allowin;
 logic agu_store_readygo, agu_load_req_readygo, agu_load_resp_readygo;
 logic agu_addr_to_valid, agu_load_req_to_valid;
@@ -255,7 +257,7 @@ always_ff @(posedge clk) begin
         agu_store_valid <= 1'b0;
     end
     else begin
-        agu_store_valid <= is_store_op && agu_addr_to_valid;
+        agu_store_valid <= is_store_op && agu_addr_to_valid && agu_store_allowin;
     end
 
     if(reset || flush) begin
@@ -275,7 +277,7 @@ always_ff @(posedge clk) begin
 end
 
 
-assign agu_store_to_commit_bus.valid = agu_store_to_valid;
+assign agu_store_to_commit_bus.valid = agu_store_valid;
 assign agu_store_to_commit_bus.rob_entry_num = store_rob_entry_num;
 
 assign agu_store_to_commit_bus.rf_we    = '0;
@@ -287,6 +289,101 @@ assign agu_store_to_commit_bus.is_store_op = 1'b1;
 assign agu_store_to_commit_bus.verify_result = '0;
 
 assign agu_store_to_commit_bus.exception = store_exception;
+
+
+/* AGU lookup */
+operation_t lookup_op;
+virt_t      lookup_addr;
+reg_addr_t  lookup_phy_dest;
+uint32_t    lookup_rt_value;
+uint32_t    lookup_data;
+uint32_t    lookup_value;
+uint32_t    lookup_result;
+
+logic       data_exist;
+
+logic [3:0] lookup_rob_entry_num;
+
+exception_t lookup_exception;
+
+logic       lookup_lb;
+logic       lookup_lbu;
+logic       lookup_lh;
+logic       lookup_lhu;
+logic       lookup_lw;
+logic       lookup_lwl;
+logic       lookup_lwr;
+
+assign lookup_lb  = lookup_op == OP_LB;
+assign lookup_lbu = lookup_op == OP_LBU;
+assign lookup_lh  = lookup_op == OP_LH;
+assign lookup_lhu = lookup_op == OP_LHU;
+assign lookup_lw  = lookup_op == OP_LW;
+assign lookup_lwl = lookup_op == OP_LWL;
+assign lookup_lwr = lookup_op == OP_LWR;
+
+always_comb begin
+    lookup_exception = '0;
+    if((lookup_lh || lookup_lhu) && lookup_addr[0] 
+     || lookup_lw && lookup_addr[1:0]) begin
+        lookup_exception.ex       = 1'b1;
+        lookup_exception.exccode  = `EXCCODE_ADEL;
+        lookup_exception.badvaddr = lookup_addr;
+    end
+end
+
+assign agu_lookup_to_valid = agu_lookup_valid;
+
+always_ff @(posedge clk) begin
+    if(reset || flush) begin
+        agu_lookup_valid <= 1'b0;
+    end
+    else begin
+        agu_lookup_valid <= agu_addr_to_valid && data_exist && !is_store_op;
+    end
+
+    if(reset) begin
+        lookup_op   <= OP_NOP;
+        lookup_addr <= 32'h0;
+        lookup_phy_dest <= 5'h0;
+        lookup_rt_value <= 32'h0;
+        lookup_value <= 32'h0;
+        lookup_rob_entry_num <= 4'h0;
+    end
+    else begin
+        lookup_op   <= op;
+        lookup_addr <= rs_value + imm_value;
+        lookup_phy_dest <= phy_dest;
+        lookup_rt_value <= rt_value;
+        lookup_value <= lookup_data;
+        lookup_rob_entry_num <= rob_entry_num;
+    end
+end
+
+assign lookup_result = (lookup_lb ) ? lookup_addr[1] ? lookup_addr[0] ? {{24{lookup_value[31]}}, lookup_value[31:24]} : {{24{lookup_value[23]}}, lookup_value[23:16]}:
+                                                       lookup_addr[0] ? {{24{lookup_value[15]}}, lookup_value[15: 8]} : {{24{lookup_value[ 7]}}, lookup_value[ 7: 0]}:
+                       (lookup_lbu) ? lookup_addr[1] ? lookup_addr[0] ? { 24'b0,                 lookup_value[31:24]} : { 24'b0,                 lookup_value[23:16]}:
+                                                       lookup_addr[0] ? { 24'b0,                 lookup_value[15: 8]} : { 24'b0,                 lookup_value[ 7: 0]}:
+                       (lookup_lh ) ? lookup_addr[1] ? {{16{lookup_value[31]}}, lookup_value[31:16]} : {{16{lookup_value[15]}}, lookup_value[15:0]} :
+                       (lookup_lhu) ? lookup_addr[1] ? { 16'b0,                 lookup_value[31:16]} : { 16'b0,                 lookup_value[15:0]} :
+                       (lookup_lwl) ? lookup_addr[1] ? lookup_addr[0] ?  lookup_value                                        : {lookup_value[23:0],       lookup_rt_value[ 7: 0]} :
+                                                       lookup_addr[0] ? {lookup_value[15:0],      lookup_rt_value[15: 0]}    : {lookup_value[ 7:0],       lookup_rt_value[23: 0]} :
+                       (lookup_lwr) ? lookup_addr[1] ? lookup_addr[0] ? {lookup_rt_value[31: 8] , lookup_value[31:24]}       : {lookup_rt_value[31:16],   lookup_value[31:16]} :
+                                                       lookup_addr[0] ? {lookup_rt_value[31:24] , lookup_value[31: 8]}       :  lookup_value                :
+                                                                         lookup_value;
+
+assign agu_lookup_to_commit_bus.valid = agu_lookup_valid;
+assign agu_lookup_to_commit_bus.rob_entry_num = lookup_rob_entry_num;
+
+assign agu_lookup_to_commit_bus.rf_we = 4'b1111;
+assign agu_lookup_to_commit_bus.phy_dest = lookup_phy_dest;
+assign agu_lookup_to_commit_bus.result = lookup_result;
+
+assign agu_lookup_to_commit_bus.is_store_op = 1'b0;
+
+assign agu_lookup_to_commit_bus.verify_result = 'b0;
+
+assign agu_lookup_to_commit_bus.exception = lookup_exception;
 
 
 /* AGU load request */
@@ -347,7 +444,7 @@ always_ff @(posedge clk) begin
         agu_load_req_valid <= 1'b0;
     end
     else if(agu_load_req_allowin) begin
-        agu_load_req_valid <= !is_store_op && agu_addr_to_valid;
+        agu_load_req_valid <= !is_store_op && !data_exist && agu_addr_to_valid;
     end
 
     if(reset || flush) begin
@@ -481,12 +578,15 @@ store_buffer store_buffer_u (
 
     .flush,
 
-    .pre_store (req_pre_store),
     .load_addr(rs_value + imm_value),
+    .data_exist,
     .pre_load_wait,
+
+    .pre_store (req_pre_store),
     .load_wait,
 
-    .store_buffer_full,
+    // .lookup_addr,
+    .lookup_data,
 
     .valid      (agu_store_valid && !store_exception.ex),
     // .wr         (mem_wr),
@@ -497,10 +597,7 @@ store_buffer store_buffer_u (
     .mem_wdata  (store_data),
     .store_num  (agu_store_num),
 
-    // .data_exist,
-    // .data_wstrb_match,
-    // .data_wstrb,
-    // .data_result,
+    .store_buffer_full,
 
     .store_req,
     .dcache_addr_ok(dcache_addr_ok && !select_load),
