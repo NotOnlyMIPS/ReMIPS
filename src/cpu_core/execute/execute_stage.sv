@@ -16,8 +16,10 @@ module execute_stage(
     // MMU
     output logic       data_valid,
     output virt_t      data_vaddr,
+    output virt_t      data_vaddr2,
     input  phys_t      data_paddr,
     input  exception_t data_tlb_ex,
+    input  exception_t data_tlb_ex2,
 
     // DCache
     output logic       dcache_req,
@@ -54,9 +56,10 @@ module execute_stage(
     output phys_t        cache_paddr,
 
     // commit store
-    input  logic       commit_store_valid,
-    output logic       commit_store_ready,
-    output exception_t commit_store_ex,
+    input  logic       commit_store1_valid,
+    input  logic       commit_store2_valid,
+    // output logic       commit_store_ready,
+    // output exception_t commit_store_ex,
 
     // commit
     output execute_to_commit_bus_t execute_to_commit_bus1,
@@ -260,13 +263,16 @@ agu agu_u (
     .issue_inst         (issue_to_execute_bus2),
     
     // commit store
-    .commit_store_valid,
-    .commit_store_ready,
-    .commit_store_ex,
+    .commit_store1_valid,
+    .commit_store2_valid,
+    // .commit_store_ready,
+    // .commit_store_ex,
 
     // mmu
     .data_vaddr(agu_data_vaddr),
+    .data_vaddr2,
     .data_tlb_ex,
+    .data_tlb_ex2,
 
     // DBus
     .dcache_req,

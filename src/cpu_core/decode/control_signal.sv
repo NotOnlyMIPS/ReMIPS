@@ -28,9 +28,9 @@ logic [ 2:0] sel;
 logic [25:0] jidx;
 
 assign op   = inst[31:26];
-assign rs   = inst[25:21];
-assign rt   = inst[20:16];
-assign rd   = inst[15:11];
+assign rs   = {1'b0, inst[25:21]};
+assign rt   = {1'b0, inst[20:16]};
+assign rd   = {1'b0, inst[15:11]};
 assign sa   = inst[10: 6];
 assign sel  = inst[ 2: 0];
 assign func = inst[ 5: 0];
@@ -162,10 +162,10 @@ always_comb begin
             inst_d.branch_type = Branch_Call;
         end
         OP_JALR: begin
-            inst_d.branch_type = inst_d.dest == `REG_RA ? Branch_Call : Branch_Jump;
+            inst_d.branch_type = rd == `REG_RA ? Branch_Call : Branch_Jump;
         end
         OP_JR: begin
-            inst_d.branch_type = inst_d.src1 == `REG_RA ? Branch_Return : Branch_Jump;
+            inst_d.branch_type = rs == `REG_RA ? Branch_Return : Branch_Jump;
         end
         OP_J: begin
             inst_d.branch_type = Branch_Jump;

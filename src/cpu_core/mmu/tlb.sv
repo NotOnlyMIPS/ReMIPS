@@ -6,8 +6,10 @@ module tlb (
     input  logic [7:0]  asid,
     input  virt_t       inst_vaddr,
     input  virt_t       data_vaddr,
+    input  virt_t       data_vaddr2,
     output tlb_result_t inst_result,
     output tlb_result_t data_result,
+    output tlb_result_t data_result2,
 
     //for TLBR/TLBWI/TLWR
     input  tlb_index_t  tlbrw_index,
@@ -50,6 +52,13 @@ tlb_lookup data_lookup(
     .virt_addr(data_vaddr),
     .asid,
     .result(data_result)
+);
+
+tlb_lookup data_lookup2(
+    .entries,
+    .virt_addr(data_vaddr2),
+    .asid,
+    .result(data_result2)
 );
 
 tlb_result_t tlbp_result;

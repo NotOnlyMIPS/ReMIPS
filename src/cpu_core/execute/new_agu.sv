@@ -15,13 +15,16 @@ module agu (
     output logic agu_load_to_valid,
 
     input  issue_to_execute_bus_t issue_inst,
-    input  logic       commit_store_valid,
-    output logic       commit_store_ready,
-    output exception_t commit_store_ex,
+    input  logic       commit_store1_valid,
+    input  logic       commit_store2_valid,
+    // output logic       commit_store_ready,
+    // output exception_t commit_store_ex,
 
     // mmu
     output virt_t      data_vaddr,
+    output virt_t      data_vaddr2,
     input  exception_t data_tlb_ex,
+    input  exception_t data_tlb_ex2,
 
     // DBus
     output logic       dcache_req,
@@ -56,12 +59,12 @@ typedef enum logic [1:0] {
 //     AGU_done
 // } AGU_Stage_t;
 
-typedef enum logic [1:0] { 
-    Store_Req_Idle,
-    Store_Req_Addr,
-    Store_Req_Data,
-    Store_Req_Done
-} Storebuffer_Req_State_t;
+// typedef enum logic [1:0] { 
+//     Store_Req_Idle,
+//     Store_Req_Addr,
+//     Store_Req_Data,
+//     Store_Req_Done
+// } Storebuffer_Req_State_t;
 
 // control
 logic agu_addr_valid, agu_store_valid, agu_load_req_valid, agu_load_resp_valid;
@@ -74,7 +77,8 @@ logic agu_addr_to_valid, agu_load_req_to_valid;
 logic data_cancel;
 
 // storebuffer
-logic select_store;
+// logic select_store;
+logic select_load;
 
 // writeback
 // uint32_t agu_result;
@@ -189,6 +193,8 @@ uint32_t    store_value, store_data;
 logic [3:0] agu_store_num;
 logic [3:0] store_rob_entry_num;
 
+logic       store_buffer_full;
+
 exception_t store_exception;
 
 logic        op_sb ;
@@ -197,11 +203,11 @@ logic        op_sw ;
 logic        op_swl;
 logic        op_swr;
 
-assign op_sb  = op == OP_SB;
-assign op_sh  = op == OP_SH;
-assign op_sw  = op == OP_SW;
-assign op_swl = op == OP_SWL;
-assign op_swr = op == OP_SWR;
+assign op_sb  = store_op == OP_SB;
+assign op_sh  = store_op == OP_SH;
+assign op_sw  = store_op == OP_SW;
+assign op_swl = store_op == OP_SWL;
+assign op_swr = store_op == OP_SWR;
 
 
 assign store_we = op_sb  ? (store_addr[1] ? store_addr[0] ? 4'h8 : 4'h4  :
@@ -218,14 +224,16 @@ assign store_size = ({3{op_sb | ((op_swl) & store_addr[1:0] == 2'd0) | ((op_swr)
                     |{3{op_sh | ((op_swl) & store_addr[1:0] == 2'd1) | ((op_swr) & store_addr[1:0] == 2'd1)}} & 3'd1
                     |{3{op_sw | ((op_swl) & store_addr[1]   == 1'b1) | ((op_swr) & store_addr[1]   == 1'b0)}} & 3'd2 );
 
-assign store_data  = op_sb  ? {4{rt_value[7:0]}} :
-                     op_sh  ? {2{rt_value[15:0]}} :
-                     op_sw  ? rt_value :
-                     op_swl ? store_addr[1] ? store_addr[0] ?  rt_value : { 8'h0, rt_value[31: 8]} :
-                                              store_addr[0] ? {16'h0, rt_value[31:16]} : {24'h0, rt_value[31:24]} :
-                     op_swr ? store_addr[1] ? store_addr[0] ? {rt_value[ 7: 0], 24'h0} : {rt_value[15: 0], 16'h0} :
-                                              store_addr[0] ? {rt_value[23: 0],  8'h0} :  rt_value                :
-                              rt_value;
+assign store_data  = op_sb  ? {4{store_value[7:0]}} :
+                     op_sh  ? {2{store_value[15:0]}} :
+                     op_sw  ? store_value :
+                     op_swl ? store_addr[1] ? store_addr[0] ?  store_value : { 8'h0, store_value[31: 8]} :
+                                              store_addr[0] ? {16'h0, store_value[31:16]} : {24'h0, store_value[31:24]} :
+                     op_swr ? store_addr[1] ? store_addr[0] ? {store_value[ 7: 0], 24'h0} : {store_value[15: 0], 16'h0} :
+                                              store_addr[0] ? {store_value[23: 0],  8'h0} :  store_value                :
+                              store_value;
+
+assign data_vaddr2 = store_addr;
 
 always_comb begin
     store_exception = '0;
@@ -234,10 +242,13 @@ always_comb begin
         store_exception.exccode  = `EXCCODE_ADES;
         store_exception.badvaddr = store_addr;
     end
+    else if(data_tlb_ex2.ex) begin
+        store_exception = data_tlb_ex2;
+    end
 end
 
 assign agu_store_to_valid = agu_store_valid;
-assign agu_store_allowin  = 1'b1;
+assign agu_store_allowin  = !store_buffer_full;
 
 always_ff @(posedge clk) begin
     if(reset || flush) begin
@@ -285,7 +296,9 @@ logic [2:0] load_size;
 reg_addr_t  req_phy_dest;
 uint32_t    req_load_value;
 logic [3:0] req_pre_store;
+logic       pre_load_wait;
 logic       load_wait;
+logic       load_wait_r;
 
 logic       load_req;
 
@@ -325,7 +338,7 @@ always_comb begin
     end
 end
 
-assign agu_load_req_readygo = !select_store && load_req && dcache_addr_ok || req_exception.ex;
+assign agu_load_req_readygo = select_load && load_req && dcache_addr_ok || req_exception.ex;
 assign agu_load_req_allowin = !agu_load_req_valid || agu_load_req_readygo && agu_load_resp_allowin;
 assign agu_load_req_to_valid = agu_load_req_valid && agu_load_req_readygo;
 
@@ -348,6 +361,7 @@ always_ff @(posedge clk) begin
     else if(agu_load_req_allowin) begin
         load_op   <= op;
         load_addr <= rs_value + imm_value;
+        load_wait_r  <= pre_load_wait;
         req_phy_dest <= phy_dest;
         req_load_value    <= rt_value;
         req_pre_store     <= pre_store;
@@ -434,10 +448,10 @@ assign load_result = (resp_lb ) ? resp_addr[1] ? resp_addr[0] ? {{24{dcache_rdat
                                                  resp_addr[0] ? { 24'b0,                 dcache_rdata[15: 8]} : { 24'b0,                 dcache_rdata[ 7: 0]}:
                      (resp_lh ) ? resp_addr[1] ? {{16{dcache_rdata[31]}}, dcache_rdata[31:16]} : {{16{dcache_rdata[15]}}, dcache_rdata[15:0]} :
                      (resp_lhu) ? resp_addr[1] ? { 16'b0,                 dcache_rdata[31:16]} : { 16'b0,                 dcache_rdata[15:0]} :
-                     (resp_lwl) ? resp_addr[1] ? resp_addr[0] ?  dcache_rdata                          : {dcache_rdata[23:0],  rt_value[ 7: 0]} :
-                                                 resp_addr[0] ? {dcache_rdata[15:0], rt_value[15: 0]}  : {dcache_rdata[ 7:0],  rt_value[23: 0]} :
-                     (resp_lwr) ? resp_addr[1] ? resp_addr[0] ? {rt_value[31: 8], dcache_rdata[31:24]} : {rt_value[31:16],     dcache_rdata[31:16]} :
-                                                 resp_addr[0] ? {rt_value[31:24], dcache_rdata[31: 8]} :  dcache_rdata                :
+                     (resp_lwl) ? resp_addr[1] ? resp_addr[0] ?  dcache_rdata                             : {dcache_rdata[23:0],  load_value[ 7: 0]} :
+                                                 resp_addr[0] ? {dcache_rdata[15:0], load_value[15: 0]}   : {dcache_rdata[ 7:0],  load_value[23: 0]} :
+                     (resp_lwr) ? resp_addr[1] ? resp_addr[0] ? {load_value[31: 8] , dcache_rdata[31:24]} : {load_value[31:16],   dcache_rdata[31:16]} :
+                                                 resp_addr[0] ? {load_value[31:24] , dcache_rdata[31: 8]} :  dcache_rdata                :
                                                                 dcache_rdata;
 
 assign agu_load_to_commit_bus.valid = agu_load_resp_valid;
@@ -455,11 +469,11 @@ assign agu_load_to_commit_bus.exception = exception;
 
 
 /* store buffer */
-Storebuffer_Req_State_t storebuffer_req_state;
-logic [3:0] storebuffer_req_wstrb, storebuffer_req_wstrb_r;
-logic [2:0] storebuffer_req_size, storebuffer_req_size_r;
-virt_t   storebuffer_req_addr, storebuffer_req_addr_r;
-uint32_t storebuffer_req_data, storebuffer_req_data_r;
+logic store_req;
+logic [3:0] storebuffer_req_wstrb;
+logic [2:0] storebuffer_req_size;
+virt_t   storebuffer_req_addr;
+uint32_t storebuffer_req_data;
 
 store_buffer store_buffer_u (
     .clk,
@@ -468,7 +482,11 @@ store_buffer store_buffer_u (
     .flush,
 
     .pre_store (req_pre_store),
+    .load_addr(rs_value + imm_value),
+    .pre_load_wait,
     .load_wait,
+
+    .store_buffer_full,
 
     .valid      (agu_store_valid && !store_exception.ex),
     // .wr         (mem_wr),
@@ -484,7 +502,12 @@ store_buffer store_buffer_u (
     // .data_wstrb,
     // .data_result,
 
-    .commit_store_valid (commit_store_valid && storebuffer_req_state == Store_Req_Idle),
+    .store_req,
+    .dcache_addr_ok(dcache_addr_ok && !select_load),
+    .dcache_data_ok,
+
+    .commit_store1_valid,
+    .commit_store2_valid,
     .commit_store_wstrb (storebuffer_req_wstrb),
     .commit_store_size  (storebuffer_req_size ),
     .commit_store_addr  (storebuffer_req_addr ),
@@ -492,65 +515,66 @@ store_buffer store_buffer_u (
 
 );
 
-always_ff @(posedge clk) begin
-    if(reset || flush) begin
-        storebuffer_req_state   <= Store_Req_Idle;
-        storebuffer_req_wstrb_r <= 'b0;
-        storebuffer_req_addr_r  <= 'b0;
-        storebuffer_req_data_r  <= 'b0;
-    end
-    else begin
-        unique case(storebuffer_req_state)
-            Store_Req_Idle: begin
-                if(commit_store_valid) begin
-                    storebuffer_req_state   <= Store_Req_Addr;
-                    storebuffer_req_wstrb_r <= storebuffer_req_wstrb;
-                    storebuffer_req_size_r  <= storebuffer_req_size;
-                    storebuffer_req_addr_r  <= storebuffer_req_addr;
-                    storebuffer_req_data_r  <= storebuffer_req_data;
-                end
-            end
-            Store_Req_Addr: begin
-                if(dcache_addr_ok)
-                    storebuffer_req_state <= Store_Req_Data;
-            end
-            Store_Req_Data: begin
-                if(dcache_data_ok && !data_cancel)
-                    storebuffer_req_state <= Store_Req_Done;
-            end
-            Store_Req_Done: begin
-                storebuffer_req_state <= Store_Req_Idle;
-            end
-            default: storebuffer_req_state <= Store_Req_Idle;
-        endcase
-    end
+// always_ff @(posedge clk) begin
+//     if(reset || flush) begin
+//         storebuffer_req_state   <= Store_Req_Idle;
+//         storebuffer_req_wstrb_r <= 'b0;
+//         storebuffer_req_addr_r  <= 'b0;
+//         storebuffer_req_data_r  <= 'b0;
+//     end
+//     else begin
+//         unique case(storebuffer_req_state)
+//             Store_Req_Idle: begin
+//                 if(commit_store_valid) begin
+//                     storebuffer_req_state   <= Store_Req_Addr;
+//                     storebuffer_req_wstrb_r <= storebuffer_req_wstrb;
+//                     storebuffer_req_size_r  <= storebuffer_req_size;
+//                     storebuffer_req_addr_r  <= storebuffer_req_addr;
+//                     storebuffer_req_data_r  <= storebuffer_req_data;
+//                 end
+//             end
+//             Store_Req_Addr: begin
+//                 if(dcache_addr_ok)
+//                     storebuffer_req_state <= Store_Req_Data;
+//             end
+//             Store_Req_Data: begin
+//                 if(dcache_data_ok && !data_cancel)
+//                     storebuffer_req_state <= Store_Req_Done;
+//             end
+//             Store_Req_Done: begin
+//                 storebuffer_req_state <= Store_Req_Idle;
+//             end
+//             default: storebuffer_req_state <= Store_Req_Idle;
+//         endcase
+//     end
 
-    if(reset || flush) begin
-        commit_store_ex <= 'b0;
-    end
-    else if(storebuffer_req_state == Store_Req_Data && dcache_data_ok && !data_cancel) begin
-        commit_store_ex <= data_tlb_ex;
-    end
-end
+//     if(reset || flush) begin
+//         commit_store_ex <= 'b0;
+//     end
+//     else if(storebuffer_req_state == Store_Req_Data && dcache_data_ok && !data_cancel) begin
+//         commit_store_ex <= data_tlb_ex;
+//     end
+// end
 
 // DBus and mmu
 assign data_vaddr   = dcache_addr;
 
-assign commit_store_ready = storebuffer_req_state == Store_Req_Done;
-assign select_store = load_wait || storebuffer_req_state == Store_Req_Addr;
-assign dcache_req   = load_req && !select_store || storebuffer_req_state == Store_Req_Addr && select_store;
-assign dcache_wr    = select_store;
-assign dcache_wstrb = storebuffer_req_wstrb_r;
-assign dcache_size  = select_store ? storebuffer_req_size_r : load_size;
-assign dcache_addr  = select_store ? storebuffer_req_addr_r : load_addr;
-assign dcache_wdata = storebuffer_req_data_r;
+// assign commit_store_ready = storebuffer_req_state == Store_Req_Done;
+// assign select_store = load_wait || store_req;
+assign select_load  = agu_load_req_valid && (!load_wait_r || !load_wait);
+assign dcache_req   = load_req && select_load || store_req && !select_load;
+assign dcache_wr    = !select_load;
+assign dcache_wstrb = storebuffer_req_wstrb;
+assign dcache_size  = !select_load ? storebuffer_req_size : load_size;
+assign dcache_addr  = !select_load ? storebuffer_req_addr : load_addr;
+assign dcache_wdata = storebuffer_req_data;
 
 always_ff @(posedge clk) begin
     if(reset || data_cancel && dcache_data_ok) begin
         data_cancel <= 1'b0;
     end
     else if(flush && (agu_load_resp_valid && !dcache_data_ok
-                  || dcache_addr_ok)) begin
+                  || dcache_addr_ok && select_load)) begin
         data_cancel <= 1'b1;
     end
 end

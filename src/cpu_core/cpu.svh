@@ -192,6 +192,7 @@ typedef enum logic [2:0] {
 } branch_type_t;
 
 typedef struct packed {
+    logic           inst2;
     logic [31:10]   tag;
     branch_type_t   br_type;
     logic [1:0]     count;
@@ -464,6 +465,7 @@ typedef struct packed {
 // EXE stage
 typedef struct packed {
     logic        valid;
+    logic        complete;
     logic [ 3:0] wstrb;
     logic [ 2:0] size;
     logic [ 3:0] store_num;

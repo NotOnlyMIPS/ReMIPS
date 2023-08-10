@@ -166,7 +166,7 @@ assign select_to_busy_table_bus2 = select_inst2_dest;
 
 always_comb begin
 
-    // selcet_mul_div
+    // select_mul_div
     select_mul_div_valid = 1'b0;
     select_mul_div_num = 3'd0;
     for(int i=0; i<ISSUE_QUEUE_SIZE; i=i+2) begin
@@ -306,8 +306,8 @@ always_comb begin
             end
 
             // store
-            if(issue_inst2.valid && issue_inst2.is_store_op
-            && issue_queue[i].pre_store == issue_inst2.store_num) begin
+            if(select_inst2_valid && issue_queue[select_inst2_num].is_store_op && issue_queue[i].pre_store == issue_queue[select_inst2_num].store_num
+            || issue_inst2.valid && issue_inst2.is_store_op && issue_queue[i].pre_store == issue_inst2.store_num) begin
                 issue_queue_bus[i].pre_store_ready = 1'b1;
             end
         end

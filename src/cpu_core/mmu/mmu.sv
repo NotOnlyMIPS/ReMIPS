@@ -15,6 +15,7 @@ module mmu(
     input  virt_t       inst_vaddr,
     input  logic        data_valid,
     input  virt_t       data_vaddr,
+    input  virt_t       data_vaddr2,
 
     output mmu_result_t inst_result,
     output mmu_result_t data_result,
@@ -33,7 +34,8 @@ module mmu(
     input  logic        load_op,
     input  logic        store_op,
     output exception_t  inst_tlb_ex,
-    output exception_t  data_tlb_ex
+    output exception_t  data_tlb_ex,
+    output exception_t  data_tlb_ex2
 
 );
 
@@ -63,9 +65,12 @@ begin: generate_mmu_enabled_code
     logic data_mapped;
     tlb_result_t inst_tlb_result;
     tlb_result_t data_tlb_result;
-    
+    tlb_result_t data_tlb_result2;    
+
+
     assign inst_mapped         = is_vaddr_mapped(inst_vaddr);
     assign data_mapped         = is_vaddr_mapped(data_vaddr);
+    assign data_mapped2        = is_vaddr_mapped(data_vaddr2);
 
     always_ff @ (posedge clk) begin
         if(reset) begin
@@ -105,7 +110,7 @@ begin: generate_mmu_enabled_code
             data_tlb_ex_r.tlb_refill    <= (data_mapped & data_tlb_result.miss);
             data_tlb_ex_r.badvaddr      <= data_vaddr;
             data_tlb_ex_r.ex            <= (((data_mapped & ~data_tlb_result.valid) | (data_mapped & data_tlb_result.miss)) & (load_op | store_op))
-                                           | (store_op & ~(data_mapped & data_tlb_result.miss) & ~(~data_mapped | data_tlb_result.dirty) & ~(inst_mapped & ~inst_tlb_result.valid));
+                                           | (store_op & ~(data_mapped & data_tlb_result.miss) & ~(~data_mapped | data_tlb_result.dirty) & ~(data_mapped & ~data_tlb_result.valid));
             data_tlb_ex_r.exccode       <= load_op ? `EXCCODE_TLBL :
                                          (store_op & ~(data_mapped & data_tlb_result.miss) & ~(~data_mapped | data_tlb_result.dirty) & ~(data_mapped & ~data_tlb_result.valid)) ? `EXCCODE_MOD :
                                          `EXCCODE_TLBS;
@@ -121,8 +126,10 @@ begin: generate_mmu_enabled_code
 		.asid(tlb_asid),
 		.inst_vaddr,
 		.data_vaddr,
+        .data_vaddr2,
 		.inst_result(inst_tlb_result),
 		.data_result(data_tlb_result),
+        .data_result2(data_tlb_result2),
 
 		.tlbrw_index,
 		.tlbrw_we   ,
@@ -132,6 +139,13 @@ begin: generate_mmu_enabled_code
 		.tlbp_entry_hi,
 		.tlbp_index   
     );
+    assign data_tlb_ex2.tlb_refill    = (data_mapped2 & data_tlb_result2.miss);
+    assign data_tlb_ex2.badvaddr      = data_vaddr2;
+    assign data_tlb_ex2.ex            = (((data_mapped2 & ~data_tlb_result2.valid) | (data_mapped2 & data_tlb_result2.miss)))
+                                            | (~(data_mapped2 & data_tlb_result2.miss) & ~(~data_mapped2 | data_tlb_result2.dirty) & ~(data_mapped2 & ~data_tlb_result2.valid));
+    assign data_tlb_ex2.exccode       = (~(data_mapped & data_tlb_result.miss) & ~(~data_mapped | data_tlb_result.dirty) & ~(data_mapped & ~data_tlb_result.valid)) ? `EXCCODE_MOD :
+                                        `EXCCODE_TLBS;
+    assign data_tlb_ex2.bd            = 1'b0;
 end else begin: generate_mmu_disabled_code
     always_ff @ (posedge clk) begin
         if(reset) begin
@@ -149,11 +163,14 @@ end else begin: generate_mmu_disabled_code
             data_tlb_ex_r          <= '0;
         end
     end
+    assign data_tlb_ex2 = '0;
 end
 endgenerate
 assign inst_result = inst_result_r;
 assign data_result = data_result_r;
 assign inst_tlb_ex = inst_tlb_ex_r;
 assign data_tlb_ex = data_tlb_ex_r;
+
+
 
 endmodule

@@ -64,8 +64,9 @@ logic select_store_ready;
 writeback_to_rf_bus_t writeback_to_rf_bus1, writeback_to_rf_bus2;
 
 // commit
-exception_t commit_store_ex;
-logic       commit_store_valid, commit_store_ready;
+// exception_t commit_store_ex;
+logic       commit_store1_valid;
+logic       commit_store2_valid;
 logic       rob_empty;
 logic [3:0] rob_tail_o;
 commit_to_rat_bus_t   commit_to_rat_bus1, commit_to_rat_bus2;
@@ -90,12 +91,14 @@ logic            data_valid;
 logic            kseg0_uncached;
 virt_t           inst_vaddr;
 virt_t           data_vaddr;
+virt_t           data_vaddr2;
 mmu_result_t     inst_result;
 mmu_result_t     data_result;
 logic            load_op;
 logic            store_op;
 exception_t      inst_tlb_ex;
 exception_t      data_tlb_ex;
+exception_t      data_tlb_ex2;
 virt_t           tlb_cache_pc;
 tlb_index_t      tlbrw_index;
 logic            tlbrw_we;
@@ -193,6 +196,7 @@ BPU u_BPU (
     .reset,
     // .reset(bpu_reset),
 
+    .flush,
     .flush_src,
 
     .bpu_verify_result,
@@ -384,6 +388,9 @@ execute_stage u_execute_stage (
     .data_paddr(data_result.phy_addr),
     .data_tlb_ex,
 
+    .data_vaddr2,
+    .data_tlb_ex2,
+
     // DCache
     .dcache_req,
     .dcache_wr,
@@ -419,9 +426,10 @@ execute_stage u_execute_stage (
     .cache_paddr,
     
     // commit store
-    .commit_store_valid,
-    .commit_store_ready,
-    .commit_store_ex,
+    .commit_store1_valid,
+    .commit_store2_valid,
+    // .commit_store_ready,
+    // .commit_store_ex,
     
     // commit
     .execute_to_commit_bus1,
@@ -454,9 +462,10 @@ commit_stage u_commit_stage (
     .execute_to_commit_bus1,
     .execute_to_commit_bus2,
 
-    .commit_store_ready,
-    .commit_store_valid,
-    .commit_store_ex,
+    // .commit_store_ready,
+    .commit_store1_valid,
+    .commit_store2_valid,
+    // .commit_store_ex,
     
     .writeback_to_busytable_bus1,
     .writeback_to_busytable_bus2,
@@ -486,6 +495,7 @@ mmu u_mmu (
     .inst_vaddr,
     .data_valid,
     .data_vaddr,
+    .data_vaddr2,
     
     .inst_result,
     .data_result,
@@ -502,7 +512,8 @@ mmu u_mmu (
     .load_op  (dcache_req && !dcache_wr),
     .store_op (dcache_req &&  dcache_wr),
     .inst_tlb_ex,
-    .data_tlb_ex
+    .data_tlb_ex,
+    .data_tlb_ex2
 
 );
 

@@ -129,7 +129,7 @@ assign predict_target   = bpu_entry.target;
 
 assign predict_sucess = br_taken && predict_is_taken && (br_target == predict_target) || !(br_taken || predict_is_taken);
                         
-assign verify_entry = {inst_pc[31:10], inst.branch_type, bpu_entry.count, br_target};
+assign verify_entry = {bpu_entry.inst2, inst_pc[31:10], inst.branch_type, bpu_entry.count, br_target};
 
 assign verify_result = {bru_valid,
                         predict_sucess,

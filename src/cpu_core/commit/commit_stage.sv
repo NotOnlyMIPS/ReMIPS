@@ -25,9 +25,10 @@ module commit_stage (
     input  execute_to_commit_bus_t execute_to_commit_bus1,
     input  execute_to_commit_bus_t execute_to_commit_bus2,
 
-    output logic       commit_store_valid,
-    input  logic       commit_store_ready,
-    input  exception_t commit_store_ex,
+    output logic       commit_store1_valid,
+    output logic       commit_store2_valid,
+    // input  logic       commit_store_ready,
+    // input  exception_t commit_store_ex,
 
     // busytable
     output writeback_to_busytable_bus_t writeback_to_busytable_bus1,
@@ -148,19 +149,19 @@ always_ff @(posedge clk) begin
         if(commit_inst1_valid) begin
             rob[rob_head_writeback  ].state <= Inst_Invalid;
         end
-        else if(commit_store_ready && rob[rob_head].state == Store_Wait) begin
-            rob[rob_head_writeback  ].state <= Inst_Complete;
-            rob[rob_head_writeback  ].exception.ex        <= commit_store_ex.ex;
-            rob[rob_head_writeback  ].exception.exccode   <= commit_store_ex.exccode;
-            rob[rob_head_writeback  ].exception.badvaddr  <= commit_store_ex.badvaddr;
-            rob[rob_head_writeback  ].exception.tlb_refill<= commit_store_ex.tlb_refill;
-        end
+        // else if(commit_store_ready && rob[rob_head].state == Store_Wait) begin
+        //     rob[rob_head_writeback  ].state <= Inst_Complete;
+        //     rob[rob_head_writeback  ].exception.ex        <= commit_store_ex.ex;
+        //     rob[rob_head_writeback  ].exception.exccode   <= commit_store_ex.exccode;
+        //     rob[rob_head_writeback  ].exception.badvaddr  <= commit_store_ex.badvaddr;
+        //     rob[rob_head_writeback  ].exception.tlb_refill<= commit_store_ex.tlb_refill;
+        // end
         if(commit_inst2_valid) begin
             rob[rob_head_next_writeback].state <= Inst_Invalid;
         end
-        else if(commit_store_ready && rob[rob_head].state != Store_Wait && rob[rob_head_next].state == Store_Wait) begin
-            rob[rob_head_next_writeback].state <= Inst_Complete;
-        end
+        // else if(commit_store_ready && rob[rob_head].state != Store_Wait && rob[rob_head_next].state == Store_Wait) begin
+        //     rob[rob_head_next_writeback].state <= Inst_Complete;
+        // end
 
         if(ds_to_rob_valid && cs_allowin) begin
             rob[rob_tail     ]   <= map_to_rob_bus1;
@@ -170,13 +171,13 @@ always_ff @(posedge clk) begin
         if(writeback_to_commit_bus1.valid) begin
             rob[writeback_to_commit_bus1.rob_entry_num].state         <= Inst_Complete;
             rob[writeback_to_commit_bus1.rob_entry_num].verify_result <= writeback_to_commit_bus1.verify_result;
-            // rob[writeback_to_commit_bus1.rob_entry_num].exception     <= writeback_to_commit_bus1.exception;
             rob[writeback_to_commit_bus1.rob_entry_num].exception.ex      <= writeback_to_commit_bus1.exception.ex;
             rob[writeback_to_commit_bus1.rob_entry_num].exception.exccode <= writeback_to_commit_bus1.exception.exccode;
         end
         if(writeback_to_commit_bus2.valid) begin
-            rob[writeback_to_commit_bus2.rob_entry_num].state         <= writeback_to_commit_bus2.is_store_op &&
-                                                                        !writeback_to_commit_bus2.exception.ex ? Store_Wait : Inst_Complete;
+            // rob[writeback_to_commit_bus2.rob_entry_num].state         <= writeback_to_commit_bus2.is_store_op &&
+            //                                                             !writeback_to_commit_bus2.exception.ex ? Store_Wait : Inst_Complete;
+            rob[writeback_to_commit_bus2.rob_entry_num].state         <= Inst_Complete;
             rob[writeback_to_commit_bus2.rob_entry_num].verify_result <= writeback_to_commit_bus2.verify_result;
             rob[writeback_to_commit_bus2.rob_entry_num].exception.ex        <= writeback_to_commit_bus2.exception.ex;
             rob[writeback_to_commit_bus2.rob_entry_num].exception.exccode   <= writeback_to_commit_bus2.exception.exccode;
@@ -266,15 +267,15 @@ always_comb begin
     commit_inst2_valid = rob[rob_head_next_commit_inst].state == Inst_Complete && commit_inst1_valid;
     if(rob[rob_head_commit_inst].is_br_op && rob[rob_head_next_commit_inst].state != Inst_Complete)
         commit_inst1_valid = 1'b0;
-    if(rob[rob_head_next_commit_inst].is_br_op || rob[rob_head_next_commit_inst].is_store_op
+    if(rob[rob_head_next_commit_inst].is_br_op
     || rob[rob_head_next_commit_inst].exception.ex
     || miss_predict || wait_1bd) begin
         commit_inst2_valid = 1'b0;
     end
 end
 
-assign commit_store_valid = rob[rob_head_commit_store].state == Store_Wait
-                         || rob[rob_head_next_commit_store].state == Store_Wait && !wait_1bd;
+assign commit_store1_valid = commit_inst1_valid && rob[rob_head_commit_store].is_store_op;
+assign commit_store2_valid = commit_inst2_valid && rob[rob_head_next_commit_store].is_store_op;
 
 assign commit_to_rat_bus1 = { commit_inst1_valid && rob[rob_head_commit_rat].rf_we,
                               rob[rob_head_commit_rat  ].dest,

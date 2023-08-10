@@ -8,6 +8,7 @@ module BPU (
     input   clk,
     input   reset,
 
+    input   logic       flush,
     input   flush_src_t flush_src,
 
     input   verify_result_t bpu_verify_result,
@@ -26,6 +27,7 @@ ras_t               ras_data;
 logic  verify_valid;
 assign verify_valid = bpu_verify_result.ready;
 
+assign w_entry.inst2   = bpu_verify_result.predict_entry.inst2;
 assign w_entry.tag     = bpu_verify_result.predict_entry.tag;
 assign w_entry.target  = bpu_verify_result.correct_target;
 assign w_entry.br_type = bpu_verify_result.predict_entry.br_type;
@@ -187,43 +189,44 @@ assign bpu_predict_result = {
 //     predict_result_r.valid && predict_result_r.br_taken
 // };
 
-ras ras_instance(
-    .clk,
-    .reset,
-    .push_req  (bpu_verify_result.predict_entry.br_type == Branch_Call  ),
-    .pop_req   (bpu_verify_result.predict_entry.br_type == Branch_Return),
-    .push_data ((bpu_verify_result.pc+8)),
-    .ras_top   (ras_data)
-);
-
-// logic push_req, pop_req;
-// virt_t push_data;
-
-// always_comb begin
-//     push_req  = 1'b0;
-//     pop_req   = 1'b0;
-//     push_data = '0;
-//     if(valid) begin
-//         push_req  = r_entry.br_type == Branch_Call;
-//         pop_req   = r_entry.br_type == Branch_Return;
-//         push_data = fetch_to_bpu_bus.pc + 32'h8;
-//     end
-// end
-
 // ras ras_instance(
 //     .clk,
 //     .reset,
-
-//     .flush(~bpu_verify_result.predict_sucess && verify_valid),
-
-//     .push_req,
-//     .pop_req,
-//     .push_data,
-
-//     .commit_push_req  (bpu_verify_result.predict_entry.br_type == Branch_Call  ),
-//     .commit_pop_req   (bpu_verify_result.predict_entry.br_type == Branch_Return),
-//     .commit_push_data ((bpu_verify_result.pc + 8)),
+//     .push_req  (bpu_verify_result.predict_entry.br_type == Branch_Call  ),
+//     .pop_req   (bpu_verify_result.predict_entry.br_type == Branch_Return),
+//     .push_data ((bpu_verify_result.pc+8)),
 //     .ras_top   (ras_data)
 // );
+
+logic push_req, pop_req;
+virt_t push_data;
+
+always_comb begin
+    push_req  = 1'b0;
+    pop_req   = 1'b0;
+    push_data = '0;
+    if(valid) begin
+        push_req  = r_entry.br_type == Branch_Call;
+        pop_req   = r_entry.br_type == Branch_Return;
+        push_data = r_entry.inst2 ? fetch_to_bpu_bus.pc + 32'hc : fetch_to_bpu_bus.pc + 32'h8;
+    end
+end
+
+ras ras_instance(
+    .clk,
+    .reset,
+
+    .flush,
+    // .flush(~bpu_verify_result.predict_sucess && verify_valid),
+
+    .push_req,
+    .pop_req,
+    .push_data,
+
+    .commit_push_req  (bpu_verify_result.predict_entry.br_type == Branch_Call  ),
+    .commit_pop_req   (bpu_verify_result.predict_entry.br_type == Branch_Return),
+    .commit_push_data ((bpu_verify_result.pc + 8)),
+    .ras_top   (ras_data)
+);
 
 endmodule
