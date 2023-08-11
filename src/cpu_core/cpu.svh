@@ -489,6 +489,11 @@ typedef struct packed {
     exception_t  exception;
 } execute_to_commit_bus_t;
 
+typedef struct packed {
+    // logic valid;
+    reg_addr_t dest;
+} execute_to_busytable_bus_t;
+
 // COMMIT stage
 typedef struct packed {
     logic       valid;
@@ -496,11 +501,6 @@ typedef struct packed {
     reg_addr_t  dest;
     uint32_t    result;
 } writeback_to_rf_bus_t;
-
-typedef struct packed {
-    // logic valid;
-    reg_addr_t dest;
-} writeback_to_busytable_bus_t;
 
 typedef struct packed {
     logic       valid;

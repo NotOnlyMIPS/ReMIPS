@@ -21,6 +21,8 @@ module issue_stage (
     input  bypass_bus_t alu1_bypass_bus,
     input  bypass_bus_t alu2_bypass_bus,
     input  bypass_bus_t bru_bypass_bus,
+    input  bypass_bus_t lookup_bypass_bus,
+    input  bypass_bus_t load_bypass_bus,
 
     // store num
     output logic select_store_ready,
@@ -30,8 +32,8 @@ module issue_stage (
     output select_to_busy_table_bus_t select_to_busy_table_bus2,
 
     // writeback
-    input  writeback_to_busytable_bus_t writeback_to_busytable_bus1,
-    input  writeback_to_busytable_bus_t writeback_to_busytable_bus2,
+    input  execute_to_busytable_bus_t execute_to_busytable_bus1,
+    input  execute_to_busytable_bus_t execute_to_busytable_bus2,
     
     input  writeback_to_rf_bus_t writeback_to_rf_bus1,
     input  writeback_to_rf_bus_t writeback_to_rf_bus2,
@@ -265,8 +267,8 @@ always_comb begin
             || issue_inst2.valid  && issue_queue[i].valid && issue_queue[i].phy_src1 == issue_inst2.phy_dest
             && !issue_inst2.inst.is_mul_div_op
             && !issue_inst2.inst.is_load_store_op
-            || issue_queue[i].valid && issue_queue[i].phy_src1 == writeback_to_busytable_bus1.dest
-            || issue_queue[i].valid && issue_queue[i].phy_src1 == writeback_to_busytable_bus2.dest) begin
+            || issue_queue[i].valid && issue_queue[i].phy_src1 == execute_to_busytable_bus1.dest
+            || issue_queue[i].valid && issue_queue[i].phy_src1 == execute_to_busytable_bus2.dest) begin
                 issue_queue_bus[i].src1_ready = 1'b1;
             end
             if(select_inst1_valid && issue_queue[i].valid && issue_queue[i].phy_src2 == select_inst1_dest
@@ -282,8 +284,8 @@ always_comb begin
             || issue_inst2.valid  && issue_queue[i].valid && issue_queue[i].phy_src2 == issue_inst2.phy_dest
             && !issue_inst2.inst.is_mul_div_op
             && !issue_inst2.inst.is_load_store_op
-            || issue_queue[i].valid && issue_queue[i].phy_src2 == writeback_to_busytable_bus1.dest
-            || issue_queue[i].valid && issue_queue[i].phy_src2 == writeback_to_busytable_bus2.dest) begin
+            || issue_queue[i].valid && issue_queue[i].phy_src2 == execute_to_busytable_bus1.dest
+            || issue_queue[i].valid && issue_queue[i].phy_src2 == execute_to_busytable_bus2.dest) begin
                 issue_queue_bus[i].src2_ready = 1'b1;
             end
 
@@ -300,8 +302,8 @@ always_comb begin
             || issue_inst2.valid  && issue_queue[i].valid && issue_queue[i].old_dest == issue_inst2.phy_dest
             && !issue_inst2.inst.is_mul_div_op
             && !issue_inst2.inst.is_load_store_op
-            || issue_queue[i].valid && issue_queue[i].old_dest == writeback_to_busytable_bus1.dest
-            || issue_queue[i].valid && issue_queue[i].old_dest == writeback_to_busytable_bus2.dest) begin
+            || issue_queue[i].valid && issue_queue[i].old_dest == execute_to_busytable_bus1.dest
+            || issue_queue[i].valid && issue_queue[i].old_dest == execute_to_busytable_bus2.dest) begin
                 issue_queue_bus[i].old_dest_ready = 1'b1;
             end
 
@@ -434,6 +436,8 @@ always_comb begin
         (  alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.phy_src1
         || alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.phy_src1
         || bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.phy_src1
+        || lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.phy_src1
+        || load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.phy_src1
         )) begin
             inst1_src1_exe_wait = 1;
         end
@@ -447,6 +451,8 @@ always_comb begin
         (  alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.phy_src2
         || alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.phy_src2
         || bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.phy_src2
+        || lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.phy_src2
+        || load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.phy_src2
         )) begin
             inst1_src2_exe_wait = 1;
         end
@@ -461,6 +467,8 @@ always_comb begin
         (  alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.old_dest
         || alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.old_dest
         || bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.old_dest
+        || lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.old_dest
+        || load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.old_dest
         )) begin
             inst1_old_dest_exe_wait = 1;
         end
@@ -478,6 +486,8 @@ always_comb begin
         (  alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst2.phy_src1
         || alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst2.phy_src1
         || bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst2.phy_src1
+        || lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst2.phy_src1
+        || load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst2.phy_src1
         )) begin
             inst2_src1_exe_wait = 1;
         end
@@ -491,6 +501,8 @@ always_comb begin
         (  alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst2.phy_src2
         || alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst2.phy_src2
         || bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst2.phy_src2
+        || lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst2.phy_src2
+        || load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst2.phy_src2
         )) begin
             inst2_src2_exe_wait = 1;
         end
@@ -503,9 +515,11 @@ always_comb begin
     end
 
     if(inst1_src1_exe_wait) begin
-        inst1_src1_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.phy_src1}} & alu1_bypass_bus.result |
-                           {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.phy_src1}} & alu2_bypass_bus.result |
-                           {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.phy_src1}} & bru_bypass_bus.result;
+        inst1_src1_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.phy_src1}} & alu1_bypass_bus.result   |
+                           {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.phy_src1}} & alu2_bypass_bus.result   |
+                           {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.phy_src1}} & bru_bypass_bus.result    |
+                           {32{lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.phy_src1}} & lookup_bypass_bus.result |
+                           {32{load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.phy_src1}} & load_bypass_bus.result;
     end
     else if(inst1_src1_wb_wait) begin
         inst1_src1_value = {32{writeback_to_rf_bus1.rf_we && writeback_to_rf_bus1.dest == issue_inst1.phy_src1}} & writeback_to_rf_bus1.result |
@@ -515,9 +529,11 @@ always_comb begin
         inst1_src1_value = inst1_rdata1;
     end
     if(inst1_src2_exe_wait) begin
-        inst1_src2_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.phy_src2}} & alu1_bypass_bus.result |
-                           {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.phy_src2}} & alu2_bypass_bus.result |
-                           {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.phy_src2}} & bru_bypass_bus.result;
+        inst1_src2_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.phy_src2}} & alu1_bypass_bus.result    |
+                           {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.phy_src2}} & alu2_bypass_bus.result    |
+                           {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.phy_src2}} & bru_bypass_bus.result     |
+                           {32{lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.phy_src2}} & lookup_bypass_bus.result  |
+                           {32{load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.phy_src2}} & load_bypass_bus.result;
     end
     else if(inst1_src2_wb_wait) begin
         inst1_src2_value = {32{writeback_to_rf_bus1.rf_we && writeback_to_rf_bus1.dest == issue_inst1.phy_src2}} & writeback_to_rf_bus1.result |
@@ -527,9 +543,11 @@ always_comb begin
         inst1_src2_value = inst1_rdata2;
     end
     if(inst1_old_dest_exe_wait) begin
-        inst1_old_dest_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.old_dest}} & alu1_bypass_bus.result |
-                               {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.old_dest}} & alu2_bypass_bus.result |
-                               {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.old_dest}} & bru_bypass_bus.result;
+        inst1_old_dest_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.old_dest}} & alu1_bypass_bus.result   |
+                               {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.old_dest}} & alu2_bypass_bus.result   |
+                               {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.old_dest}} & bru_bypass_bus.result    |
+                               {32{lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.old_dest}} & lookup_bypass_bus.result |
+                               {32{load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.old_dest}} & load_bypass_bus.result;
     end
     else if(inst1_old_dest_wb_wait) begin
         inst1_old_dest_value = {32{writeback_to_rf_bus1.rf_we && writeback_to_rf_bus1.dest == issue_inst1.old_dest}} & writeback_to_rf_bus1.result |
@@ -540,9 +558,11 @@ always_comb begin
     end
 
     if(inst2_src1_exe_wait) begin
-        inst2_src1_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst2.phy_src1}} & alu1_bypass_bus.result |
-                           {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst2.phy_src1}} & alu2_bypass_bus.result |
-                           {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst2.phy_src1}} & bru_bypass_bus.result;
+        inst2_src1_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst2.phy_src1}} & alu1_bypass_bus.result   |
+                           {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst2.phy_src1}} & alu2_bypass_bus.result   |
+                           {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst2.phy_src1}} & bru_bypass_bus.result    |
+                           {32{lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst2.phy_src1}} & lookup_bypass_bus.result |
+                           {32{load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst2.phy_src1}} & load_bypass_bus.result;
     end
     else if(inst2_src1_wb_wait) begin
         inst2_src1_value = {32{writeback_to_rf_bus1.rf_we && writeback_to_rf_bus1.dest == issue_inst2.phy_src1}} & writeback_to_rf_bus1.result |
@@ -552,9 +572,11 @@ always_comb begin
         inst2_src1_value = inst2_rdata1;
     end
     if(inst2_src2_exe_wait) begin
-        inst2_src2_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst2.phy_src2}} & alu1_bypass_bus.result |
-                           {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst2.phy_src2}} & alu2_bypass_bus.result |
-                           {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst2.phy_src2}} & bru_bypass_bus.result;
+        inst2_src2_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst2.phy_src2}} & alu1_bypass_bus.result   |
+                           {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst2.phy_src2}} & alu2_bypass_bus.result   |
+                           {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst2.phy_src2}} & bru_bypass_bus.result    |
+                           {32{lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst2.phy_src2}} & lookup_bypass_bus.result |
+                           {32{load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst2.phy_src2}} & load_bypass_bus.result;
     end
     else if(inst2_src2_wb_wait) begin
         inst2_src2_value = {32{writeback_to_rf_bus1.rf_we && writeback_to_rf_bus1.dest == issue_inst2.phy_src2}} & writeback_to_rf_bus1.result |

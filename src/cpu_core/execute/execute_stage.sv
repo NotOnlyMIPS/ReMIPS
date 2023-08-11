@@ -36,9 +36,15 @@ module execute_stage(
     output bypass_bus_t alu1_bypass_bus,
     output bypass_bus_t alu2_bypass_bus,
     output bypass_bus_t bru_bypass_bus,
+    output bypass_bus_t lookup_bypass_bus,
+    output bypass_bus_t load_bypass_bus,
 
     input  issue_to_execute_bus_t issue_to_execute_bus1,
     input  issue_to_execute_bus_t issue_to_execute_bus2,
+
+    // busy table
+    output execute_to_busytable_bus_t execute_to_busytable_bus1,
+    output execute_to_busytable_bus_t execute_to_busytable_bus2,
 
     // CP0
     output logic       cp0_we,
@@ -87,23 +93,31 @@ logic alu1_to_cs_allowin;
 logic alu2_to_cs_allowin;
 logic mul_div_to_cs_allowin;
 logic bru_to_cs_allowin;
-logic agu_to_cs_allowin;
+logic agu_store_to_cs_allowin;
+logic agu_lookup_to_cs_allowin;
+logic agu_load_to_cs_allowin;
 logic spu_to_cs_allowin;
 
 logic alu1_to_valid;
 logic alu2_to_valid;
 logic mul_div_to_valid;
 logic bru_to_valid;
-logic agu_to_valid;
+logic agu_load_to_valid;
+logic agu_lookup_to_valid;
+logic agu_store_to_valid;
 logic spu_to_valid;
 
 assign alu1_to_cs_allowin    = 1'b1;
 assign bru_to_cs_allowin     = 1'b1;
-assign mul_div_to_cs_allowin = !alu1_to_valid && !bru_to_valid && !alu2_to_valid && !agu_to_valid && !spu_to_valid;
+assign mul_div_to_cs_allowin = !alu1_to_valid && !bru_to_valid 
+                            && !alu2_to_valid && !agu_load_to_valid 
+                            && !agu_lookup_to_valid && !agu_store_to_valid && !spu_to_valid;
 
-assign alu2_to_cs_allowin    = 1'b1;
-assign agu_to_cs_allowin     = !alu2_to_valid;
-assign spu_to_cs_allowin     = 1'b1;
+assign alu2_to_cs_allowin         = 1'b1;
+assign agu_load_to_cs_allowin     = !alu2_to_valid;
+assign agu_lookup_to_cs_allowin   = !alu2_to_valid && !agu_load_to_valid;
+assign agu_store_to_cs_allowin    = !alu2_to_valid && !agu_load_to_valid && !agu_lookup_to_valid;
+assign spu_to_cs_allowin          = 1'b1;
 
 // commit
 execute_to_commit_bus_t alu1_to_commit_bus;
@@ -113,44 +127,44 @@ execute_to_commit_bus_t mul_div_to_commit_bus2;
 execute_to_commit_bus_t bru_to_commit_bus;
 execute_to_commit_bus_t agu_to_commit_bus;
 execute_to_commit_bus_t spu_to_commit_bus;
-
-logic agu_store_to_valid, agu_lookup_to_valid, agu_load_to_valid;
-execute_to_commit_bus_t agu_commit_queue[7:0];
 execute_to_commit_bus_t agu_store_to_commit_bus, agu_lookup_to_commit_bus, agu_load_to_commit_bus;
-logic [2:0] agu_commit_queue_head, agu_commit_queue_tail, agu_commit_queue_tail_next;
 
-assign agu_to_valid = agu_commit_queue_head != agu_commit_queue_tail;
-assign agu_to_commit_bus = agu_commit_queue[agu_commit_queue_head];
+// logic agu_store_to_valid, agu_lookup_to_valid, agu_load_to_valid;
+// execute_to_commit_bus_t agu_commit_queue[7:0];
+// logic [2:0] agu_commit_queue_head, agu_commit_queue_tail, agu_commit_queue_tail_next;
 
-always_ff @(posedge clk) begin
-    if(reset || flush) begin
-        agu_commit_queue_head <= 'b0;
-        agu_commit_queue_tail <= 'b0;
-        agu_commit_queue_tail_next <= 3'd1;
-    end
-    else begin
-        if(agu_to_cs_allowin && agu_commit_queue_head != agu_commit_queue_tail) begin
-            agu_commit_queue_head <= agu_commit_queue_head + 3'b1;
-        end
+// assign agu_to_valid = agu_commit_queue_head != agu_commit_queue_tail;
+// assign agu_to_commit_bus = agu_commit_queue[agu_commit_queue_head];
 
-        if((agu_store_to_valid || agu_lookup_to_valid) && agu_load_to_valid) begin
-            agu_commit_queue_tail      <= agu_commit_queue_tail + 3'd2;
-            agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd2;
-            agu_commit_queue[agu_commit_queue_tail]      <= agu_store_to_valid ? agu_store_to_commit_bus : agu_lookup_to_commit_bus;
-            agu_commit_queue[agu_commit_queue_tail_next] <= agu_load_to_commit_bus;
-        end
-        else if(agu_store_to_valid || agu_lookup_to_valid) begin
-            agu_commit_queue_tail <= agu_commit_queue_tail + 3'd1;
-            agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd1;
-            agu_commit_queue[agu_commit_queue_tail] <= agu_store_to_valid ? agu_store_to_commit_bus : agu_lookup_to_commit_bus;
-        end
-        else if(agu_load_to_valid) begin
-            agu_commit_queue_tail <= agu_commit_queue_tail + 3'd1;
-            agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd1;
-            agu_commit_queue[agu_commit_queue_tail] <= agu_load_to_commit_bus;
-        end
-    end
-end
+// always_ff @(posedge clk) begin
+//     if(reset || flush) begin
+//         agu_commit_queue_head <= 'b0;
+//         agu_commit_queue_tail <= 'b0;
+//         agu_commit_queue_tail_next <= 3'd1;
+//     end
+//     else begin
+//         if(agu_to_cs_allowin && agu_commit_queue_head != agu_commit_queue_tail) begin
+//             agu_commit_queue_head <= agu_commit_queue_head + 3'b1;
+//         end
+
+//         if((agu_store_to_valid || agu_lookup_to_valid) && agu_load_to_valid) begin
+//             agu_commit_queue_tail      <= agu_commit_queue_tail + 3'd2;
+//             agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd2;
+//             agu_commit_queue[agu_commit_queue_tail]      <= agu_store_to_valid ? agu_store_to_commit_bus : agu_lookup_to_commit_bus;
+//             agu_commit_queue[agu_commit_queue_tail_next] <= agu_load_to_commit_bus;
+//         end
+//         else if(agu_store_to_valid || agu_lookup_to_valid) begin
+//             agu_commit_queue_tail <= agu_commit_queue_tail + 3'd1;
+//             agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd1;
+//             agu_commit_queue[agu_commit_queue_tail] <= agu_store_to_valid ? agu_store_to_commit_bus : agu_lookup_to_commit_bus;
+//         end
+//         else if(agu_load_to_valid) begin
+//             agu_commit_queue_tail <= agu_commit_queue_tail + 3'd1;
+//             agu_commit_queue_tail_next <= agu_commit_queue_tail_next + 3'd1;
+//             agu_commit_queue[agu_commit_queue_tail] <= agu_load_to_commit_bus;
+//         end
+//     end
+// end
 
 // MMU
 logic spu_data_valid;
@@ -167,14 +181,25 @@ always_comb begin
         execute_to_commit_bus1 = alu1_to_valid ? alu1_to_commit_bus : bru_to_commit_bus;
         execute_to_commit_bus2 = spu_to_valid  ? spu_to_commit_bus :
                                  alu2_to_valid ? alu2_to_commit_bus:
-                                 agu_to_valid  ? agu_to_commit_bus :
-                                                 'b0;
+                                 agu_load_to_valid   ? agu_load_to_commit_bus   :
+                                 agu_lookup_to_valid ? agu_lookup_to_commit_bus :
+                                 agu_store_to_valid  ? agu_store_to_commit_bus  :
+                                                       'b0;
     end
     else begin
         execute_to_commit_bus1 = mul_div_to_commit_bus1;
         execute_to_commit_bus2 = mul_div_to_commit_bus2;
     end
 end
+
+// busy table
+assign execute_to_busytable_bus1.dest = spu_to_valid        ? spu_to_commit_bus.phy_dest        :
+                                        agu_lookup_to_valid ? agu_lookup_to_commit_bus.phy_dest :
+                                        mul_div_to_valid && mul_div_to_cs_allowin  ? mul_div_to_commit_bus1.phy_dest   :
+                                                              '0;
+assign execute_to_busytable_bus2.dest = agu_load_to_valid ? agu_load_to_commit_bus.phy_dest :
+                                        mul_div_to_valid && mul_div_to_cs_allowin  ? mul_div_to_commit_bus2.phy_dest :
+                                                            '0;
 
 // alu1
 alu alu1 (
@@ -256,7 +281,9 @@ agu agu_u (
     .issue_to_agu_valid(issue_to_agu_valid),
     .agu_allowin       (agu_allowin       ),
 
-    // .cs_allowin        (1'b1),
+    .cs_store_allowin  (agu_store_to_cs_allowin  ),
+    .cs_lookup_allowin (agu_lookup_to_cs_allowin ),
+    .cs_load_allowin   (agu_load_to_cs_allowin   ),
     .agu_store_to_valid,
     .agu_lookup_to_valid,
     .agu_load_to_valid,
@@ -285,6 +312,9 @@ agu agu_u (
     .dcache_rdata,
     .dcache_addr_ok,
     .dcache_data_ok,
+
+    .lookup_bypass_bus,
+    .load_bypass_bus,
 
     .agu_store_to_commit_bus,
     .agu_lookup_to_commit_bus,

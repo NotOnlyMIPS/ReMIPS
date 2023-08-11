@@ -73,12 +73,15 @@ commit_to_rat_bus_t   commit_to_rat_bus1, commit_to_rat_bus2;
 
 // busy table
 select_to_busy_table_bus_t   select_to_busy_table_bus1, select_to_busy_table_bus2;
-writeback_to_busytable_bus_t writeback_to_busytable_bus1, writeback_to_busytable_bus2;
+execute_to_busytable_bus_t   execute_to_busytable_bus1, execute_to_busytable_bus2;
+// writeback_to_busytable_bus_t writeback_to_busytable_bus1, writeback_to_busytable_bus2;
 
 // bypass
 bypass_bus_t       alu1_bypass_bus;
 bypass_bus_t       alu2_bypass_bus;
 bypass_bus_t        bru_bypass_bus;
+bypass_bus_t     lookup_bypass_bus;
+bypass_bus_t       load_bypass_bus;
 
 `ifdef GOLDEN_TRACE
 commit_to_debug_bus_t commit_to_debug_bus1, commit_to_debug_bus2;
@@ -302,8 +305,8 @@ decode_stage u_decode_stage (
     .select_to_busy_table_bus1,
     .select_to_busy_table_bus2,
     
-    .writeback_to_busytable_bus1,
-    .writeback_to_busytable_bus2,
+    .execute_to_busytable_bus1,
+    .execute_to_busytable_bus2,
     
     // rat
     .commit_to_rat_bus1,
@@ -343,13 +346,15 @@ issue_stage u_issue_stage (
     .alu1_bypass_bus,
     .alu2_bypass_bus,
     .bru_bypass_bus,
+    .lookup_bypass_bus,
+    .load_bypass_bus,
     
     // store num
     .select_store_ready,
 
     // wakeup
-    .writeback_to_busytable_bus1,
-    .writeback_to_busytable_bus2,
+    .execute_to_busytable_bus1,
+    .execute_to_busytable_bus2,
 
     // select
     .select_to_busy_table_bus1,
@@ -406,9 +411,15 @@ execute_stage u_execute_stage (
     .alu1_bypass_bus,
     .alu2_bypass_bus,
     .bru_bypass_bus,
+    .lookup_bypass_bus,
+    .load_bypass_bus,
     
     .issue_to_execute_bus1,
     .issue_to_execute_bus2,
+
+    // busy table
+    .execute_to_busytable_bus1,
+    .execute_to_busytable_bus2,
 
     // CP0
     .cp0_we,
@@ -467,8 +478,8 @@ commit_stage u_commit_stage (
     .commit_store2_valid,
     // .commit_store_ex,
     
-    .writeback_to_busytable_bus1,
-    .writeback_to_busytable_bus2,
+    // .writeback_to_busytable_bus1,
+    // .writeback_to_busytable_bus2,
     
     .commit_to_rat_bus1,
     .commit_to_rat_bus2,

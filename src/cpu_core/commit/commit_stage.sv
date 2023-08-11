@@ -31,8 +31,8 @@ module commit_stage (
     // input  exception_t commit_store_ex,
 
     // busytable
-    output writeback_to_busytable_bus_t writeback_to_busytable_bus1,
-    output writeback_to_busytable_bus_t writeback_to_busytable_bus2,
+    // output writeback_to_busytable_bus_t writeback_to_busytable_bus1,
+    // output writeback_to_busytable_bus_t writeback_to_busytable_bus2,
 
     // RAT
     output commit_to_rat_bus_t commit_to_rat_bus1,
@@ -70,9 +70,9 @@ always_ff @(posedge clk) begin
     end
 end
 
-// writeback to busytable
-assign writeback_to_busytable_bus1 = { {6{execute_to_commit_bus1.valid && execute_to_commit_bus1.rf_we}} & execute_to_commit_bus1.phy_dest};
-assign writeback_to_busytable_bus2 = { {6{execute_to_commit_bus2.valid && execute_to_commit_bus2.rf_we}} & execute_to_commit_bus2.phy_dest};
+// // writeback to busytable
+// assign writeback_to_busytable_bus1 = { {6{execute_to_commit_bus1.valid && execute_to_commit_bus1.rf_we}} & execute_to_commit_bus1.phy_dest};
+// assign writeback_to_busytable_bus2 = { {6{execute_to_commit_bus2.valid && execute_to_commit_bus2.rf_we}} & execute_to_commit_bus2.phy_dest};
 
 // writeback to regfile
 // inst1

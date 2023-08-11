@@ -25,8 +25,8 @@ module decode_stage (
     input  select_to_busy_table_bus_t select_to_busy_table_bus1,
     input  select_to_busy_table_bus_t select_to_busy_table_bus2,
 
-    input  writeback_to_busytable_bus_t writeback_to_busytable_bus1,
-    input  writeback_to_busytable_bus_t writeback_to_busytable_bus2,
+    input  execute_to_busytable_bus_t execute_to_busytable_bus1,
+    input  execute_to_busytable_bus_t execute_to_busytable_bus2,
 
     // rat
     input  commit_to_rat_bus_t commit_to_rat_bus1,
@@ -401,8 +401,8 @@ busy_table busy_table_u (
     .sel_inst2_dest (select_to_busy_table_bus2.dest ),
     
     // writeback
-    .wb_inst1_dest  (writeback_to_busytable_bus1.dest),
-    .wb_inst2_dest  (writeback_to_busytable_bus2.dest)
+    .wb_inst1_dest  (execute_to_busytable_bus1.dest),
+    .wb_inst2_dest  (execute_to_busytable_bus2.dest)
 
 );
 
