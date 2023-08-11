@@ -2,8 +2,9 @@
 #include <regdef.h>
 #include <inst_test.h>
 
-LEAF(n93_jr_ds_ex_test)
+LEAF(n26_jalr_ds_ex_test)
     .set noreorder
+    move  s6, ra
     addiu s0, s0, 1
     li    t0, 0x800d0000
 ##clear cause.TI, status.EXL
@@ -17,13 +18,13 @@ LEAF(n93_jr_ds_ex_test)
     lui   s7, 0x0001      #ex, ref return value.
     sw    s2, 0(t0)
     la    s4, 1f
-1:  jr  s2
+1:  jalr  s2
     syscall
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000001
     la    s4, 2f
-2:  jr  t0
+2:  jalr  t0
     syscall
     bne s2, s7, inst_error
     nop
@@ -32,13 +33,13 @@ LEAF(n93_jr_ds_ex_test)
     lui   s7, 0x0002      #ex, ref return value.
     sw    s2, 0(t0)
     la    s4, 1f
-1:  jr  s2
+1:  jalr  s2
     break
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000002
     la    s4, 2f
-2:  jr  t0
+2:  jalr  t0
     break
     bne s2, s7, inst_error
     nop
@@ -49,13 +50,13 @@ LEAF(n93_jr_ds_ex_test)
     la    s4, 1f
     li    a0, 0xba034f60
     li    a1, 0xb615fd67
-1:  jr  s2
+1:  jalr  s2
     add   s7, a0, a1
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000003
     la    s4, 2f
-2:  jr  t0
+2:  jalr  t0
     add   s7, a0, a1
     sw    s7, 0(t0)
     bne s2, s7, inst_error
@@ -64,13 +65,13 @@ LEAF(n93_jr_ds_ex_test)
     sw    s2, 0(t0)
     la    s4, 1f
     li    a0,0x7fffc19e
-1:  jr  s2
+1:  jalr  s2
     addi  s7, a0, 0x6512
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000003
     la    s4, 2f
-2:  jr  t0
+2:  jalr  t0
     addi  s7, a0, 0x6512
     bne s2, s7, inst_error
     nop
@@ -78,13 +79,13 @@ LEAF(n93_jr_ds_ex_test)
     la    s4, 1f
     li    a0, 0xa85e7d00
     li    a1, 0x6b7e8e36
-1:  jr  s2
+1:  jalr  s2
     sub   s7, a0, a1
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000003
     la    s4, 2f
-2:  jr  t0
+2:  jalr  t0
     sub   s7, a0, a1
     bne s2, s7, inst_error
     nop
@@ -93,37 +94,37 @@ LEAF(n93_jr_ds_ex_test)
     lui   s7, 0x0004      #ex, ref return value.
     sw    s2, 0(t0)
     la    s4, 1f
-1:  jr  s2
+1:  jalr  s2
     lw    s7, 2(t0)
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000004
     la    s4, 2f
-2:  jr  t0
+2:  jalr  t0
     lw    s7, 2(t0)
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000004
     la    s4, 1f
-1:  jr  s2
+1:  jalr  s2
     lh    s7, 1(t0)
     divu zero, s7, s2
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000004
     la    s4, 2f
-2:  jr  s2
+2:  jalr  s2
     lh    s7, 1(t0)
     bne s2, s7, inst_error
     nop
     la    s4, 1f
-1:  jr  t0
+1:  jalr  t0
     lhu   s7, 3(t0)
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000004
     la    s4, 2f
-2:  jr  t0
+2:  jalr  t0
     lhu   s7, 3(t0)
     bne s2, s7, inst_error
     nop
@@ -132,25 +133,25 @@ LEAF(n93_jr_ds_ex_test)
     lui   s7, 0x0005      #ex, ref return value.
     sw    s2, 0(t0)
     la    s4, 1f
-1:  jr  s2
+1:  jalr  s2
     sw    s7, 2(t0)
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000005
     la    s4, 2f
-2:  jr  s2 
+2:  jalr  s2
     sw    s7, 2(t0)
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000005
     la    s4, 1f
-1:  jr  t0
+1:  jalr  t0
     sh    s7, 1(t0)
     bne s2, s7, inst_error
     nop
     li    s2, 0xa0000005
     la    s4, 2f
-2:  jr  t0
+2:  jalr  t0
     sh    s7, 1(t0)
     bne s2, s7, inst_error
     nop
@@ -160,7 +161,7 @@ LEAF(n93_jr_ds_ex_test)
     lui   s7, 0x0007      #ex, ref return value.
     sw    s2, 0(t0)
     la    s4, 1f
-1:  jr  s2
+1:  jalr  s2
     .word 0x9e3c56aa
     mult  s7, s2
     bne s2, s7, inst_error
@@ -168,17 +169,18 @@ LEAF(n93_jr_ds_ex_test)
     li    s2, 0xa0000007
     la    s4, 2f
     mult  s7, s2
-2:  jr  t0
+2:  jalr  t0
     .word 0xec1ba960
     bne s2, s7, inst_error
     nop
 ###score ++
     addiu s3, s3, 1
 ###output (s0<<24)|s3
-inst_error:  
+inst_error:
     sll t1, s0, 24
-    or t0, t1, s3 
+    or t0, t1, s3
     sw t0, 0(s1)
+    move ra, s6
     jr ra
     nop
-END(n93_jr_ds_ex_test)
+END(n26_jalr_ds_ex_test)

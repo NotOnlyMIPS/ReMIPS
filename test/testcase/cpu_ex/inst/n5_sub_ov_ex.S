@@ -2,7 +2,7 @@
 #include <regdef.h>
 #include <inst_test.h>
 
-LEAF(n72_addi_ov_ex_test)
+LEAF(n5_sub_ov_ex_test)
     .set noreorder
     addiu s0, s0, 1
     li    t0, 0x800d0000
@@ -16,19 +16,21 @@ LEAF(n72_addi_ov_ex_test)
     lui   s7, 0x0003      #add ex, ref return value.
 ###test inst
  ##1
-    TEST_ADDI_OV_PRE(0x7ffff84b, 0x00002c26, 0xdeb06fd0)
+    TEST_SUB_OV_PRE(0x63d3fd1e, 0xd0378bea, 0x3f0637b6)
     la    s4, 1f
-1:  addi v0, a0, 0x2c26
+1:  sub v0, a0, a1
     bne s2, s7, inst_error
+    nop
+    bne v0, v1, inst_error
     nop
  ##2
     li    s2, 0x03
-TEST_ADDI_OV_PRE(0x7ffff480, 0x000054b0, 0x6c5392aa)
+    TEST_SUB_OV_PRE(0x6f8c1169, 0x9eddbba4, 0x8754eb0d)
     la    s4, 1f
     sw    t0, 4(t0)
-    sw    s4, 4(t0) 
-1:  addi v0, a0, 0x54b0
-    sw    s4, 0(t0) 
+    sw    s4, 4(t0)
+1:  sub v0, a0, a1
+    sw    s4, 0(t0)
     lw    t1, 4(t0)
     bne t1, s4, inst_error
     nop
@@ -40,11 +42,11 @@ TEST_ADDI_OV_PRE(0x7ffff480, 0x000054b0, 0x6c5392aa)
     sw    s2, 0(t0)
  ##3
     li    s2, 0x03
-    TEST_ADDI_OV_PRE(0x7fff9b21, 0x000071db, 0x60a71e30)
+    TEST_SUB_OV_PRE(0x734a367f, 0xe17354f8, 0xf4e01aa8)
     la    s4, 1f
     mthi  t0
     divu  zero, t0, s0
-1:  addi v0, a0, 0x71db
+1:  sub v0, a0, a1
     mfhi  t1
     beq   t1, t0, inst_error
     nop
@@ -54,9 +56,9 @@ TEST_ADDI_OV_PRE(0x7ffff480, 0x000054b0, 0x6c5392aa)
     nop
  ##4
     li    s2, 0x03
-    TEST_ADDI_OV_PRE(0x80003a57, 0x0000be07, 0xe6075700)
+    TEST_SUB_OV_PRE(0x21ccbee8, 0x9a01fac4, 0xdc373c00)
     la    s4, 1f
-1:  addi v0, a0, -0x41f9
+1:  sub v0, a0, a1
     divu  zero, s0, t0
     bne s2, s7, inst_error
     nop
@@ -64,11 +66,11 @@ TEST_ADDI_OV_PRE(0x7ffff480, 0x000054b0, 0x6c5392aa)
     nop
  ##5
     li    s2, 0x03
-    TEST_ADDI_OV_PRE(0x80002c93, 0x0000845d, 0x8f7ee6c0)
+    TEST_SUB_OV_PRE(0xb196dd00, 0x7dfd9ab0, 0xb226ec94)
     la    s4, 1f
     mtlo  t0
     multu t0, s0
-1:  addi v0, a0, -0x7ba3
+1:  sub v0, a0, a1
     mfhi  t1
     beq   t1, t0, inst_error
     nop
@@ -78,9 +80,9 @@ TEST_ADDI_OV_PRE(0x7ffff480, 0x000054b0, 0x6c5392aa)
     nop
  ##6
     li    s2, 0x03
-    TEST_ADDI_OV_PRE(0x80004016, 0x000081f4, 0xbd3ea700)
+    TEST_SUB_OV_PRE(0xb53cd464, 0x421d020a, 0x1625bcc8)
     la    s4, 1f
-1:  addi v0, a0, -0x7e0c
+1:  sub v0, a0, a1
     multu t0, s2
     bne s2, s7, inst_error
     nop
@@ -88,10 +90,10 @@ TEST_ADDI_OV_PRE(0x7ffff480, 0x000054b0, 0x6c5392aa)
     nop
  ##7
     li    s2, 0x03
-    TEST_ADDI_OV_PRE(0x80003510, 0x0000baa6, 0x06152570)
+    TEST_SUB_OV_PRE(0x70410c7a, 0x8ddc20c0, 0x9f767750)
     la    s4, 1f
     mtc0  s2, c0_epc
-1:  addi v0, a0, -0x455a
+1:  sub v0, a0, a1
     mtc0 t0, c0_epc
     bne s2, s7, inst_error
     nop
@@ -100,10 +102,10 @@ TEST_ADDI_OV_PRE(0x7ffff480, 0x000054b0, 0x6c5392aa)
 ###score ++
     addiu s3, s3, 1
 ###output (s0<<24)|s3
-inst_error:  
+inst_error:
     sll t1, s0, 24
-    or t0, t1, s3 
+    or t0, t1, s3
     sw t0, 0(s1)
     jr ra
     nop
-END(n72_addi_ov_ex_test)
+END(n5_sub_ov_ex_test)

@@ -2,7 +2,7 @@
 #include <regdef.h>
 #include <inst_test.h>
 
-LEAF(n74_lw_adel_ex_test)
+LEAF(n7_lh_adel_ex_test)
     .set noreorder
     addiu s0, s0, 1
     li    t0, 0x800d0000
@@ -16,9 +16,9 @@ LEAF(n74_lw_adel_ex_test)
     lui   s7, 0x0004      #add ex, ref return value.
 ###test inst
  ##1
-    TEST_LW_ADEL(0xb27f9788, 0x800d759c, 0x00008845, 0x00008844, 0x3958f252)
+    TEST_LH_ADEL(0x0233e52c, 0x800d1348, 0x00009a19, 0x00009a18, 0x93252910)
     la    s4, 1f
-1:  lw v0, -0x77bb(a0)
+1:  lh v0, -0x65e7(a0)
     bne s2, s7, inst_error
     nop
     bne v0, v1, inst_error
@@ -28,12 +28,12 @@ LEAF(n74_lw_adel_ex_test)
     nop
  ##2
     li    s2, 0x04
-    TEST_LW_ADEL(0x3101bbec, 0x800d7748, 0x00000ea2, 0x00000ea0, 0xc0442bd0)
+    TEST_LH_ADEL(0x2ba90e90, 0x800d2ca8, 0x00002577, 0x00002574, 0x854aa680)
     la    s4, 1f
     sw    t0, 4(t0)
-    sw    s4, 4(t0) 
-1:  lw v0, 0x0ea2(a0)
-    sw    s4, 0(t0) 
+    sw    s4, 4(t0)
+1:  lh v0, 0x2577(a0)
+    sw    s4, 0(t0)
     lw    t1, 4(t0)
     bne t1, s4, inst_error
     nop
@@ -48,11 +48,11 @@ LEAF(n74_lw_adel_ex_test)
     sw    s2, 0(t0)
  ##3
     li    s2, 0x04
-    TEST_LW_ADEL(0x94a1ade4, 0x800d59dc, 0x00007cee, 0x00007cec, 0x68929b5c)
+    TEST_LH_ADEL(0x9554e8d4, 0x800d1570, 0x000085e3, 0x000085e0, 0x541f6c5c)
     la    s4, 1f
     mthi  t0
     divu  zero, t0, s0
-1:  lw v0, 0x7cee(a0)
+1:  lh v0, -0x7a1d(a0)
     mfhi  t1
     beq   t1, t0, inst_error
     nop
@@ -65,9 +65,9 @@ LEAF(n74_lw_adel_ex_test)
     nop
  ##4
     li    s2, 0x04
-    TEST_LW_ADEL(0xe2b0a2c0, 0x800d7748, 0x00004973, 0x00004970, 0x7423d85f)
+    TEST_LH_ADEL(0x8ef75a20, 0x800d69cc, 0x00008341, 0x00008340, 0x224cf16c)
     la    s4, 1f
-1:  lw v0, 0x4973(a0)
+1:  lh v0, -0x7cbf(a0)
     divu  zero, s0, t0
     bne s2, s7, inst_error
     nop
@@ -78,11 +78,11 @@ LEAF(n74_lw_adel_ex_test)
     nop
  ##5
     li    s2, 0x04
-    TEST_LW_ADEL(0x0f9edafa, 0x800d5bac, 0x0000003e, 0x0000003c, 0xdd064458)
+    TEST_LH_ADEL(0xcb7ef7d5, 0x800d0438, 0x0000db3b, 0x0000db38, 0x516f5fa2)
     la    s4, 1f
     mtlo  t0
     multu t0, s0
-1:  lw v0, 0x003e(a0)
+1:  lh v0, -0x24c5(a0)
     mfhi  t1
     beq   t1, t0, inst_error
     nop
@@ -95,9 +95,9 @@ LEAF(n74_lw_adel_ex_test)
     nop
  ##6
     li    s2, 0x04
-    TEST_LW_ADEL(0x5077f320, 0x800d0704, 0x0000e53f, 0x0000e53c, 0x15148b6c)
+    TEST_LH_ADEL(0x5118e811, 0x800d2c20, 0x00001915, 0x00001914, 0x3537cc30)
     la    s4, 1f
-1:  lw v0, -0x1ac1(a0)
+1:  lh v0, 0x1915(a0)
     multu t0, s2
     bne s2, s7, inst_error
     nop
@@ -108,10 +108,10 @@ LEAF(n74_lw_adel_ex_test)
     nop
  ##7
     li    s2, 0x04
-    TEST_LW_ADEL(0xb27f9788, 0x800d759c, 0x00008845, 0x00008844, 0x3958f252)
+    TEST_LH_ADEL(0xd80241b4, 0x800d3d5c, 0x000032e9, 0x000032e8, 0x63c6e7af)
     la    s4, 1f
     mtc0  s2, c0_epc
-1:  lw v0, -0x77bb(a0)
+1:  lh v0, 0x32e9(a0)
     mtc0 t0, c0_epc
     bne s2, s7, inst_error
     nop
@@ -123,10 +123,10 @@ LEAF(n74_lw_adel_ex_test)
 ###score ++
     addiu s3, s3, 1
 ###output (s0<<24)|s3
-inst_error:  
+inst_error:
     sll t1, s0, 24
-    or t0, t1, s3 
+    or t0, t1, s3
     sw t0, 0(s1)
     jr ra
     nop
-END(n74_lw_adel_ex_test)
+END(n7_lh_adel_ex_test)

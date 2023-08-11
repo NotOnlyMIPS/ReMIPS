@@ -2,16 +2,10 @@
 #include <regdef.h>
 #include <cpu_cde.h>
 
-#define lab3  1
-#define lab6  1
-#define lab7  1
-#define lab8  1
-#define lab9  1
-
-#define TEST_NUM (lab3*23 + lab6*19 + lab7*26 + lab8*1 + lab9*25)
+#define TEST_NUM 27
 
 ##s0, number
-##s1, number adress 
+##s1, number adress
 ##s2, exception use
 ##s3, score
 ##s4, exception pc
@@ -59,7 +53,7 @@ test_finish:
  *  exception handle
  */
 .org 0x380
-1:  
+1:
     mfhi k0
     mflo k1
     li  k0, 0x800d0000
@@ -87,6 +81,9 @@ test_finish:
     nop
     li  k0, 0x08 # int
     beq k1, k0, int_ex
+    nop
+    li  k0, 0x09 # trap
+    beq k1, k0, trap_ex
     nop
 
 syscall_ex:
@@ -128,7 +125,7 @@ break_ex:
     nop
 
 overflow_ex:
-    addu s2, zero, zero 
+    addu s2, zero, zero
     mfc0 k0, c0_epc
     bne  k0, s4, ex_finish
     mfc0 k0, c0_cause
@@ -146,7 +143,7 @@ overflow_ex:
     nop
 
 adel_load_ex:
-    addu s2, zero, zero 
+    addu s2, zero, zero
     mfc0 k0, c0_epc
     bne  k0, s4, ex_finish
     nop
@@ -165,7 +162,7 @@ adel_load_ex:
     nop
 
 ades_ex:
-    addu s2, zero, zero 
+    addu s2, zero, zero
     mfc0 k0, c0_epc
     bne  k0, s4, ex_finish
     nop
@@ -184,7 +181,7 @@ ades_ex:
     nop
 
 adel_if_ex:
-    addu s2, zero, zero 
+    addu s2, zero, zero
     mfc0 k0, c0_epc
     bne  k0, s4, ex_finish
     nop
@@ -204,7 +201,7 @@ adel_if_ex:
     nop
 
 reserved_inst_ex:
-    addu s2, zero, zero 
+    addu s2, zero, zero
     mfc0 k0, c0_epc
     bne  k0, s4, ex_finish
     nop
@@ -223,14 +220,14 @@ reserved_inst_ex:
     nop
 
 int_ex:
-    addu s2, zero, zero 
+    addu s2, zero, zero
     mfc0 k0, c0_epc
     bne  k0, s4, ex_finish
     nop
     addiu k0, k0, 8
     mtc0  k0, c0_epc   //epc+8
     disable_trace_cmp_s
-    mfc0 k0, c0_cause  //don't compare cause.bd
+    mfc0 k0, c0_cause  //do not compare cause.bd
     enable_trace_cmp_s
     andi k0, k0, 0x7c # 6..2 exc code
     li   k1, 0x00 # 000_0000
@@ -249,6 +246,24 @@ int_ex:
     b ex_ret
     nop
 
+trap_ex:
+    addu s2, zero, zero
+    mfc0 k0, c0_epc
+    bne  k0, s4, ex_finish
+    mfc0 k0, c0_cause
+    andi k0, k0, 0x7c # 6..2 exc code
+    li   k1, 0x34     # 011_0100
+    bne  k0, k1, ex_finish
+    nop
+    mfc0 k0, c0_status
+    andi k0, k0, 0x02 # exl
+    li k1, 0x02 # exl = 1
+    bne k0, k1, ex_finish
+    nop
+    lui s2, 0x9
+    b ex_finish
+    nop
+
 ex_finish:
     mfc0 k0,c0_cause
     lui k1,0x8000
@@ -258,7 +273,7 @@ ex_finish:
     beq k0,zero, 1f
     nop
     addiu k1,k1,0x4
-1:  
+1:
     mtc0  k1,c0_epc
     nop
     bne s2, zero, ex_ret
@@ -303,407 +318,114 @@ kseg1_kseg0:
 ############################
 
 inst_test:
-############################
-###lab3 test
-#if lab3
-    jal n1_lui_test    #lui
+    jal n1_syscall_ex_test       # syscall_ex
     nop
     jal wait_1s
     nop
-    jal n2_addu_test   #addu
+    jal n2_break_ex_test         # break_ex
     nop
     jal wait_1s
     nop
-    jal n3_addiu_test  #addiu
+    jal n3_add_ov_ex_test        # add_ov_ex
     nop
     jal wait_1s
     nop
-    jal n4_subu_test   #subu
+    jal n4_addi_ov_ex_test       # addi_ov_ex
     nop
     jal wait_1s
     nop
-    jal n5_slt_test    #slt
+    jal n5_sub_ov_ex_test        # sub_ov_ex
     nop
     jal wait_1s
     nop
-    jal n6_sltu_test   #sltu
+    jal n6_lw_adel_ex_test       # lw_adel_ex
     nop
     jal wait_1s
     nop
-    jal n7_and_test    #and
+    jal n7_lh_adel_ex_test       # lh_adel_ex
     nop
     jal wait_1s
     nop
-    jal n8_or_test     #or
+    jal n8_lhu_adel_ex_test      # lhu_adel_ex
     nop
     jal wait_1s
     nop
-    jal n9_xor_test    #xor
+    jal n9_sw_ades_ex_test       # sw_ades_ex
     nop
     jal wait_1s
     nop
-    jal n10_nor_test   #nor
+    jal n10_sh_ades_ex_test      # sh_ades_ex
     nop
     jal wait_1s
     nop
-    jal n11_sll_test   #sll
+    jal n11_ft_adel_ex_test      # ft_adel_ex
     nop
     jal wait_1s
     nop
-    jal n12_srl_test   #srl
+    jal n12_ri_ex_test           # ri_ex
     nop
     jal wait_1s
     nop
-    jal n13_sra_test   #sra
+    jal n13_ti_ex_test           # ti_ex
     nop
     jal wait_1s
     nop
-    jal n14_lw_test    #lw
+    jal n14_soft_int_ex_test     # soft_int_ex
     nop
     jal wait_1s
     nop
-    jal n15_sw_test    #sw
+    jal n15_beq_ds_ex_test       # beq_ds_ex
     nop
     jal wait_1s
     nop
-    jal n16_beq_test   #beq
+    jal n16_bne_ds_ex_test       # bne_ds_ex
     nop
     jal wait_1s
     nop
-    jal n17_bne_test   #bne
+    jal n17_bgez_ds_ex_test      # bgez_ds_ex
     nop
     jal wait_1s
     nop
-    jal n18_jal_test   #jal
+    jal n18_bgtz_ds_ex_test      # bgtz_ds_ex
     nop
     jal wait_1s
     nop
-    jal n19_jr_test    #jr
+    jal n19_blez_ds_ex_test      # blez_ds_ex
     nop
     jal wait_1s
     nop
-    jal n20_beq_ds_test  #beq delay slot
+    jal n20_bltz_ds_ex_test      # bltz_ds_ex
     nop
     jal wait_1s
     nop
-    jal n21_bne_ds_test  #bne delay slot
+    jal n21_bltzal_ds_ex_test    # bltzal_ds_ex
     nop
     jal wait_1s
     nop
-    jal n22_jal_ds_test  #jal delay slot
+    jal n22_bgezal_ds_ex_test    # bgezal_ds_ex
     nop
     jal wait_1s
     nop
-    jal n23_jr_ds_test   #jr delay slot
+    jal n23_j_ds_ex_test         # j_ds_ex
     nop
     jal wait_1s
     nop
-#endif
-############################
-############################
-###lab6 test
-#if lab6
-    jal n24_add_test    #add
+    jal n24_jal_ds_ex_test       # jal_ds_ex
     nop
     jal wait_1s
     nop
-    jal n25_addi_test   #addi
+    jal n25_jr_ds_ex_test        # jr_ds_ex
     nop
     jal wait_1s
     nop
-    jal n26_sub_test    #sub
+    jal n26_jalr_ds_ex_test      # jalr_ds_ex
     nop
     jal wait_1s
     nop
-    jal n27_slti_test   #slti
+    jal n27_trap_ex_test         # trap_ex
     nop
     jal wait_1s
     nop
-    jal n28_sltiu_test  #sltiu
-    nop
-    jal wait_1s
-    nop
-    jal n29_andi_test   #andi
-    nop
-    jal wait_1s
-    nop
-    jal n30_ori_test    #ori
-    nop
-    jal wait_1s
-    nop
-    jal n31_xori_test   #xori
-    nop
-    jal wait_1s
-    nop
-    jal n32_sllv_test   #sllv
-    nop
-    jal wait_1s
-    nop
-    jal n33_srav_test   #srav
-    nop
-    jal wait_1s
-    nop
-    jal n34_srlv_test   #srlv
-    nop
-    jal wait_1s
-    nop
-    jal n35_div_test    #div
-    nop
-    jal wait_1s
-    nop
-    jal n36_divu_test   #divu
-    nop
-    jal wait_1s
-    nop
-    jal n37_mult_test   #mult
-    nop
-    jal wait_1s
-    nop
-    jal n38_multu_test  #multu
-    nop
-    jal wait_1s
-    nop
-    jal n39_mfhi_test   #mfhi
-    nop
-    jal wait_1s
-    nop
-    jal n40_mflo_test   #mflo
-    nop
-    jal wait_1s
-    nop
-    jal n41_mthi_test   #mthi
-    nop
-    jal wait_1s
-    nop
-    jal n42_mtlo_test   #mtlo
-    nop
-    jal wait_1s
-    nop
-#endif
-############################
-############################
-###lab7 test
-#if lab7
-    jal n43_j_test          #j
-    nop
-    jal wait_1s
-    nop
-    jal n44_bgez_test       #bgez
-    nop
-    jal wait_1s
-    nop
-    jal n45_bgtz_test       #bgtz
-    nop
-    jal wait_1s
-    nop
-    jal n46_blez_test       #blez
-    nop
-    jal wait_1s
-    nop
-    jal n47_bltz_test       #bltz
-    nop
-    jal wait_1s
-    nop
-    jal n48_bltzal_test     #bltzal
-    nop
-    jal wait_1s
-    nop
-    jal n49_bgezal_test     #bgezal
-    nop
-    jal wait_1s
-    nop
-    jal n50_jalr_test       #jalr
-    nop
-    jal wait_1s
-    nop
-    jal n51_j_ds_test       #j delay slot
-    nop
-    jal wait_1s
-    nop
-    jal n52_bgez_ds_test    #bgez delay slot
-    nop
-    jal wait_1s
-    nop
-    jal n53_bgtz_ds_test    #bgtz delay slot
-    nop
-    jal wait_1s
-    nop
-    jal n54_blez_ds_test    #blez delay slot
-    nop
-    jal wait_1s
-    nop
-    jal n55_bltz_ds_test    #bltz delay slot
-    nop
-    jal wait_1s
-    nop
-    jal n56_bltzal_ds_test  #bltzal delay slot
-    nop
-    jal wait_1s
-    nop
-    jal n57_bgezal_ds_test  #bgezal delay slot
-    nop
-    jal wait_1s
-    nop
-    jal n58_jalr_ds_test    #jalr delay slot
-    nop
-    jal wait_1s
-    nop
-    jal n59_lb_test         #lb
-    nop
-    jal wait_1s
-    nop
-    jal n60_lbu_test        #lbu
-    nop
-    jal wait_1s
-    nop
-    jal n61_lh_test         #lh
-    nop
-    jal wait_1s
-    nop
-    jal n62_lhu_test        #lhu
-    nop
-    jal wait_1s
-    nop
-    jal n63_lwl_test        #lwl
-    nop
-    jal wait_1s
-    nop
-    jal n64_lwr_test        #lwr
-    nop
-    jal wait_1s
-    nop
-    jal n65_sb_test         #sb
-    nop
-    jal wait_1s
-    nop
-    jal n66_sh_test         #sh
-    nop
-    jal wait_1s
-    nop
-    jal n67_swl_test        #swl
-    nop
-    jal wait_1s
-    nop
-    jal n68_swr_test        #swr
-    nop
-    jal wait_1s
-    nop
-#endif
-############################
-############################
-###lab8 test
-#if lab8
-    jal n69_syscall_ex_test       #syscall
-    nop
-    jal wait_1s
-    nop
-#endif
-############################
-############################
-###lab9 test
-#if lab9
-    jal n70_break_ex_test       #break ex
-    nop
-    jal wait_1s
-    nop
-    jal n71_add_ov_ex_test      #add ov ex
-    nop
-    jal wait_1s
-    nop
-    jal n72_addi_ov_ex_test     #addi ov ex
-    nop
-    jal wait_1s
-    nop
-    jal n73_sub_ov_ex_test      #sub ov ex
-    nop
-    jal wait_1s
-    nop
-    jal n74_lw_adel_ex_test     #lw adel ex
-    nop
-    jal wait_1s
-    nop
-    jal n75_lh_adel_ex_test     #lh adel ex
-    nop
-    jal wait_1s
-    nop
-    jal n76_lhu_adel_ex_test    #lhu adel ex
-    nop
-    jal wait_1s
-    nop
-    jal n77_sw_ades_ex_test     #sw ades ex
-    nop
-    jal wait_1s
-    nop
-    jal n78_sh_ades_ex_test     #sh ades ex
-    nop
-    jal wait_1s
-    nop
-    jal n79_ft_adel_ex_test     #ft adel ex
-    nop
-    jal wait_1s
-    nop
-    jal n80_ri_ex_test          #ri ex
-    nop
-    jal wait_1s
-    nop
-    jal n81_ti_ex_test          #ti ex
-    nop
-    jal wait_1s
-    nop
-    jal n82_soft_int_ex_test    #soft int ex
-    nop
-    jal wait_1s
-    nop
-    jal n83_beq_ds_ex_test      #beq ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n84_bne_ds_ex_test      #bne ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n85_bgez_ds_ex_test     #bgez ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n86_bgtz_ds_ex_test     #bgtz ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n87_blez_ds_ex_test     #blez ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n88_bltz_ds_ex_test     #bltz ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n89_bltzal_ds_ex_test   #bltzal ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n90_bgezal_ds_ex_test   #bgezal ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n91_j_ds_ex_test        #j ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n92_jal_ds_ex_test      #jal ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n93_jr_ds_ex_test       #jr ds ex
-    nop
-    jal wait_1s
-    nop
-    jal n94_jalr_ds_ex_test     #jalr ds ex
-    nop
-    jal wait_1s
-    nop
-#endif
-############################
 
 ############################
 ###Kseg0 -> Kseg1
@@ -711,7 +433,7 @@ inst_test:
     la t1, kseg0_kseg1 #####
     li t2, 0x20000000  ###
     addu t9, t1, t2    #kseg0 -> kseg1
-    jr t9              
+    jr t9
     nop                #####
 kseg0_kseg1:
 #endif
@@ -727,10 +449,10 @@ test_end:
     LI (a0, LED_ADDR)
 	LI (a1, LED_RG1_ADDR)
     LI (a2, LED_RG0_ADDR)
-	
+
     LI (t1, 0x0002)
     NOP4
-    
+
 	sw zero, 0(a0)
     sw t1, 0(a1)
     sw t1, 0(a2)
@@ -766,7 +488,7 @@ wait_1s:
     addiu t3, t3, 1
     NOP4
 
-sub1:  
+sub1:
     addiu t3, t3, -1
 
     #select min{t3, switch_interleave}
@@ -778,7 +500,7 @@ sub1:
     NOP4
     sltu  t4, t3, t2
     NOP4
-    bnez  t4, 1f 
+    bnez  t4, 1f
     nop
     addu  t3, t2, 0
     NOP4
