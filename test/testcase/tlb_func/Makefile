@@ -37,7 +37,7 @@ main.elf: start.o libinst.a
 libinst.a:
 	make -C inst $(TOPDIR)/$@
 
-convert:convert.c
+convert:
 	gcc  $(ALIGNED) -o convert  convert.c
 
 clean:
