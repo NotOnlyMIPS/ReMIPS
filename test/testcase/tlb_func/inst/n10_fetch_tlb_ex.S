@@ -1,7 +1,7 @@
 #include <asm.h>
 #include <regdef.h>
 
-LEAF(n9_fetch_tlb_ex_test)
+LEAF(n10_fetch_tlb_ex_test)
     .set noreorder
     addiu s0, s0 ,1
     addiu s2, zero, 0x3
@@ -23,7 +23,7 @@ fetch_tlb_pc_2:
     b  inst_error
     nop
 fetch_tlb_pc_3:
-#endif 
+#endif
     nop
 ###detect exception
     li  t1, 0x3333
@@ -32,10 +32,10 @@ fetch_tlb_pc_3:
 ###score ++
     addiu s3, s3, 1
 ###output (s0<<24)|s3
-inst_error:  
+inst_error:
     sll t1, s0, 24
-    or t0, t1, s3 
+    or t0, t1, s3
     sw t0, 0(s1)
     jr ra
     nop
-END(n9_fetch_tlb_ex_test)
+END(n10_fetch_tlb_ex_test)

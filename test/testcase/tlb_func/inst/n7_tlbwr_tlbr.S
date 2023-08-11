@@ -1,7 +1,7 @@
 #include <asm.h>
 #include <regdef.h>
 
-LEAF(n5_tlbwi_tlbr_test)
+LEAF(n7_tlbwr_tlbr_test)
     .set noreorder
     addiu s0, s0 ,1
     addiu s2, zero, 0x0
@@ -19,7 +19,7 @@ LEAF(n5_tlbwi_tlbr_test)
 1:
     mtc0  t0, c0_entryhi
     mtc0  v0, c0_index
-    tlbwi
+    tlbwr
     li   t3, 0xffffffff
     mtc0 t3, c0_entryhi
     mtc0 t3, c0_entrylo0
@@ -47,7 +47,7 @@ LEAF(n5_tlbwi_tlbr_test)
     li    t2, 0x00789a00
     mtc0  t0, c0_entryhi
     mtc0  v0, c0_index
-    tlbwi
+    tlbwr
     li   t3, 0xffffffff
     mtc0 t3, c0_entryhi
     mtc0 t3, c0_entrylo0
@@ -74,7 +74,7 @@ LEAF(n5_tlbwi_tlbr_test)
     mtc0  t2, c0_entrylo1
     mtc0  t0, c0_entryhi
     mtc0  v0, c0_index
-    tlbwi
+    tlbwr
     li   t3, 0xffffffff
     mtc0 t3, c0_entryhi
     mtc0 t3, c0_entrylo0
@@ -100,7 +100,7 @@ LEAF(n5_tlbwi_tlbr_test)
     mtc0  t2, c0_entrylo1
     mtc0  t0, c0_entryhi
     mtc0  v0, c0_index
-    tlbwi
+    tlbwr
     li   t3, 0xffffffff
     mtc0 t3, c0_entryhi
     mtc0 t3, c0_entrylo0
@@ -133,4 +133,4 @@ inst_error:
     sw t0, 0(s1)
     jr ra
     nop
-END(n5_tlbwi_tlbr_test)
+END(n7_tlbwr_tlbr_test)

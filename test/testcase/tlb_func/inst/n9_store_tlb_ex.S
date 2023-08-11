@@ -1,7 +1,7 @@
 #include <asm.h>
 #include <regdef.h>
 
-LEAF(n8_store_tlb_ex_test)
+LEAF(n9_store_tlb_ex_test)
     .set noreorder
     addiu s0, s0 ,1
     addiu s2, zero, 0x2
@@ -22,7 +22,7 @@ store_tlb_pc_1:
     lw t1, 0(a0)
     bne t1, t0, inst_error
     nop
-#endif 
+#endif
     nop
 ###detect exception
     li  t1, 0x2222
@@ -31,10 +31,10 @@ store_tlb_pc_1:
 ###score ++
     addiu s3, s3, 1
 ###output (s0<<24)|s3
-inst_error:  
+inst_error:
     sll t1, s0, 24
-    or t0, t1, s3 
+    or t0, t1, s3
     sw t0, 0(s1)
     jr ra
     nop
-END(n8_store_tlb_ex_test)
+END(n9_store_tlb_ex_test)

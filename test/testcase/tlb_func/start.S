@@ -5,13 +5,13 @@
 #define TEST_TLB_EXCEPTION 1
 
 #if TEST_TLB_EXCEPTION
-    #define TEST_NUM 9
+    #define TEST_NUM 10
 #else
-    #define TEST_NUM 6
+    #define TEST_NUM 7
 #endif
 
 ##s0, number
-##s1, number adress 
+##s1, number adress
 ##s2, exception use
 ##s3, score
 ##s4, exception pc
@@ -60,13 +60,13 @@ tlb_refill:
     mfc0 k0, c0_cause
     andi k0, k0, 0x7c # 6..2
     li   k1, 1
-    beq  s2, k1, load_refill_ex 
+    beq  s2, k1, load_refill_ex
     nop
     li   k1, 2
-    beq  s2, k1, store_refill_ex 
+    beq  s2, k1, store_refill_ex
     nop
     li   k1, 3
-    beq  s2, k1, fetch_refill_ex 
+    beq  s2, k1, fetch_refill_ex
     nop
     b    tlb_fail
     nop
@@ -78,9 +78,9 @@ load_refill_ex:
     la   k1, load_tlb_pc_1
     bne  k0, k1, tlb_fail
     nop
-    li    t1, 0x00234500 
+    li    t1, 0x00234500
     mtc0  t1, c0_entrylo0
-    li    t2, 0x00789a00 
+    li    t2, 0x00789a00
     mtc0  t2, c0_entrylo1
     li    t3, 0x1
     mtc0  t3, c0_index
@@ -97,9 +97,9 @@ store_refill_ex:
     la   k1, store_tlb_pc_1
     bne  k0, k1, tlb_fail
     nop
-    li    t1, 0x00234500 
+    li    t1, 0x00234500
     mtc0  t1, c0_entrylo0
-    li    t2, 0x00789a00 
+    li    t2, 0x00789a00
     mtc0  t2, c0_entrylo1
     li    t3, 0x2
     mtc0  t3, c0_index
@@ -119,9 +119,9 @@ fetch_refill_ex:
     mfc0 k0, c0_epc
     bne  k0, k1, tlb_fail
     nop
-    li    t1, 0x00234500 
+    li    t1, 0x00234500
     mtc0  t1, c0_entrylo0
-    li    t2, 0x00789a00 
+    li    t2, 0x00789a00
     mtc0  t2, c0_entrylo1
     li    t3, 0x3
     mtc0  t3, c0_index
@@ -131,17 +131,17 @@ fetch_refill_ex:
     eret
     .set mips0
 .org 0x380
-1:  
+1:
     mfc0 k0, c0_cause
     andi k0, k0, 0x7c # 6..2
     li   k1, 1
-    beq  s2, k1, load_inv_ex 
+    beq  s2, k1, load_inv_ex
     nop
     li   k1, 2
-    beq  s2, k1, store_inv_mod_ex 
+    beq  s2, k1, store_inv_mod_ex
     nop
     li   k1, 3
-    beq  s2, k1, fetch_inv_ex 
+    beq  s2, k1, fetch_inv_ex
     nop
     b    tlb_fail
     nop
@@ -239,9 +239,9 @@ fetch_tlb_invalid:
     eret
     .set mips0
 
-tlb_fail:  
+tlb_fail:
     sll t1, s0, 24
-    or t0, t1, s3 
+    or t0, t1, s3
     sw t0, 0(s1)
     jr ra
     nop
@@ -289,16 +289,19 @@ inst_test:
     nop
     jal wait_1s
     nop
+    jal n7_tlbwr_tlbr_test
+    jal wait_1s
+    nop
 #if TEST_TLB_EXCEPTION
-    jal n7_load_tlb_ex_test
+    jal n8_load_tlb_ex_test
     nop
     jal wait_1s
     nop
-    jal n8_store_tlb_ex_test
+    jal n9_store_tlb_ex_test
     nop
     jal wait_1s
     nop
-    jal n9_fetch_tlb_ex_test
+    jal n10_fetch_tlb_ex_test
     nop
     jal wait_1s
     nop
@@ -312,9 +315,9 @@ test_end:
     LI (a0, LED_ADDR)
 	LI (a1, LED_RG1_ADDR)
     LI (a2, LED_RG0_ADDR)
-	
+
     LI (t1, 0x0002)
-    
+
 	sw zero, 0(a0)
     sw t1, 0(a1)
     sw t1, 0(a2)
