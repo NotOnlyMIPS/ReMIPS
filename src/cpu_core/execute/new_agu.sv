@@ -73,10 +73,10 @@ typedef enum logic [1:0] {
 // } Storebuffer_Req_State_t;
 
 // control
-logic agu_addr_valid, agu_store_valid, agu_load_req_valid, agu_load_resp_valid, agu_lookup_valid;
-logic agu_store_allowin, agu_load_req_allowin, agu_load_resp_allowin, agu_lookup_allowin;
+logic agu_addr_valid, agu_store_valid, agu_load_req_valid, agu_load_resp_valid, agu_load_done_valid, agu_lookup_valid;
+logic agu_store_allowin, agu_load_req_allowin, agu_load_resp_allowin, agu_load_done_allowin, agu_lookup_allowin;
 logic agu_load_req_readygo, agu_load_resp_readygo;
-logic agu_addr_to_valid, agu_load_req_to_valid;
+logic agu_addr_to_valid, agu_load_req_to_valid, agu_load_resp_to_valid;
 // AGU_Stage_t agu_stage;
 
 logic data_exist;
@@ -192,6 +192,33 @@ always_ff @(posedge clk) begin
     end
 end
 
+// pre lookup
+logic op_lb;
+logic op_lbu;
+logic op_lh;
+logic op_lhu;
+logic op_lw;
+logic op_lwl;
+logic op_lwr;
+
+virt_t      pre_lookup_addr;
+logic [3:0] pre_lookup_wstrb;
+
+assign op_lb  = op == OP_LB;
+assign op_lbu = op == OP_LBU;
+assign op_lh  = op == OP_LH;
+assign op_lhu = op == OP_LHU;
+assign op_lw  = op == OP_LW;
+assign op_lwl = op == OP_LWL;
+assign op_lwr = op == OP_LWR;
+
+assign pre_lookup_addr = rs_value + imm_value;
+
+assign pre_lookup_wstrb = (op_lb  || op_lbu) ? 4'h1 << pre_lookup_addr[1:0]
+                        : (op_lh  || op_lhu) ? 4'h3 << pre_lookup_addr[1:0]
+                        : (op_lw  || op_lwr) ? 4'hf
+                        : 0;
+
 /* AGU store stage */
 operation_t store_op;
 virt_t store_addr;
@@ -204,6 +231,7 @@ logic [3:0] store_rob_entry_num;
 logic       store_wait;
 logic       store_buffer_full;
 
+exception_t data_tlb_ex2_r;
 exception_t store_exception;
 
 logic        op_sb ;
@@ -242,7 +270,7 @@ assign store_data  = op_sb  ? {4{store_value[7:0]}} :
                                               store_addr[0] ? {store_value[23: 0],  8'h0} :  store_value                :
                               store_value;
 
-assign data_vaddr2 = store_addr;
+assign data_vaddr2 = rs_value+imm_value;
 
 always_comb begin
     store_exception = '0;
@@ -251,8 +279,8 @@ always_comb begin
         store_exception.exccode  = `EXCCODE_ADES;
         store_exception.badvaddr = store_addr;
     end
-    else if(data_tlb_ex2.ex) begin
-        store_exception = data_tlb_ex2;
+    else if(data_tlb_ex2_r.ex) begin
+        store_exception = data_tlb_ex2_r;
     end
 end
 
@@ -283,6 +311,7 @@ always_ff @(posedge clk) begin
         store_value<= 32'h0;
         agu_store_num <= 4'h0;
         store_rob_entry_num <= 4'h0;
+        data_tlb_ex2_r <= '0;
     end
     else if(agu_store_allowin) begin
         store_op   <= op;
@@ -290,6 +319,7 @@ always_ff @(posedge clk) begin
         store_value<= rt_value;
         agu_store_num <= store_num;
         store_rob_entry_num <= rob_entry_num;
+        data_tlb_ex2_r <= data_tlb_ex2;
     end
 end
 
@@ -424,32 +454,32 @@ logic [3:0] req_rob_entry_num;
 
 exception_t req_exception;
 
-logic        op_lb;
-logic        op_lbu;
-logic        op_lh;
-logic        op_lhu;
-logic        op_lw;
-logic        op_lwl;
-logic        op_lwr;
+logic        req_lb;
+logic        req_lbu;
+logic        req_lh;
+logic        req_lhu;
+logic        req_lw;
+logic        req_lwl;
+logic        req_lwr;
 
-assign op_lb  = load_op == OP_LB;
-assign op_lbu = load_op == OP_LBU;
-assign op_lh  = load_op == OP_LH;
-assign op_lhu = load_op == OP_LHU;
-assign op_lw  = load_op == OP_LW;
-assign op_lwl = load_op == OP_LWL;
-assign op_lwr = load_op == OP_LWR;
+assign req_lb  = load_op == OP_LB;
+assign req_lbu = load_op == OP_LBU;
+assign req_lh  = load_op == OP_LH;
+assign req_lhu = load_op == OP_LHU;
+assign req_lw  = load_op == OP_LW;
+assign req_lwl = load_op == OP_LWL;
+assign req_lwr = load_op == OP_LWR;
 
-assign load_size = ({3{op_lb | op_lbu | ((op_lwl) & load_addr[1:0] == 2'd0) | ((op_lwr) & load_addr[1:0] == 2'd3)}} & 3'd0
-                   |{3{op_lh | op_lhu | ((op_lwl) & load_addr[1:0] == 2'd1) | ((op_lwr) & load_addr[1:0] == 2'd1)}} & 3'd1
-                   |{3{op_lw |          ((op_lwl) & load_addr[1]   == 1'b1) | ((op_lwr) & load_addr[1]   == 1'b0)}} & 3'd2 );
+assign load_size = ({3{req_lb | req_lbu | ((req_lwl) & load_addr[1:0] == 2'd0) | ((req_lwr) & load_addr[1:0] == 2'd3)}} & 3'd0
+                   |{3{req_lh | req_lhu | ((req_lwl) & load_addr[1:0] == 2'd1) | ((req_lwr) & load_addr[1:0] == 2'd1)}} & 3'd1
+                   |{3{req_lw |           ((req_lwl) & load_addr[1]   == 1'b1) | ((req_lwr) & load_addr[1]   == 1'b0)}} & 3'd2 );
 
 assign load_req = agu_load_req_valid && !req_exception.ex && (!agu_load_resp_valid || cs_load_allowin);
 
 always_comb begin
     req_exception = '0;
-    if((op_lh || op_lhu) && load_addr[0] 
-    ||  op_lw && load_addr[1:0]) begin
+    if((req_lh || req_lhu) && load_addr[0] 
+    ||  req_lw && load_addr[1:0]) begin
         req_exception.ex       = 1'b1;
         req_exception.exccode  = `EXCCODE_ADEL;
         req_exception.badvaddr = load_addr;
@@ -521,8 +551,8 @@ always_comb begin
 end
 
 assign agu_load_resp_readygo = dcache_data_ok && !data_cancel || exception.ex || load_ready;
-assign agu_load_resp_allowin = !agu_load_resp_valid || agu_load_resp_readygo && cs_load_allowin;
-assign agu_load_to_valid = agu_load_resp_valid && agu_load_resp_readygo;
+assign agu_load_resp_allowin = !agu_load_resp_valid || agu_load_resp_readygo && agu_load_done_allowin;
+assign agu_load_resp_to_valid = agu_load_resp_valid && agu_load_resp_readygo;
 
 always_ff @(posedge clk) begin
     if(reset || flush) begin
@@ -554,13 +584,13 @@ always_ff @(posedge clk) begin
         resp_rob_entry_num <= req_rob_entry_num;
         addr_ex            <= req_exception;
 
-        resp_lb  <= op_lb;
-        resp_lbu <= op_lbu;
-        resp_lh  <= op_lh;
-        resp_lhu <= op_lhu;
-        resp_lw  <= op_lw;
-        resp_lwl <= op_lwl;
-        resp_lwr <= op_lwr;
+        resp_lb  <= req_lb;
+        resp_lbu <= req_lbu;
+        resp_lh  <= req_lh;
+        resp_lhu <= req_lhu;
+        resp_lw  <= req_lw;
+        resp_lwl <= req_lwl;
+        resp_lwr <= req_lwr;
     end
 
     if(reset || flush) begin
@@ -571,7 +601,7 @@ always_ff @(posedge clk) begin
     else if(agu_load_resp_allowin) begin
         load_ready    <= 1'b0;
     end
-    else if(agu_load_to_valid && !cs_load_allowin && !load_ready) begin
+    else if(agu_load_resp_to_valid && !agu_load_done_allowin && !load_ready) begin
         load_ready    <= 1'b1;
         load_result_r <= load_result;
         exception_r   <= exception;
@@ -590,23 +620,50 @@ assign load_result = (resp_lb ) ? resp_addr[1] ? resp_addr[0] ? {{24{dcache_rdat
                                                  resp_addr[0] ? {load_value[31:24] , dcache_rdata[31: 8]} :  dcache_rdata                :
                                                                 dcache_rdata;
 
+/* AGU load done */
+reg_addr_t  load_done_phy_dest;
+uint32_t    load_done_result;
+logic [3:0] load_done_rob_entry_num;
+
+exception_t load_done_exception;
+
+assign agu_load_done_allowin = !agu_load_done_valid || cs_load_allowin;
+assign agu_load_to_valid = agu_load_done_valid;
+
+always_ff @(posedge clk) begin
+    if(reset || flush) begin
+        agu_load_done_valid     <= 1'b0;
+        load_done_phy_dest      <= 6'h0;
+        load_done_result        <= 32'h0;
+        load_done_rob_entry_num <= 4'h0;
+        load_done_exception     <= '0;
+    end
+    else if(agu_load_done_allowin) begin
+        agu_load_done_valid     <= agu_load_resp_to_valid;
+        load_done_phy_dest      <= resp_phy_dest;
+        load_done_result        <= load_ready ? load_result_r : load_result;
+        load_done_rob_entry_num <= resp_rob_entry_num;
+        load_done_exception     <= load_ready ? exception_r : exception;
+    end
+end
+
 // bypass
-assign load_bypass_bus.rf_we = {4{agu_load_to_valid}};
-assign load_bypass_bus.dest = resp_phy_dest;
-assign load_bypass_bus.result = load_ready ? load_result_r : load_result;
+assign load_bypass_bus.rf_we  = {4{agu_load_done_valid}};
+assign load_bypass_bus.dest   = load_done_phy_dest;
+assign load_bypass_bus.result = load_done_result;
 
-assign agu_load_to_commit_bus.valid = agu_load_resp_valid;
-assign agu_load_to_commit_bus.rob_entry_num = resp_rob_entry_num;
+assign agu_load_to_commit_bus.valid = agu_load_done_valid;
+assign agu_load_to_commit_bus.rob_entry_num = load_done_rob_entry_num;
 
-assign agu_load_to_commit_bus.rf_we = 4'b1111;
-assign agu_load_to_commit_bus.phy_dest = resp_phy_dest;
-assign agu_load_to_commit_bus.result = load_ready ? load_result_r : load_result;
+assign agu_load_to_commit_bus.rf_we    = 4'b1111;
+assign agu_load_to_commit_bus.phy_dest = load_done_phy_dest;
+assign agu_load_to_commit_bus.result   = load_done_result;
 
 assign agu_load_to_commit_bus.is_store_op = 1'b0;
 
 assign agu_load_to_commit_bus.verify_result = 'b0;
 
-assign agu_load_to_commit_bus.exception = load_ready ? exception_r : exception;
+assign agu_load_to_commit_bus.exception = load_done_exception;
 
 
 /* store buffer */
@@ -622,7 +679,8 @@ store_buffer store_buffer_u (
 
     .flush,
 
-    .load_addr(rs_value + imm_value),
+    .pre_lookup_addr,
+    .pre_lookup_wstrb,
     .data_exist,
     .pre_load_wait,
 

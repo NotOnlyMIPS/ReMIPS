@@ -7,7 +7,8 @@ module store_buffer #(
     input  logic            reset,
     input  logic            flush,
 
-    input  virt_t           load_addr,
+    input  virt_t           pre_lookup_addr,
+    input  logic [3:0]      pre_lookup_wstrb,
     output logic            data_exist,
     output logic            pre_load_wait,
 
@@ -79,7 +80,7 @@ assign store_buffer_full = store_buffer_tail_next == commit_store_resp_head
 
 //write store_buffer
 always_ff @( posedge clk ) begin : store_buffer_write
-    if( reset) begin
+    if(reset) begin
         for(int i = 0; i < STORE_GROUP; i++)begin
             store_buffer[i] <= '0;
         end
@@ -203,12 +204,12 @@ logic mark3[1:0];
 logic [3:0]  sel_num_out;
 logic sel_match_out;
 
-assign store_addr_match = valid && data_addr[31:2] == load_addr[31:2];
-assign store_wstrb_match = valid && buffer_we == 4'b1111;
+assign store_addr_match = valid && data_addr[31:2] == pre_lookup_addr[31:2];
+assign store_wstrb_match = valid && ((buffer_we & pre_lookup_wstrb) == pre_lookup_wstrb);
 always_comb begin
     for(int i=0; i<STORE_GROUP; i=i+1) begin
-        addr_match[i] = store_buffer[i].valid && store_buffer[i].addr[31:2] == load_addr[31:2];
-        wstrb_match[i] = store_buffer[i].valid && store_buffer[i].wstrb == 4'hf;
+        addr_match[i]  = store_buffer[i].valid && store_buffer[i].addr[31:2] == pre_lookup_addr[31:2];
+        wstrb_match[i] = store_buffer[i].valid && ((store_buffer[i].wstrb & pre_lookup_wstrb) == pre_lookup_wstrb);
     end
 end
 

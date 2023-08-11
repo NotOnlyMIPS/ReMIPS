@@ -124,7 +124,9 @@ typedef enum logic [6:0] {
     OP_TGEI, OP_TGEIU, OP_TLTI, OP_TLTIU, OP_TEQI, OP_TNEI,
     /* privileged instructions */
     OP_CACHE, OP_ERET, OP_MFC0, OP_MTC0,
-    OP_TLBP, OP_TLBR, OP_TLBWI, OP_TLBWR, OP_WAIT
+    OP_TLBP, OP_TLBR, OP_TLBWI, OP_TLBWR, OP_WAIT,
+    /* FPU */
+    OP_FPU
 //     /* LL/SC */
 //     OP_LL, OP_SC,
 //     /* ASIC */

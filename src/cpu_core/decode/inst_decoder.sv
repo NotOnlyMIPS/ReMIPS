@@ -135,6 +135,8 @@ always_comb begin
                 default:  operation = OP_INVALID;
             endcase
             end
+            /* CP1 */
+            6'b010001: operation = OP_FPU;
             /* Branch Likely */
             // 6'b010100: operation = OP_BEQL;
             // 6'b010101: operation = OP_BNEL;

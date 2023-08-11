@@ -14,7 +14,7 @@ module issue_stage (
     input  logic mul_div_allowin,
     // input  logic alu2_allowin,
     input  logic agu_allowin,
-    input  logic agu_pre_allowin,
+    // input  logic agu_pre_allowin,
     // input  logic sp_allowin,
 
     // bypass

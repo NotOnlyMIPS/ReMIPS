@@ -48,18 +48,28 @@ always_comb begin
         exception_d.exccode = `EXCCODE_INT;
     end
     else if(!exception.ex && valid) begin
-        if(operation == OP_INVALID) begin
-            exception_d.ex      = 1'b1;
-            exception_d.exccode = `EXCCODE_RI;
-        end
-        else if(operation == OP_SYSCALL) begin
-            exception_d.ex      = 1'b1;
-            exception_d.exccode = `EXCCODE_SYS;
-        end
-        else if(operation == OP_BREAK) begin
-            exception_d.ex      = 1'b1;
-            exception_d.exccode = `EXCCODE_BP;
-        end
+        unique case(operation)
+            OP_INVALID: begin
+                exception_d.ex      = 1'b1;
+                exception_d.exccode = `EXCCODE_RI;
+            end
+            OP_SYSCALL: begin
+                exception_d.ex      = 1'b1;
+                exception_d.exccode = `EXCCODE_SYS;
+            end
+            OP_BREAK: begin
+                exception_d.ex      = 1'b1;
+                exception_d.exccode = `EXCCODE_BP;
+            end
+            OP_FPU: begin
+                exception_d.ex      = 1'b1;
+                exception_d.exccode = `EXCCODE_CpU;
+            end
+            default: begin
+                exception_d.ex = 1'b0;
+                exception_d.exccode = '0;
+            end
+        endcase
     end
 
     if(!exception.ex && valid && is_privileged_op) begin
