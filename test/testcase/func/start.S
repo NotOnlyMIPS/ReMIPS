@@ -2,7 +2,7 @@
 #include <regdef.h>
 #include <cpu_cde.h>
 
-#define TEST_NUM 78
+#define TEST_NUM 77
 
 ##s0, number
 ##s1, number address
@@ -421,7 +421,7 @@ inst_test:
     nop
     jal wait_1s
     nop
-    jal n32_xori_test      # xori
+    jal n32_sllv_test      # sllv
     nop
     jal wait_1s
     nop
@@ -602,10 +602,6 @@ inst_test:
     jal wait_1s
     nop
     jal n77_movz_test      # movz
-    nop
-    jal wait_1s
-    nop
-    jal n78_sllv_test      # sllv
     nop
     jal wait_1s
     nop

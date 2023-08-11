@@ -2,7 +2,7 @@
 #include <regdef.h>
 #include <inst_test.h>
 
-LEAF(n78_sllv_test)
+LEAF(n32_sllv_test)
     .set noreorder
     addiu s0, s0 ,1
     li  s2, 0x00
@@ -320,4 +320,4 @@ inst_error:
     sw t0, 0(s1)
     jr ra
     nop
-END(n78_sllv_test)
+END(n32_sllv_test)
