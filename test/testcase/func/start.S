@@ -297,315 +297,315 @@ kseg1_kseg0:
 ############################
 
 inst_test:
-    jal n1_lui        # lui
+    jal n1_lui_test        # lui
     nop
     jal wait_1s
     nop
-    jal n2_addu       # addu
+    jal n2_addu_test       # addu
     nop
     jal wait_1s
     nop
-    jal n3_addiu      # addiu
+    jal n3_addiu_test      # addiu
     nop
     jal wait_1s
     nop
-    jal n4_subu       # subu
+    jal n4_subu_test       # subu
     nop
     jal wait_1s
     nop
-    jal n5_slt        # slt
+    jal n5_slt_test        # slt
     nop
     jal wait_1s
     nop
-    jal n6_sltu       # sltu
+    jal n6_sltu_test       # sltu
     nop
     jal wait_1s
     nop
-    jal n7_and        # and
+    jal n7_and_test        # and
     nop
     jal wait_1s
     nop
-    jal n8_or         # or
+    jal n8_or_test         # or
     nop
     jal wait_1s
     nop
-    jal n9_xor        # xor
+    jal n9_xor_test        # xor
     nop
     jal wait_1s
     nop
-    jal n10_nor       # nor
+    jal n10_nor_test       # nor
     nop
     jal wait_1s
     nop
-    jal n11_sll       # sll
+    jal n11_sll_test       # sll
     nop
     jal wait_1s
     nop
-    jal n12_srl       # srl
+    jal n12_srl_test       # srl
     nop
     jal wait_1s
     nop
-    jal n13_sra       # sra
+    jal n13_sra_test       # sra
     nop
     jal wait_1s
     nop
-    jal n14_lw        # lw
+    jal n14_lw_test        # lw
     nop
     jal wait_1s
     nop
-    jal n15_sw        # sw
+    jal n15_sw_test        # sw
     nop
     jal wait_1s
     nop
-    jal n16_beq       # beq
+    jal n16_beq_test       # beq
     nop
     jal wait_1s
     nop
-    jal n17_bne       # bne
+    jal n17_bne_test       # bne
     nop
     jal wait_1s
     nop
-    jal n18_jal       # jal
+    jal n18_jal_test       # jal
     nop
     jal wait_1s
     nop
-    jal n19_jr        # jr
+    jal n19_jr_test        # jr
     nop
     jal wait_1s
     nop
-    jal n20_beq_ds    # beq_ds
+    jal n20_beq_ds_test    # beq_ds
     nop
     jal wait_1s
     nop
-    jal n21_bne_ds    # bne_ds
+    jal n21_bne_ds_test    # bne_ds
     nop
     jal wait_1s
     nop
-    jal n22_jal_ds    # jal_ds
+    jal n22_jal_ds_test    # jal_ds
     nop
     jal wait_1s
     nop
-    jal n23_jr_ds     # jr_ds
+    jal n23_jr_ds_test     # jr_ds
     nop
     jal wait_1s
     nop
-    jal n24_add       # add
+    jal n24_add_test       # add
     nop
     jal wait_1s
     nop
-    jal n25_addi      # addi
+    jal n25_addi_test      # addi
     nop
     jal wait_1s
     nop
-    jal n26_sub       # sub
+    jal n26_sub_test       # sub
     nop
     jal wait_1s
     nop
-    jal n27_slti      # slti
+    jal n27_slti_test      # slti
     nop
     jal wait_1s
     nop
-    jal n28_sltiu     # sltiu
+    jal n28_sltiu_test     # sltiu
     nop
     jal wait_1s
     nop
-    jal n29_andi      # andi
+    jal n29_andi_test      # andi
     nop
     jal wait_1s
     nop
-    jal n30_ori       # ori
+    jal n30_ori_test       # ori
     nop
     jal wait_1s
     nop
-    jal n31_xori      # xori
+    jal n31_xori_test      # xori
     nop
     jal wait_1s
     nop
-    jal n32_xori      # xori
+    jal n32_xori_test      # xori
     nop
     jal wait_1s
     nop
-    jal n33_srav      # srav
+    jal n33_srav_test      # srav
     nop
     jal wait_1s
     nop
-    jal n34_srlv      # srlv
+    jal n34_srlv_test      # srlv
     nop
     jal wait_1s
     nop
-    jal n35_div       # div
+    jal n35_div_test       # div
     nop
     jal wait_1s
     nop
-    jal n36_divu      # divu
+    jal n36_divu_test      # divu
     nop
     jal wait_1s
     nop
-    jal n37_mult      # mult
+    jal n37_mult_test      # mult
     nop
     jal wait_1s
     nop
-    jal n38_multu     # multu
+    jal n38_multu_test     # multu
     nop
     jal wait_1s
     nop
-    jal n39_mfhi      # mfhi
+    jal n39_mfhi_test      # mfhi
     nop
     jal wait_1s
     nop
-    jal n40_mflo      # mflo
+    jal n40_mflo_test      # mflo
     nop
     jal wait_1s
     nop
-    jal n41_mthi      # mthi
+    jal n41_mthi_test      # mthi
     nop
     jal wait_1s
     nop
-    jal n42_mtlo      # mtlo
+    jal n42_mtlo_test      # mtlo
     nop
     jal wait_1s
     nop
-    jal n43_j         # j
+    jal n43_j_test         # j
     nop
     jal wait_1s
     nop
-    jal n44_bgez      # bgez
+    jal n44_bgez_test      # bgez
     nop
     jal wait_1s
     nop
-    jal n45_bgtz      # bgtz
+    jal n45_bgtz_test      # bgtz
     nop
     jal wait_1s
     nop
-    jal n46_blez      # blez
+    jal n46_blez_test      # blez
     nop
     jal wait_1s
     nop
-    jal n47_bltz      # bltz
+    jal n47_bltz_test      # bltz
     nop
     jal wait_1s
     nop
-    jal n48_bltzal    # bltzal
+    jal n48_bltzal_test    # bltzal
     nop
     jal wait_1s
     nop
-    jal n49_bgezal    # bgezal
+    jal n49_bgezal_test    # bgezal
     nop
     jal wait_1s
     nop
-    jal n50_jalr      # jalr
+    jal n50_jalr_test      # jalr
     nop
     jal wait_1s
     nop
-    jal n51_j_ds      # j_ds
+    jal n51_j_ds_test      # j_ds
     nop
     jal wait_1s
     nop
-    jal n52_bgez_ds   # bgez_ds
+    jal n52_bgez_ds_test   # bgez_ds
     nop
     jal wait_1s
     nop
-    jal n53_bgtz_ds   # bgtz_ds
+    jal n53_bgtz_ds_test   # bgtz_ds
     nop
     jal wait_1s
     nop
-    jal n54_blez_ds   # blez_ds
+    jal n54_blez_ds_test   # blez_ds
     nop
     jal wait_1s
     nop
-    jal n55_bltz_ds   # bltz_ds
+    jal n55_bltz_ds_test   # bltz_ds
     nop
     jal wait_1s
     nop
-    jal n56_bltzal_ds # bltzal_ds
+    jal n56_bltzal_ds_test # bltzal_ds
     nop
     jal wait_1s
     nop
-    jal n57_bgezal_ds # bgezal_ds
+    jal n57_bgezal_ds_test # bgezal_ds
     nop
     jal wait_1s
     nop
-    jal n58_jalr_ds   # jalr_ds
+    jal n58_jalr_ds_test   # jalr_ds
     nop
     jal wait_1s
     nop
-    jal n59_lb        # lb
+    jal n59_lb_test        # lb
     nop
     jal wait_1s
     nop
-    jal n60_lbu       # lbu
+    jal n60_lbu_test       # lbu
     nop
     jal wait_1s
     nop
-    jal n61_lh        # lh
+    jal n61_lh_test        # lh
     nop
     jal wait_1s
     nop
-    jal n62_lhu       # lhu
+    jal n62_lhu_test       # lhu
     nop
     jal wait_1s
     nop
-    jal n63_lwl       # lwl
+    jal n63_lwl_test       # lwl
     nop
     jal wait_1s
     nop
-    jal n64_lwr       # lwr
+    jal n64_lwr_test       # lwr
     nop
     jal wait_1s
     nop
-    jal n65_sb        # sb
+    jal n65_sb_test        # sb
     nop
     jal wait_1s
     nop
-    jal n66_sh        # sh
+    jal n66_sh_test        # sh
     nop
     jal wait_1s
     nop
-    jal n67_swl       # swl
+    jal n67_swl_test       # swl
     nop
     jal wait_1s
     nop
-    jal n68_swr       # swr
+    jal n68_swr_test       # swr
     nop
     jal wait_1s
     nop
-    jal n69_clz       # clz
+    jal n69_clz_test       # clz
     nop
     jal wait_1s
     nop
-    jal n70_clo       # clo
+    jal n70_clo_test       # clo
     nop
     jal wait_1s
     nop
-    jal n71_movn      # movn
+    jal n71_movn_test      # movn
     nop
     jal wait_1s
     nop
-    jal n72_mul       # mul
+    jal n72_mul_test       # mul
     nop
     jal wait_1s
     nop
-    jal n73_madd      # madd
+    jal n73_madd_test      # madd
     nop
     jal wait_1s
     nop
-    jal n74_maddu     # maddu
+    jal n74_maddu_test     # maddu
     nop
     jal wait_1s
     nop
-    jal n75_msub      # msub
+    jal n75_msub_test      # msub
     nop
     jal wait_1s
     nop
-    jal n76_msubu     # msubu
+    jal n76_msubu_test     # msubu
     nop
     jal wait_1s
     nop
-    jal n77_movz      # movz
+    jal n77_movz_test      # movz
     nop
     jal wait_1s
     nop
-    jal n78_sllv      # sllv
+    jal n78_sllv_test      # sllv
     nop
     jal wait_1s
     nop
