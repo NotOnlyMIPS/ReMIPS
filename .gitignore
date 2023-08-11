@@ -29,3 +29,9 @@ vivado*.str
 **/ip/xilinx/*/*
 **/ip/xilinx/*/*/
 !**/ip/xilinx/*/*.xci
+
+# testcase output files
+main.bin
+main.data
+main.elf
+convert
