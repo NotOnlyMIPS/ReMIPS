@@ -16,6 +16,7 @@ module test_write(
     // writeback
     input  execute_to_commit_bus_t execute_to_commit_bus1,
     input  execute_to_commit_bus_t execute_to_commit_bus2,
+    input  execute_to_commit_bus_t execute_to_commit_bus3,
 
     // commit
     input  commit_to_debug_bus_t commit_to_debug_bus1,
@@ -62,6 +63,10 @@ always_ff @(posedge clk) begin
         if(execute_to_commit_bus2.valid) begin
             test_queue[execute_to_commit_bus2.rob_entry_num].wstrb <= execute_to_commit_bus2.rf_we;
             test_queue[execute_to_commit_bus2.rob_entry_num].wdata <= execute_to_commit_bus2.result;
+        end
+        if(execute_to_commit_bus3.valid) begin
+            test_queue[execute_to_commit_bus3.rob_entry_num].wstrb <= execute_to_commit_bus3.rf_we;
+            test_queue[execute_to_commit_bus3.rob_entry_num].wdata <= execute_to_commit_bus3.result;
         end
     end
 

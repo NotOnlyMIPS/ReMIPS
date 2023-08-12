@@ -104,6 +104,8 @@ logic [3:0] rob_entry_num;
 logic [3:0] store_num;
 logic [3:0] pre_store;
 
+virt_t pre_lookup_addr;
+
 reg_addr_t phy_dest_r[1:0];
 uint32_t rs_value_r[1:0], rt_value_r[1:0], imm_value_r[1:0];
 operation_t op_r[1:0];
@@ -161,6 +163,8 @@ always_ff @(posedge clk) begin
         store_num     <= '0;
         pre_store     <= '0;
         buffer_head   <= '0;
+
+        pre_lookup_addr <= '0;
     end
     else if(data_out_we) begin
         phy_dest  <= use_buffer_data ? phy_dest_r[buffer_head]  : issue_inst.phy_dest;
@@ -173,6 +177,8 @@ always_ff @(posedge clk) begin
         store_num     <= use_buffer_data ? store_num_r[buffer_head]     : issue_inst.store_num;
         pre_store     <= use_buffer_data ? pre_store_r[buffer_head]     : issue_inst.pre_store;
         buffer_head   <= use_buffer_data ? !buffer_head : buffer_head;
+
+        pre_lookup_addr <= use_buffer_data ? rs_value_r[buffer_head]+imm_value_r[buffer_head] : issue_inst.src1_value+{ {16{issue_inst.inst.imm[15]}}, issue_inst.inst.imm };
     end
 
     if(reset || flush) begin
@@ -201,7 +207,7 @@ logic op_lw;
 logic op_lwl;
 logic op_lwr;
 
-virt_t      pre_lookup_addr;
+// virt_t      pre_lookup_addr;
 logic [3:0] pre_lookup_wstrb;
 
 assign op_lb  = op == OP_LB;
@@ -212,7 +218,7 @@ assign op_lw  = op == OP_LW;
 assign op_lwl = op == OP_LWL;
 assign op_lwr = op == OP_LWR;
 
-assign pre_lookup_addr = rs_value + imm_value;
+// assign pre_lookup_addr = rs_value + imm_value;
 
 assign pre_lookup_wstrb = (op_lb  || op_lbu) ? 4'h1 << pre_lookup_addr[1:0]
                         : (op_lh  || op_lhu) ? 4'h3 << pre_lookup_addr[1:0]
@@ -301,7 +307,7 @@ always_ff @(posedge clk) begin
     else if(agu_store_allowin && agu_addr_to_valid && is_store_op) begin
         store_wait <= 1'b0;
     end
-    else if(agu_store_valid && !cs_store_allowin) begin
+    else if(agu_store_valid && !agu_store_allowin) begin
         store_wait <= 1'b1;
     end
 

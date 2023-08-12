@@ -105,6 +105,7 @@ always_ff @( posedge clk ) begin : store_buffer_write
         store_buffer[store_buffer_tail].data  <= mem_wdata;
         store_buffer[store_buffer_tail].store_num <= store_num;
 
+        // store_buffer[store_buffer_tail].mark  <= store_buffer_tail_mark;
         store_buffer_mark[store_buffer_tail]  <= store_buffer_tail_mark;
 
         store_buffer_tail <= (store_buffer_tail + 1'b1);
@@ -317,7 +318,7 @@ assign sel = mark0 ^ mark1;
 assign match = match0 | match1;
 
 always_comb begin
-    case({match0, match1})
+    unique casez({match0, match1})
         2'b00: begin
             select_num = 4'd0;
             mark = 1'b0;

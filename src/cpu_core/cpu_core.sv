@@ -45,7 +45,7 @@ fetch_to_decode_bus_t   fetch_to_decode_bus1,   fetch_to_decode_bus2;
 decode_to_issue_bus_t   decode_to_issue_bus1,   decode_to_issue_bus2;
 rob_entry_t             map_to_rob_bus1,        map_to_rob_bus2;
 issue_to_execute_bus_t  issue_to_execute_bus1,  issue_to_execute_bus2;
-execute_to_commit_bus_t execute_to_commit_bus1, execute_to_commit_bus2;
+execute_to_commit_bus_t execute_to_commit_bus1, execute_to_commit_bus2, execute_to_commit_bus3;
 
 logic pfs_to_valid, fs_to_valid, ds_to_is_valid, ds_to_rob_valid;
 logic fs_allowin, ds_allowin, is_allowin, cs_allowin;
@@ -61,7 +61,7 @@ verify_result_t       bpu_verify_result;
 logic select_store_ready;
 
 // writeback
-writeback_to_rf_bus_t writeback_to_rf_bus1, writeback_to_rf_bus2;
+writeback_to_rf_bus_t writeback_to_rf_bus1, writeback_to_rf_bus2, writeback_to_rf_bus3;
 
 // commit
 // exception_t commit_store_ex;
@@ -82,6 +82,10 @@ bypass_bus_t       alu2_bypass_bus;
 bypass_bus_t        bru_bypass_bus;
 bypass_bus_t     lookup_bypass_bus;
 bypass_bus_t       load_bypass_bus;
+bypass_bus_t        spu_bypass_bus;
+bypass_bus_t   mul_div_bypass_bus1;
+bypass_bus_t   mul_div_bypass_bus2;
+
 
 `ifdef GOLDEN_TRACE
 commit_to_debug_bus_t commit_to_debug_bus1, commit_to_debug_bus2;
@@ -348,6 +352,9 @@ issue_stage u_issue_stage (
     .bru_bypass_bus,
     .lookup_bypass_bus,
     .load_bypass_bus,
+    .spu_bypass_bus,
+    .mul_div_bypass_bus1,
+    .mul_div_bypass_bus2,
     
     // store num
     .select_store_ready,
@@ -363,6 +370,7 @@ issue_stage u_issue_stage (
     // writeback
     .writeback_to_rf_bus1,
     .writeback_to_rf_bus2,
+    .writeback_to_rf_bus3,
     
     .decode_to_issue_bus1,
     .decode_to_issue_bus2,
@@ -413,6 +421,9 @@ execute_stage u_execute_stage (
     .bru_bypass_bus,
     .lookup_bypass_bus,
     .load_bypass_bus,
+    .spu_bypass_bus,
+    .mul_div_bypass_bus1,
+    .mul_div_bypass_bus2,
     
     .issue_to_execute_bus1,
     .issue_to_execute_bus2,
@@ -444,7 +455,8 @@ execute_stage u_execute_stage (
     
     // commit
     .execute_to_commit_bus1,
-    .execute_to_commit_bus2
+    .execute_to_commit_bus2,
+    .execute_to_commit_bus3
 
 );
 
@@ -472,6 +484,7 @@ commit_stage u_commit_stage (
     
     .execute_to_commit_bus1,
     .execute_to_commit_bus2,
+    .execute_to_commit_bus3,
 
     // .commit_store_ready,
     .commit_store1_valid,
@@ -488,6 +501,7 @@ commit_stage u_commit_stage (
     
     .writeback_to_rf_bus1,
     .writeback_to_rf_bus2,
+    .writeback_to_rf_bus3,
 
     .exception
 
@@ -594,6 +608,7 @@ test_write u_test_write (
 
     .execute_to_commit_bus1,
     .execute_to_commit_bus2,
+    .execute_to_commit_bus3,
 
     .commit_to_debug_bus1,
     .commit_to_debug_bus2,

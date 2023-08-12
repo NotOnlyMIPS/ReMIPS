@@ -38,6 +38,9 @@ module execute_stage(
     output bypass_bus_t bru_bypass_bus,
     output bypass_bus_t lookup_bypass_bus,
     output bypass_bus_t load_bypass_bus,
+    output bypass_bus_t spu_bypass_bus,
+    output bypass_bus_t mul_div_bypass_bus1,
+    output bypass_bus_t mul_div_bypass_bus2,
 
     input  issue_to_execute_bus_t issue_to_execute_bus1,
     input  issue_to_execute_bus_t issue_to_execute_bus2,
@@ -69,7 +72,8 @@ module execute_stage(
 
     // commit
     output execute_to_commit_bus_t execute_to_commit_bus1,
-    output execute_to_commit_bus_t execute_to_commit_bus2
+    output execute_to_commit_bus_t execute_to_commit_bus2,
+    output execute_to_commit_bus_t execute_to_commit_bus3  // AGU
 );
 
 
@@ -114,9 +118,9 @@ assign mul_div_to_cs_allowin = !alu1_to_valid && !bru_to_valid
                             && !agu_lookup_to_valid && !agu_store_to_valid && !spu_to_valid;
 
 assign alu2_to_cs_allowin         = 1'b1;
-assign agu_load_to_cs_allowin     = !alu2_to_valid;
-assign agu_lookup_to_cs_allowin   = !alu2_to_valid && !agu_load_to_valid;
-assign agu_store_to_cs_allowin    = !alu2_to_valid && !agu_load_to_valid && !agu_lookup_to_valid;
+assign agu_lookup_to_cs_allowin   = 1'b1;
+assign agu_load_to_cs_allowin     = !agu_lookup_to_valid;
+assign agu_store_to_cs_allowin    = !agu_lookup_to_valid && !agu_load_to_valid;
 assign spu_to_cs_allowin          = 1'b1;
 
 // commit
@@ -176,29 +180,42 @@ assign data_vaddr = spu_data_valid ? spu_data_vaddr : agu_data_vaddr;
 always_comb begin
     execute_to_commit_bus1 = 'b0;
     execute_to_commit_bus2 = 'b0;
+    execute_to_commit_bus3 = 'b0;
 
     if(!mul_div_to_cs_allowin)begin
         execute_to_commit_bus1 = alu1_to_valid ? alu1_to_commit_bus : bru_to_commit_bus;
         execute_to_commit_bus2 = spu_to_valid  ? spu_to_commit_bus :
                                  alu2_to_valid ? alu2_to_commit_bus:
-                                 agu_load_to_valid   ? agu_load_to_commit_bus   :
-                                 agu_lookup_to_valid ? agu_lookup_to_commit_bus :
-                                 agu_store_to_valid  ? agu_store_to_commit_bus  :
                                                        'b0;
     end
     else begin
         execute_to_commit_bus1 = mul_div_to_commit_bus1;
         execute_to_commit_bus2 = mul_div_to_commit_bus2;
     end
+
+    // if(agu_store_to_valid || agu_lookup_to_valid) begin
+    //     execute_to_commit_bus3 = agu_store_to_valid ? agu_store_to_commit_bus : agu_lookup_to_commit_bus;
+    // end
+    // else if(agu_load_to_valid) begin
+    //     execute_to_commit_bus3 = agu_load_to_commit_bus;
+    // end
+    if(agu_lookup_to_valid) begin
+        execute_to_commit_bus3 = agu_lookup_to_commit_bus;
+    end
+    else if(agu_load_to_valid) begin
+        execute_to_commit_bus3 = agu_load_to_commit_bus;
+    end
+    else if(agu_store_to_valid) begin
+        execute_to_commit_bus3 = agu_store_to_commit_bus;
+    end
 end
 
 // busy table
-assign execute_to_busytable_bus1.dest = spu_to_valid        ? spu_to_commit_bus.phy_dest        :
-                                        agu_lookup_to_valid ? agu_lookup_to_commit_bus.phy_dest :
-                                        mul_div_to_valid && mul_div_to_cs_allowin  ? mul_div_to_commit_bus1.phy_dest   :
+assign execute_to_busytable_bus1.dest = agu_lookup_to_valid ? agu_lookup_to_commit_bus.phy_dest :
+                                        mul_div_to_valid    ? mul_div_to_commit_bus1.phy_dest   :
                                                               '0;
 assign execute_to_busytable_bus2.dest = agu_load_to_valid ? agu_load_to_commit_bus.phy_dest :
-                                        mul_div_to_valid && mul_div_to_cs_allowin  ? mul_div_to_commit_bus2.phy_dest :
+                                        mul_div_to_valid  ? mul_div_to_commit_bus2.phy_dest :
                                                             '0;
 
 // alu1
@@ -232,6 +249,9 @@ mul_div_unit mul_div_unit_u (
 
     .issue_inst1           (issue_to_execute_bus1),
     .issue_inst2           (issue_to_execute_bus2),
+
+    .mul_div_bypass_bus1,
+    .mul_div_bypass_bus2,
     
     .mul_div_to_commit_bus1,
     .mul_div_to_commit_bus2
@@ -355,6 +375,8 @@ spu spu_u (
     .cp0_addr,
     .cp0_wdata,
     .cp0_rdata,
+
+    .spu_bypass_bus,
 
     .spu_to_commit_bus
 );

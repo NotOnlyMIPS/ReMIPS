@@ -54,5 +54,13 @@ assign which_matched = ({4{matched[ 0]}} & 4'd 0) |
 					   ({4{matched[13]}} & 4'd13) |
 					   ({4{matched[14]}} & 4'd14) |
 					   ({4{matched[15]}} & 4'd15);
+// assign which_matched = ({3{matched[ 0]}} & 3'd 0) |
+// 					   ({3{matched[ 1]}} & 3'd 1) |
+// 					   ({3{matched[ 2]}} & 3'd 2) |
+// 					   ({3{matched[ 3]}} & 3'd 3) |
+// 					   ({3{matched[ 4]}} & 3'd 4) |
+// 					   ({3{matched[ 5]}} & 3'd 5) |
+// 					   ({3{matched[ 6]}} & 3'd 6) |
+// 					   ({3{matched[ 7]}} & 3'd 7) ;
 
 endmodule

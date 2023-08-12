@@ -34,6 +34,8 @@ module spu (
     output uint32_t    cp0_wdata,
     input  uint32_t    cp0_rdata,
 
+    output bypass_bus_t spu_bypass_bus,
+
     output execute_to_commit_bus_t spu_to_commit_bus
 
 );
@@ -178,6 +180,11 @@ assign spu_result = {32{op_mfc0                 }} & cp0_rdata
                   | {32{op_movn && !src2_is_zero}} & src1_value;
 
 assign spu_to_valid = spu_valid && !op_cache || wait_cache_op;
+
+// bypass
+assign spu_bypass_bus.rf_we  = rf_we;
+assign spu_bypass_bus.dest   = phy_dest;
+assign spu_bypass_bus.result = spu_result;
 
 assign spu_to_commit_bus.valid = spu_valid && !op_cache || wait_cache_op;
 assign spu_to_commit_bus.rob_entry_num = rob_entry_num;

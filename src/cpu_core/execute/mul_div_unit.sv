@@ -15,6 +15,9 @@ module mul_div_unit (
     input  issue_to_execute_bus_t issue_inst1,
     input  issue_to_execute_bus_t issue_inst2,
 
+    output bypass_bus_t mul_div_bypass_bus1,
+    output bypass_bus_t mul_div_bypass_bus2,
+
     output execute_to_commit_bus_t mul_div_to_commit_bus1,
     output execute_to_commit_bus_t mul_div_to_commit_bus2
 
@@ -232,6 +235,15 @@ uint64_t hi_lo_result;
 
 assign hi_lo_result = ({64{op_div|op_divu}} & divide_res)
                     | ({64{mul_op        }} & mul_res   );
+
+// bypass
+assign mul_div_bypass_bus1.rf_we = {4{inst1.rf_we}};
+assign mul_div_bypass_bus1.dest = phy_dest1;
+assign mul_div_bypass_bus1.result   = mul_op ? hi_lo_result[63:32] : hi_lo_result[31: 0];
+
+assign mul_div_bypass_bus2.rf_we = {4{inst2.rf_we}};
+assign mul_div_bypass_bus2.dest = phy_dest2;
+assign mul_div_bypass_bus2.result   = mul_op ? hi_lo_result[31: 0] : hi_lo_result[63:32];
 
 // inst1
 assign mul_div_to_commit_bus1.valid = mul_div_to_valid;

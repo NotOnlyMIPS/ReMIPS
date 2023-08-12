@@ -24,6 +24,7 @@ module commit_stage (
     // execute
     input  execute_to_commit_bus_t execute_to_commit_bus1,
     input  execute_to_commit_bus_t execute_to_commit_bus2,
+    input  execute_to_commit_bus_t execute_to_commit_bus3,
 
     output logic       commit_store1_valid,
     output logic       commit_store2_valid,
@@ -44,6 +45,7 @@ module commit_stage (
     // regfile
     output writeback_to_rf_bus_t writeback_to_rf_bus1,
     output writeback_to_rf_bus_t writeback_to_rf_bus2,
+    output writeback_to_rf_bus_t writeback_to_rf_bus3,
 
     // exception
     output exception_t exception
@@ -57,16 +59,18 @@ logic flush_r;
 logic commit_flush;
 
 // writeback
-execute_to_commit_bus_t writeback_inst1, writeback_inst2;
-writeback_to_commit_bus_t writeback_to_commit_bus1, writeback_to_commit_bus2;
+execute_to_commit_bus_t writeback_inst1, writeback_inst2, writeback_inst3;
+writeback_to_commit_bus_t writeback_to_commit_bus1, writeback_to_commit_bus2, writeback_to_commit_bus3;
 
 always_ff @(posedge clk) begin
     if(reset || flush || commit_flush) begin
         writeback_inst1 <= '0;
         writeback_inst2 <= '0;
+        writeback_inst3 <= '0;
     end else begin
         writeback_inst1 <= execute_to_commit_bus1;
         writeback_inst2 <= execute_to_commit_bus2;
+        writeback_inst3 <= execute_to_commit_bus3;
     end
 end
 
@@ -87,6 +91,12 @@ assign writeback_to_rf_bus2.rf_we  = {4{writeback_inst2.valid}} & writeback_inst
 assign writeback_to_rf_bus2.dest   = writeback_inst2.phy_dest;
 assign writeback_to_rf_bus2.result = writeback_inst2.result;
 
+// inst3
+assign writeback_to_rf_bus3.valid  = writeback_inst3.valid;
+assign writeback_to_rf_bus3.rf_we  = {4{writeback_inst3.valid}} & writeback_inst3.rf_we;
+assign writeback_to_rf_bus3.dest   = writeback_inst3.phy_dest;
+assign writeback_to_rf_bus3.result = writeback_inst3.result;
+
 // writeback to commit
 // inst1
 assign writeback_to_commit_bus1.valid = writeback_inst1.valid;
@@ -101,10 +111,19 @@ assign writeback_to_commit_bus1.exception     = writeback_inst1.exception;
 assign writeback_to_commit_bus2.valid = writeback_inst2.valid;
 assign writeback_to_commit_bus2.rob_entry_num = writeback_inst2.rob_entry_num;
 
-assign writeback_to_commit_bus2.is_store_op = writeback_inst2.is_store_op;
+assign writeback_to_commit_bus2.is_store_op = 1'b0;
 
-assign writeback_to_commit_bus2.verify_result = writeback_inst2.verify_result;
+assign writeback_to_commit_bus2.verify_result = '0;
 assign writeback_to_commit_bus2.exception     = writeback_inst2.exception;
+
+// inst3
+assign writeback_to_commit_bus3.valid = writeback_inst3.valid;
+assign writeback_to_commit_bus3.rob_entry_num = writeback_inst3.rob_entry_num;
+
+assign writeback_to_commit_bus3.is_store_op = writeback_inst3.is_store_op;
+
+assign writeback_to_commit_bus3.verify_result = '0;
+assign writeback_to_commit_bus3.exception     = writeback_inst3.exception;
 
 // commit
 // (*mark_debug = "true"*) rob_entry_t rob[ROB_ENTRY_NUM-1:0]; // debug
@@ -179,11 +198,19 @@ always_ff @(posedge clk) begin
             // rob[writeback_to_commit_bus2.rob_entry_num].state         <= writeback_to_commit_bus2.is_store_op &&
             //                                                             !writeback_to_commit_bus2.exception.ex ? Store_Wait : Inst_Complete;
             rob[writeback_to_commit_bus2.rob_entry_num].state         <= Inst_Complete;
-            rob[writeback_to_commit_bus2.rob_entry_num].verify_result <= writeback_to_commit_bus2.verify_result;
+            // rob[writeback_to_commit_bus2.rob_entry_num].verify_result <= writeback_to_commit_bus2.verify_result;
             rob[writeback_to_commit_bus2.rob_entry_num].exception.ex        <= writeback_to_commit_bus2.exception.ex;
             rob[writeback_to_commit_bus2.rob_entry_num].exception.exccode   <= writeback_to_commit_bus2.exception.exccode;
-            rob[writeback_to_commit_bus2.rob_entry_num].exception.badvaddr  <= writeback_to_commit_bus2.exception.badvaddr;
-            rob[writeback_to_commit_bus2.rob_entry_num].exception.tlb_refill<= writeback_to_commit_bus2.exception.tlb_refill;
+            // rob[writeback_to_commit_bus2.rob_entry_num].exception.badvaddr  <= writeback_to_commit_bus2.exception.badvaddr;
+            // rob[writeback_to_commit_bus2.rob_entry_num].exception.tlb_refill<= writeback_to_commit_bus2.exception.tlb_refill;
+        end
+        if(writeback_to_commit_bus3.valid) begin
+            rob[writeback_to_commit_bus3.rob_entry_num].state         <= Inst_Complete;
+            // rob[writeback_to_commit_bus2.rob_entry_num].verify_result <= writeback_to_commit_bus2.verify_result;
+            rob[writeback_to_commit_bus3.rob_entry_num].exception.ex        <= writeback_to_commit_bus3.exception.ex;
+            rob[writeback_to_commit_bus3.rob_entry_num].exception.exccode   <= writeback_to_commit_bus3.exception.exccode;
+            rob[writeback_to_commit_bus3.rob_entry_num].exception.badvaddr  <= writeback_to_commit_bus3.exception.badvaddr;
+            rob[writeback_to_commit_bus3.rob_entry_num].exception.tlb_refill<= writeback_to_commit_bus3.exception.tlb_refill;
         end
     end
 

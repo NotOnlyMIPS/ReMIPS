@@ -470,7 +470,7 @@ typedef struct packed {
 typedef struct packed {
     logic        valid;
     logic        complete;
-    // logic        mark;
+    logic        mark;
     logic [ 3:0] wstrb;
     logic [ 2:0] size;
     logic [ 3:0] store_num;
