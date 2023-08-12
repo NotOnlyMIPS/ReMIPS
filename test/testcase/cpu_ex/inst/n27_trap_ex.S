@@ -18,46 +18,53 @@ LEAF(n27_trap_ex_test)
     li    s2, 0x00
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    teq   a0, a1             # trap
+    la    s4, 1f
+1:  teq   a0, a1             # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x1110   # in: 0x00001110
-    teq   a0, a1             # no trap
+    la    s4, 1f
+1:  teq   a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tne   a0, a1             # no trap
+    la    s4, 1f
+1:  tne   a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x1110   # in: 0x00001110
-    tne   a0, a1             # trap
+    la    s4, 1f
+1:  tne   a0, a1             # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     ori   a0, zero, 0x1000   # in: 0x00001000
-	tnei  a0, 0x1110         # trap
+	la    s4, 1f
+1:  tnei  a0, 0x1110         # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     ori   a0, zero, 0x1110   # in: 0x00001110
-	tnei  a0, 0x1110         # no trap
+	la    s4, 1f
+1:  tnei  a0, 0x1110         # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     LI(a0, 0xffff8000)       # in: 0xffff8000
-    teqi  a0, 0x8000         # trap
+    la    s4, 1f
+1:  teqi  a0, 0x8000         # trap
     bne   s2, s7, inst_error
     nop
 
@@ -69,191 +76,220 @@ LEAF(n27_trap_ex_test)
 
     li    s2, 0x00
     LI(a0, 0x00007fff)       # in: 0x00007fff
-    teqi  a0, 0x7fff         # trap
+    la    s4, 1f
+1:  teqi  a0, 0x7fff         # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     ori   a0, zero, 0x4000   # in: 0x00004000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tge   a0, a1             # trap
+    la    s4, 1f
+1:  tge   a0, a1             # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     LI(a0, 0xffff4000)       # in: 0xffff4000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tge   a0, a1             # no trap
+    la    s4, 1f
+1:  tge   a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x4000   # in: 0x00004000
-    tge   a0, a1             # no trap
+    la    s4, 1f
+1:  tge   a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tge  a0, a1              # trap
+    la    s4, 1f
+1:  tge  a0, a1              # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     ori   a0, zero, 0x4000   # in: 0x00004000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tgeu  a0, a1             # trap
+    la    s4, 1f
+1:  tgeu  a0, a1             # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     LI(a0, 0xffff4000)       # in: 0xffff4000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tgeu  a0, a1             # trap
+    la    s4, 1f
+1:  tgeu  a0, a1             # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x4000   # in: 0x00004000
-    tgeu  a0, a1             # no trap
+    la    s4, 1f
+1:  tgeu  a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tgeu  a0, a1             # trap
+    la    s4, 1f
+1:  tgeu  a0, a1             # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     LI(a0, 0xffff8000)       # in: 0xffff8000
-	tgei  a0, 0x8000         # trap
+	la    s4, 1f
+1:  tgei  a0, 0x8000         # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     LI(a0, 0xffff7f00)       # in: 0xffff7f00
-	tgei  a0, 0x7f00         # no trap
+	la    s4, 1f
+1:  tgei  a0, 0x7f00         # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     LI(a0, 0x00007f00)       # in: 0x00007f00
-	tgei  a0, 0x7f00         # trap
+	la    s4, 1f
+1:  tgei  a0, 0x7f00         # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     LI(a0, 0xffff8000)       # in: 0xffff8000
-	tgeiu a0, 0x8000         # trap
+	la    s4, 1f
+1:  tgeiu a0, 0x8000         # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     LI(a0, 0xffff7f00)       # in: 0xffff7f00
-	tgeiu a0, 0x7f00         # trap
+	la    s4, 1f
+1:  tgeiu a0, 0x7f00         # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     LI(a0, 0x00007f00)       # in: 0x00007f00
-	tgeiu a0, 0x7f00         # trap
+	la    s4, 1f
+1:  tgeiu a0, 0x7f00         # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     ori   a0, zero, 0x4000   # in: 0x00004000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tlt   a0, a1             # no trap
+    la    s4, 1f
+1:  tlt   a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     LI(a0, 0xffff4000)       # in: 0xffff4000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tlt   a0, a1             # trap
+    la    s4, 1f
+1:  tlt   a0, a1             # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x4000   # in: 0x00004000
-    tlt   a0, a1             # trap
+    la    s4, 1f
+1:  tlt   a0, a1             # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tlt   a0, a1             # no trap
+    la    s4, 1f
+1:  tlt   a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     ori   a0, zero, 0x4000   # in: 0x00004000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tltu  a0, a1             # no trap
+    la    s4, 1f
+1:  tltu  a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     LI(a0, 0xffff4000)       # in: 0xffff4000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tltu  a0, a1             # no trap
+    la    s4, 1f
+1:  tltu  a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x4000   # in: 0x00004000
-    tltu  a0, a1             # trap
+    la    s4, 1f
+1:  tltu  a0, a1             # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     ori   a0, zero, 0x1000   # in: 0x00001000
     ori   a1, zero, 0x1000   # in: 0x00001000
-    tltu  a0, a1             # no trap
+    la    s4, 1f
+1:  tltu  a0, a1             # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     LI(a0, 0xffff8000)       # in: 0xffff8000
-	tlti  a0, 0x8000         # no trap
+	la    s4, 1f
+1:  tlti  a0, 0x8000         # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x00
     LI(a0, 0xffff7f00)       # in: 0xffff7f00
-	tlti  a0, 0x7f00         # trap
+	la    s4, 1f
+1:  tlti  a0, 0x7f00         # trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     LI(a0, 0x00007f00)       # in: 0x00007f00
-	tlti  a0, 0x7f00         # no trap
+	la    s4, 1f
+1:  tlti  a0, 0x7f00         # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     LI(a0, 0xffff8000)       # in: 0xffff8000
-	tltiu a0, 0x8000         # no trap
+	la    s4, 1f
+1:  tltiu a0, 0x8000         # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     LI(a0, 0xffff7f00)       # in: 0xffff7f00
-	tltiu a0, 0x7f00         # no trap
+	la    s4, 1f
+1:  tltiu a0, 0x7f00         # no trap
     bne   s2, s7, inst_error
     nop
 
     li    s2, 0x09
     LI(a0, 0x00007f00)       # in: 0x00007f00
-	tltiu a0, 0x7f00         # no trap
+	la    s4, 1f
+1:  tltiu a0, 0x7f00         # no trap
     bne   s2, s7, inst_error
     nop
 ###score ++
