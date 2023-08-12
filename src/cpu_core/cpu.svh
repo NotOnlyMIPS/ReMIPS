@@ -244,6 +244,7 @@ typedef struct packed {
     logic is_mul_div_op;
     logic is_br_op;
     logic is_store_op;
+    logic is_move_cond_op;
     logic is_privileged_op;
     logic is_eret;
 
@@ -312,7 +313,7 @@ typedef struct packed {
 
     // logic        use_src1;
     // logic        use_src2;
-    logic        use_old_dest;
+    // logic        use_old_dest;
     reg_addr_t   src1;
     reg_addr_t   src2;
     // reg_addr_t      rd;
@@ -351,6 +352,7 @@ typedef struct packed {
     logic       br_taken;
     BHT_entry_t bpu_entry;
 
+    logic       is_move_cond_op;
     logic       is_privileged_op;
     logic       is_eret;
     exception_t exception;
@@ -371,11 +373,11 @@ typedef struct packed {
     virt_t      pc;
     logic    src1_ready;
     logic    src2_ready;
-    logic    old_dest_ready;
+    // logic    old_dest_ready;
     reg_addr_t phy_src1;
     reg_addr_t phy_src2;
     reg_addr_t phy_dest;
-    reg_addr_t old_dest;
+    // reg_addr_t old_dest;
     decoded_inst_t inst;
 
     logic [3:0] rob_entry_num;
@@ -395,11 +397,11 @@ typedef struct packed {
     virt_t     pc;
     logic      src1_ready;
     logic      src2_ready;
-    logic      old_dest_ready;
+    // logic      old_dest_ready;
     reg_addr_t phy_src1;
     reg_addr_t phy_src2;
     reg_addr_t phy_dest;
-    reg_addr_t old_dest;
+    // reg_addr_t old_dest;
     decoded_inst_t inst;
 
     logic [3:0] rob_entry_num;
@@ -424,7 +426,7 @@ typedef struct packed {
     reg_addr_t phy_src1;
     reg_addr_t phy_src2;
     reg_addr_t phy_dest;
-    reg_addr_t old_dest;
+    // reg_addr_t old_dest;
     decoded_inst_t inst;
 
     logic [3:0] rob_entry_num;
@@ -452,7 +454,7 @@ typedef struct packed {
 
     uint32_t   src1_value;
     uint32_t   src2_value;
-    uint32_t   old_value;
+    // uint32_t   old_value;
 
     logic [3:0] rob_entry_num;
 

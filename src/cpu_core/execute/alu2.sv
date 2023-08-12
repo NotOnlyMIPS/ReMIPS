@@ -26,7 +26,7 @@ logic [3:0] rob_entry_num;
 
 decoded_inst_t inst;
 reg_addr_t phy_dest;
-uint32_t src1_value, src2_value, old_value;
+uint32_t src1_value, src2_value;
 exception_t exception;
 
 // assign alu_allowin  = cs_allowin || !alu_valid;

@@ -21,7 +21,7 @@ module inst_dispatch (
     // inst1
     input  logic  inst1_src1_ready,
     input  logic  inst1_src2_ready,
-    input  logic  inst1_old_dest_ready,
+    // input  logic  inst1_old_dest_ready,
     input  reg_addr_t  inst1_phy_src1,
     input  reg_addr_t  inst1_phy_src2,
     input  reg_addr_t  inst1_phy_dest,
@@ -36,7 +36,7 @@ module inst_dispatch (
     // inst2
     input  logic  inst2_src1_ready,
     input  logic  inst2_src2_ready,
-    input  logic  inst2_old_dest_ready,
+    // input  logic  inst2_old_dest_ready,
     input  reg_addr_t  inst2_phy_src1,
     input  reg_addr_t  inst2_phy_src2,
     input  reg_addr_t  inst2_phy_dest,
@@ -52,6 +52,7 @@ module inst_dispatch (
     // inst1
     input  reg_addr_t  inst1_old_dest,
 
+    input  logic       inst1_is_move_cond_op,
     input  logic       inst1_is_privileged_op,
     input  logic       inst1_is_eret,
     input  exception_t inst1_exception,
@@ -59,6 +60,7 @@ module inst_dispatch (
     // inst2
     input  reg_addr_t  inst2_old_dest,
 
+    input  logic       inst2_is_move_cond_op,
     input  logic       inst2_is_privileged_op,
     input  logic       inst2_is_eret,
     input  exception_t inst2_exception,
@@ -94,11 +96,11 @@ assign pre_issue_inst1.pc    = inst1_pc;
 
 assign pre_issue_inst1.src1_ready = inst1_src1_ready;
 assign pre_issue_inst1.src2_ready = inst1_src2_ready;
-assign pre_issue_inst1.old_dest_ready = inst1_old_dest_ready;
+// assign pre_issue_inst1.old_dest_ready = inst1_old_dest_ready;
 assign pre_issue_inst1.phy_src1   = inst1_phy_src1;
 assign pre_issue_inst1.phy_src2   = inst1_phy_src2;
 assign pre_issue_inst1.phy_dest   = inst1_phy_dest;
-assign pre_issue_inst1.old_dest   = inst1_old_dest;
+// assign pre_issue_inst1.old_dest   = inst1_old_dest;
 assign pre_issue_inst1.inst       = inst1_inst;
 
 assign pre_issue_inst1.rob_entry_num = rob_tail_o;
@@ -117,11 +119,11 @@ assign pre_issue_inst2.pc    = inst2_pc;
 
 assign pre_issue_inst2.src1_ready = inst2_src1_ready;
 assign pre_issue_inst2.src2_ready = inst2_src2_ready;
-assign pre_issue_inst2.old_dest_ready = inst2_old_dest_ready;
+// assign pre_issue_inst2.old_dest_ready = inst2_old_dest_ready;
 assign pre_issue_inst2.phy_src1   = inst2_phy_src1;
 assign pre_issue_inst2.phy_src2   = inst2_phy_src2;
 assign pre_issue_inst2.phy_dest   = inst2_phy_dest;
-assign pre_issue_inst2.old_dest   = inst2_old_dest;
+// assign pre_issue_inst2.old_dest   = inst2_old_dest;
 assign pre_issue_inst2.inst       = inst2_inst;
 
 assign pre_issue_inst2.rob_entry_num = inst1_valid ? rob_tail_o + 1 : rob_tail_o;
@@ -152,6 +154,7 @@ assign dispatch_inst1.is_store_op   = inst1_is_store_op;
 
 assign dispatch_inst1.verify_result = '0;
 
+assign dispatch_inst1.is_move_cond_op  = inst1_is_move_cond_op;
 assign dispatch_inst1.is_privileged_op = inst1_is_privileged_op;
 assign dispatch_inst1.is_eret          = inst1_is_eret;
 assign dispatch_inst1.exception        = inst1_exception;
@@ -173,6 +176,7 @@ assign dispatch_inst2.is_store_op   = inst2_is_store_op;
 
 assign dispatch_inst2.verify_result = '0;
 
+assign dispatch_inst2.is_move_cond_op  = inst2_is_move_cond_op;
 assign dispatch_inst2.is_privileged_op = inst2_is_privileged_op;
 assign dispatch_inst2.is_eret          = inst2_is_eret;
 assign dispatch_inst2.exception        = inst2_exception;

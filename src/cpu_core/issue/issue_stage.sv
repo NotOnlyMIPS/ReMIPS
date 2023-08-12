@@ -188,7 +188,7 @@ always_comb begin
     select_exe1_num = 3'd0;
     for(int i=0; i<ISSUE_QUEUE_SIZE; i++) begin
         if(issue_queue[i].valid &&
-          (issue_queue[i].inst.is_alu1_op && (!issue_queue[i].inst.use_old_dest || issue_queue[i].old_dest_ready)
+          (issue_queue[i].inst.is_alu1_op
         || issue_queue[i].inst.is_br_op)
         && issue_queue[i].src1_ready && issue_queue[i].src2_ready) begin
             select_exe1_valid = 1'b1;
@@ -289,23 +289,23 @@ always_comb begin
                 issue_queue_bus[i].src2_ready = 1'b1;
             end
 
-            if(select_inst1_valid && issue_queue[i].valid && issue_queue[i].old_dest == select_inst1_dest
-            && !issue_queue[select_inst1_num].inst.is_mul_div_op
-            // && !issue_queue[select_inst1_num].inst.is_load_store_op
-            || select_inst2_valid && issue_queue[i].valid && issue_queue[i].old_dest == select_inst2_dest
-            && !issue_queue[select_inst2_num].inst.is_mul_div_op
-            && !issue_queue[select_inst2_num].inst.is_load_store_op
-            && !issue_queue[select_inst2_num].inst.is_sp_op
-            || issue_inst1.valid  && issue_queue[i].valid && issue_queue[i].old_dest == issue_inst1.phy_dest
-            && !issue_inst1.inst.is_mul_div_op
-            // && !issue_inst1.inst.is_load_store_op
-            || issue_inst2.valid  && issue_queue[i].valid && issue_queue[i].old_dest == issue_inst2.phy_dest
-            && !issue_inst2.inst.is_mul_div_op
-            && !issue_inst2.inst.is_load_store_op
-            || issue_queue[i].valid && issue_queue[i].old_dest == execute_to_busytable_bus1.dest
-            || issue_queue[i].valid && issue_queue[i].old_dest == execute_to_busytable_bus2.dest) begin
-                issue_queue_bus[i].old_dest_ready = 1'b1;
-            end
+            // if(select_inst1_valid && issue_queue[i].valid && issue_queue[i].old_dest == select_inst1_dest
+            // && !issue_queue[select_inst1_num].inst.is_mul_div_op
+            // // && !issue_queue[select_inst1_num].inst.is_load_store_op
+            // || select_inst2_valid && issue_queue[i].valid && issue_queue[i].old_dest == select_inst2_dest
+            // && !issue_queue[select_inst2_num].inst.is_mul_div_op
+            // && !issue_queue[select_inst2_num].inst.is_load_store_op
+            // && !issue_queue[select_inst2_num].inst.is_sp_op
+            // || issue_inst1.valid  && issue_queue[i].valid && issue_queue[i].old_dest == issue_inst1.phy_dest
+            // && !issue_inst1.inst.is_mul_div_op
+            // // && !issue_inst1.inst.is_load_store_op
+            // || issue_inst2.valid  && issue_queue[i].valid && issue_queue[i].old_dest == issue_inst2.phy_dest
+            // && !issue_inst2.inst.is_mul_div_op
+            // && !issue_inst2.inst.is_load_store_op
+            // || issue_queue[i].valid && issue_queue[i].old_dest == execute_to_busytable_bus1.dest
+            // || issue_queue[i].valid && issue_queue[i].old_dest == execute_to_busytable_bus2.dest) begin
+            //     issue_queue_bus[i].old_dest_ready = 1'b1;
+            // end
 
             // store
             if(select_inst2_valid && issue_queue[select_inst2_num].is_store_op && issue_queue[i].pre_store == issue_queue[select_inst2_num].store_num
@@ -326,7 +326,7 @@ assign select_to_issue_bus1.pc    = issue_queue[select_inst1_num].pc;
 assign select_to_issue_bus1.phy_src1 = issue_queue[select_inst1_num].phy_src1;
 assign select_to_issue_bus1.phy_src2 = issue_queue[select_inst1_num].phy_src2;
 assign select_to_issue_bus1.phy_dest = issue_queue[select_inst1_num].phy_dest;
-assign select_to_issue_bus1.old_dest = issue_queue[select_inst1_num].old_dest;
+// assign select_to_issue_bus1.old_dest = issue_queue[select_inst1_num].old_dest;
 assign select_to_issue_bus1.inst     = issue_queue[select_inst1_num].inst    ;
 
 assign select_to_issue_bus1.rob_entry_num = issue_queue[select_inst1_num].rob_entry_num;
@@ -345,7 +345,7 @@ assign select_to_issue_bus2.pc    = issue_queue[select_inst2_num].pc;
 assign select_to_issue_bus2.phy_src1 = issue_queue[select_inst2_num].phy_src1;
 assign select_to_issue_bus2.phy_src2 = issue_queue[select_inst2_num].phy_src2;
 assign select_to_issue_bus2.phy_dest = issue_queue[select_inst2_num].phy_dest;
-assign select_to_issue_bus2.old_dest = issue_queue[select_inst2_num].old_dest;
+// assign select_to_issue_bus2.old_dest = issue_queue[select_inst2_num].old_dest;
 assign select_to_issue_bus2.inst     = issue_queue[select_inst2_num].inst    ;
 
 assign select_to_issue_bus2.rob_entry_num = issue_queue[select_inst2_num].rob_entry_num;
@@ -377,7 +377,7 @@ end
 
 // regfile
 uint32_t inst1_rdata1, inst1_rdata2, inst2_rdata1, inst2_rdata2;
-uint32_t inst1_rdata_old;
+// uint32_t inst1_rdata_old;
 
 regfile regfile_u (
     .clk,
@@ -385,11 +385,11 @@ regfile regfile_u (
     // read
     .inst1_raddr1(issue_inst1.phy_src1),
     .inst1_raddr2(issue_inst1.phy_src2),
-    .inst1_raddr_old(issue_inst1.old_dest),
+    // .inst1_raddr_old(issue_inst1.old_dest),
 
     .inst1_rdata1,
     .inst1_rdata2,
-    .inst1_rdata_old,
+    // .inst1_rdata_old,
 
     .inst2_raddr1(issue_inst2.phy_src1),
     .inst2_raddr2(issue_inst2.phy_src2),
@@ -415,8 +415,8 @@ logic inst1_src1_exe_wait, inst1_src2_exe_wait, inst2_src1_exe_wait, inst2_src2_
 logic inst1_src1_wb_wait, inst1_src2_wb_wait, inst2_src1_wb_wait, inst2_src2_wb_wait;
 uint32_t inst1_src1_value, inst1_src2_value, inst2_src1_value, inst2_src2_value;
 
-logic inst1_old_dest_exe_wait, inst1_old_dest_wb_wait;
-uint32_t inst1_old_dest_value;
+// logic inst1_old_dest_exe_wait, inst1_old_dest_wb_wait;
+// uint32_t inst1_old_dest_value;
 
 always_comb begin
     inst1_src1_exe_wait = 1'b0;
@@ -428,8 +428,8 @@ always_comb begin
     inst2_src1_wb_wait = 1'b0;
     inst2_src2_wb_wait = 1'b0;
 
-    inst1_old_dest_exe_wait = 1'b0;
-    inst1_old_dest_wb_wait = 1'b0;
+    // inst1_old_dest_exe_wait = 1'b0;
+    // inst1_old_dest_wb_wait = 1'b0;
 
     if(issue_inst1.valid) begin
         if(issue_inst1.phy_src1 != 0 && 
@@ -463,21 +463,21 @@ always_comb begin
             inst1_src2_wb_wait = 1;
         end
 
-        if(issue_inst1.old_dest != 0 &&
-        (  alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.old_dest
-        || alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.old_dest
-        || bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.old_dest
-        || lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.old_dest
-        || load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.old_dest
-        )) begin
-            inst1_old_dest_exe_wait = 1;
-        end
-        if(issue_inst1.old_dest != 0 &&
-        (  writeback_to_rf_bus1.rf_we && writeback_to_rf_bus1.dest == issue_inst1.old_dest
-        || writeback_to_rf_bus2.rf_we && writeback_to_rf_bus2.dest == issue_inst1.old_dest
-        )) begin
-            inst1_old_dest_wb_wait = 1;
-        end
+        // if(issue_inst1.old_dest != 0 &&
+        // (  alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.old_dest
+        // || alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.old_dest
+        // || bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.old_dest
+        // || lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.old_dest
+        // || load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.old_dest
+        // )) begin
+        //     inst1_old_dest_exe_wait = 1;
+        // end
+        // if(issue_inst1.old_dest != 0 &&
+        // (  writeback_to_rf_bus1.rf_we && writeback_to_rf_bus1.dest == issue_inst1.old_dest
+        // || writeback_to_rf_bus2.rf_we && writeback_to_rf_bus2.dest == issue_inst1.old_dest
+        // )) begin
+        //     inst1_old_dest_wb_wait = 1;
+        // end
 
     end
 
@@ -542,20 +542,20 @@ always_comb begin
     else begin
         inst1_src2_value = inst1_rdata2;
     end
-    if(inst1_old_dest_exe_wait) begin
-        inst1_old_dest_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.old_dest}} & alu1_bypass_bus.result   |
-                               {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.old_dest}} & alu2_bypass_bus.result   |
-                               {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.old_dest}} & bru_bypass_bus.result    |
-                               {32{lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.old_dest}} & lookup_bypass_bus.result |
-                               {32{load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.old_dest}} & load_bypass_bus.result;
-    end
-    else if(inst1_old_dest_wb_wait) begin
-        inst1_old_dest_value = {32{writeback_to_rf_bus1.rf_we && writeback_to_rf_bus1.dest == issue_inst1.old_dest}} & writeback_to_rf_bus1.result |
-                               {32{writeback_to_rf_bus2.rf_we && writeback_to_rf_bus2.dest == issue_inst1.old_dest}} & writeback_to_rf_bus2.result;
-    end
-    else begin
-        inst1_old_dest_value = inst1_rdata_old;
-    end
+    // if(inst1_old_dest_exe_wait) begin
+    //     inst1_old_dest_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst1.old_dest}} & alu1_bypass_bus.result   |
+    //                            {32{alu2_bypass_bus.rf_we   && alu2_bypass_bus.dest   == issue_inst1.old_dest}} & alu2_bypass_bus.result   |
+    //                            {32{bru_bypass_bus.rf_we    && bru_bypass_bus.dest    == issue_inst1.old_dest}} & bru_bypass_bus.result    |
+    //                            {32{lookup_bypass_bus.rf_we && lookup_bypass_bus.dest == issue_inst1.old_dest}} & lookup_bypass_bus.result |
+    //                            {32{load_bypass_bus.rf_we   && load_bypass_bus.dest   == issue_inst1.old_dest}} & load_bypass_bus.result;
+    // end
+    // else if(inst1_old_dest_wb_wait) begin
+    //     inst1_old_dest_value = {32{writeback_to_rf_bus1.rf_we && writeback_to_rf_bus1.dest == issue_inst1.old_dest}} & writeback_to_rf_bus1.result |
+    //                            {32{writeback_to_rf_bus2.rf_we && writeback_to_rf_bus2.dest == issue_inst1.old_dest}} & writeback_to_rf_bus2.result;
+    // end
+    // else begin
+    //     inst1_old_dest_value = inst1_rdata_old;
+    // end
 
     if(inst2_src1_exe_wait) begin
         inst2_src1_value = {32{alu1_bypass_bus.rf_we   && alu1_bypass_bus.dest   == issue_inst2.phy_src1}} & alu1_bypass_bus.result   |
@@ -596,7 +596,7 @@ assign issue_to_execute_bus1.phy_dest   = issue_inst1.phy_dest;
 assign issue_to_execute_bus1.inst       = issue_inst1.inst;
 assign issue_to_execute_bus1.src1_value = inst1_src1_value;
 assign issue_to_execute_bus1.src2_value = inst1_src2_value;
-assign issue_to_execute_bus1.old_value  = inst1_old_dest_value;
+// assign issue_to_execute_bus1.old_value  = inst1_old_dest_value;
 
 assign issue_to_execute_bus1.rob_entry_num = issue_inst1.rob_entry_num;
 
@@ -615,7 +615,7 @@ assign issue_to_execute_bus2.phy_dest   = issue_inst2.phy_dest;
 assign issue_to_execute_bus2.inst       = issue_inst2.inst;
 assign issue_to_execute_bus2.src1_value = inst2_src1_value;
 assign issue_to_execute_bus2.src2_value = inst2_src2_value;
-assign issue_to_execute_bus2.old_value  = '0;
+// assign issue_to_execute_bus2.old_value  = '0;
 
 assign issue_to_execute_bus2.rob_entry_num = issue_inst2.rob_entry_num;
 

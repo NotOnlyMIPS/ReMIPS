@@ -119,6 +119,7 @@ logic [4:0] rob_num;
 logic commit_inst1_valid, commit_inst2_valid;
 logic map_to_rob_bus1_valid, map_to_rob_bus2_valid;
 
+logic miss_rename;
 logic miss_predict;
 logic wait_1bd, wait_2bd;
 
@@ -222,7 +223,7 @@ always_ff @(posedge clk) begin
     if(reset || flush) begin
         flush_r <= 1'b0;
     end
-    else if(miss_predict) begin
+    else if(miss_predict || miss_rename) begin
         flush_r <= 1'b1;
     end
 
@@ -246,9 +247,10 @@ always_ff @(posedge clk) begin
 end
 
 assign flush = flush_r && !wait_1bd && !wait_2bd || flush_src.exception || flush_src.eret || flush_src.privileged_inst;
-assign commit_flush = (wait_1bd || wait_2bd) && rob[rob_head_miss_predict].state == Inst_Complete;
+assign commit_flush = (wait_1bd || wait_2bd || miss_rename) && rob[rob_head_miss_predict].state == Inst_Complete;
 
 assign miss_predict = commit_inst1_valid && (!rob[rob_head_miss_predict].verify_result.predict_sucess && rob[rob_head_miss_predict].is_br_op);
+assign miss_rename  = commit_inst1_valid && (rob[rob_head_miss_predict].is_move_cond_op && !rob[rob_head_miss_predict].rf_we);
 
 assign flush_src.miss_predict    = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].is_br_op && !rob[rob_head_flush].verify_result.predict_sucess;
 assign flush_src.eret            = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].is_eret;

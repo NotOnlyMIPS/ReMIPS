@@ -9,6 +9,7 @@ module control_signal(
 
     input   logic is_inst2,
     output  logic is_store_op,
+    output  logic is_move_cond_op,
 
     output  logic is_privileged_op,
     output  logic is_eret,
@@ -83,13 +84,14 @@ always_comb begin
     inst_d.imm  = imm;
     inst_d.jidx = jidx;
 
-    inst_d.use_old_dest = operation == OP_MOVN || operation == OP_MOVZ;
+    // inst_d.use_old_dest = operation == OP_MOVN || operation == OP_MOVZ;
     
     inst_d.cache_op  = Cache_Code_EMPTY;
 
     inst_d.cp0_addr  = {sel, rd};
 
     is_store_op      = 1'b0;
+    is_move_cond_op  = 1'b0;
 
     is_privileged_op = 1'b0;
     is_eret          = 1'b0;
@@ -211,7 +213,8 @@ always_comb begin
         end
         /* conditional move */
         OP_MOVN, OP_MOVZ:begin
-            inst_d.is_alu1_op = 1'b1;
+            inst_d.is_sp_op = 1'b1;
+            is_move_cond_op = 1'b1;
         end
         /* multiplication and division */
         OP_MULT, OP_MULTU, OP_DIV, OP_DIVU,

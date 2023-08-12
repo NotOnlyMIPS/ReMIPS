@@ -10,25 +10,25 @@ module busy_table (
     input reg_addr_t inst1_src1,
     input reg_addr_t inst1_src2,
 
-    input logic      inst1_use_old_dest,
-    input reg_addr_t inst1_old_dest,
+    // input logic      inst1_use_old_dest,
+    // input reg_addr_t inst1_old_dest,
 
     input reg_addr_t inst2_src1,
     input reg_addr_t inst2_src2,
 
-    input logic      inst2_use_old_dest,
-    input reg_addr_t inst2_old_dest,
+    // input logic      inst2_use_old_dest,
+    // input reg_addr_t inst2_old_dest,
 
     input  logic src1_raw_hazard,
     input  logic src2_raw_hazard,
-    input  logic dest_waw_hazard,
+    // input  logic dest_waw_hazard,
 
     output logic inst1_src1_ready,
     output logic inst1_src2_ready,
-    output logic inst1_old_dest_ready,
+    // output logic inst1_old_dest_ready,
     output logic inst2_src1_ready,
     output logic inst2_src2_ready,
-    output logic inst2_old_dest_ready,
+    // output logic inst2_old_dest_ready,
 
     // map
     input logic map_inst1_rf_we,
@@ -83,10 +83,10 @@ end
 always_comb begin
     inst1_src1_ready = 1'b1;
     inst1_src2_ready = 1'b1;
-    inst1_old_dest_ready = 1'b1;
+    // inst1_old_dest_ready = 1'b1;
     inst2_src1_ready = !src1_raw_hazard;
     inst2_src2_ready = !src2_raw_hazard;
-    inst2_old_dest_ready = !(dest_waw_hazard && inst2_use_old_dest);
+    // inst2_old_dest_ready = !(dest_waw_hazard && inst2_use_old_dest);
 
     if(inst1_src1 != 0 && busy_table[inst1_src1] == 1'b1
     && inst1_src1 != sel_inst1_dest && inst1_src1 != sel_inst2_dest
@@ -98,11 +98,11 @@ always_comb begin
     && inst1_src2 != wb_inst1_dest  && inst1_src2 != wb_inst2_dest) begin
         inst1_src2_ready = 1'b0;
     end
-    if(inst1_old_dest != 0 && busy_table[inst1_old_dest] == 1'b1 && inst1_use_old_dest
-    && inst1_old_dest != sel_inst1_dest && inst1_old_dest != sel_inst2_dest
-    && inst1_old_dest != wb_inst1_dest  && inst1_old_dest != wb_inst2_dest) begin
-        inst1_old_dest_ready = 1'b0;
-    end
+    // if(inst1_old_dest != 0 && busy_table[inst1_old_dest] == 1'b1 && inst1_use_old_dest
+    // && inst1_old_dest != sel_inst1_dest && inst1_old_dest != sel_inst2_dest
+    // && inst1_old_dest != wb_inst1_dest  && inst1_old_dest != wb_inst2_dest) begin
+    //     inst1_old_dest_ready = 1'b0;
+    // end
 
     if(inst2_src1 != 0 && busy_table[inst2_src1] == 1'b1
     && inst2_src1 != sel_inst1_dest && inst2_src1 != sel_inst2_dest
@@ -114,11 +114,11 @@ always_comb begin
     && inst2_src2 != wb_inst1_dest  && inst2_src2 != wb_inst2_dest) begin
         inst2_src2_ready = 1'b0;
     end
-    if(inst2_old_dest != 0 && busy_table[inst2_old_dest] == 1'b1 && inst2_use_old_dest
-    && inst2_old_dest != sel_inst1_dest && inst2_old_dest != sel_inst2_dest
-    && inst2_old_dest != wb_inst1_dest  && inst2_old_dest != wb_inst2_dest) begin
-        inst2_old_dest_ready = 1'b0;
-    end
+    // if(inst2_old_dest != 0 && busy_table[inst2_old_dest] == 1'b1 && inst2_use_old_dest
+    // && inst2_old_dest != sel_inst1_dest && inst2_old_dest != sel_inst2_dest
+    // && inst2_old_dest != wb_inst1_dest  && inst2_old_dest != wb_inst2_dest) begin
+    //     inst2_old_dest_ready = 1'b0;
+    // end
 end
 
 endmodule

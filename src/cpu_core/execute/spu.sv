@@ -47,6 +47,10 @@ uint32_t src1_value, src2_value;
 
 logic [3:0] rf_we;
 
+logic    src2_is_zero;
+
+assign src2_is_zero = src2_value == 0;
+
 always_ff @(posedge clk) begin
     if(reset || flush) begin
         spu_valid  <= 1'b0;
@@ -64,6 +68,9 @@ always_ff @(posedge clk) begin
         rob_entry_num <= issue_inst.rob_entry_num;
     end
 end
+
+logic op_movz;
+logic op_movn;
 
 logic op_teq;
 logic op_tne;
@@ -84,6 +91,9 @@ logic op_tlbr;
 
 logic op_cache;
 
+assign op_movn  = inst.operation == OP_MOVN;
+assign op_movz  = inst.operation == OP_MOVZ;
+
 assign op_teq   = inst.operation == OP_TEQ;
 assign op_tne   = inst.operation == OP_TNE;
 assign op_tlt   = inst.operation == OP_TLT;
@@ -103,7 +113,7 @@ assign op_tlbr  = inst.operation == OP_TLBR;
 
 assign op_cache = inst.operation == OP_CACHE;
 
-assign rf_we = {4{op_mfc0}};
+assign rf_we = {4{op_mfc0 || op_movn && !src2_is_zero || op_movz && src2_is_zero}};
 
 // CP0
 assign cp0_we    = op_mtc0 && spu_valid;
@@ -163,7 +173,9 @@ end
 
 uint32_t spu_result;
 
-assign spu_result = cp0_rdata;
+assign spu_result = {32{op_mfc0                 }} & cp0_rdata
+                  | {32{op_movz &&  src2_is_zero}} & src1_value
+                  | {32{op_movn && !src2_is_zero}} & src1_value;
 
 assign spu_to_valid = spu_valid && !op_cache || wait_cache_op;
 

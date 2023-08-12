@@ -102,6 +102,7 @@ operation_t sel_inst1_op, sel_inst2_op;
 virt_t  sel_inst1_pc, sel_inst2_pc;
 
 // exception
+logic inst1_is_move_cond_op, inst2_is_move_cond_op;
 logic inst1_is_privileged_op, inst2_is_privileged_op;
 logic inst1_is_eret, inst2_is_eret;
 
@@ -130,6 +131,7 @@ control_signal inst_control1 (
 
     .is_inst2(1'b0),
     .is_store_op(inst1_is_store_op),
+    .is_move_cond_op(inst1_is_move_cond_op),
 
     .is_privileged_op(inst1_is_privileged_op),
     .is_eret         (inst1_is_eret),
@@ -152,6 +154,7 @@ control_signal inst_control2 (
 
     .is_inst2(1'b1),
     .is_store_op(inst2_is_store_op),
+    .is_move_cond_op(inst2_is_move_cond_op),
 
     .is_privileged_op(inst2_is_privileged_op),
     .is_eret         (inst2_is_eret),
@@ -178,6 +181,7 @@ assign inst1_sp_op = inst1_op == OP_MFC0    || inst1_op == OP_MTC0
                   || inst1_op == OP_SYSCALL || inst1_op == OP_BREAK
                   || inst1_op == OP_TLBP    || inst1_op == OP_TLBR
                   || inst1_op == OP_TLBWI   || inst1_op == OP_TLBWR
+                  || inst1_op == OP_MOVZ    || inst1_op == OP_MOVN
                   || inst1_op == OP_TGE     || inst1_op == OP_TGEU || inst1_op == OP_TLT || inst1_op == OP_TLTU  || inst1_op == OP_TEQ || inst1_op == OP_TNE
                   || inst1_op == OP_TGEI    || inst1_op == OP_TGEIU|| inst1_op == OP_TLTI|| inst1_op == OP_TLTIU || inst1_op == OP_TEQI|| inst1_op == OP_TNEI;
 assign inst2_sp_op = inst2_op == OP_MFC0    || inst2_op == OP_MTC0
@@ -185,6 +189,7 @@ assign inst2_sp_op = inst2_op == OP_MFC0    || inst2_op == OP_MTC0
                   || inst2_op == OP_SYSCALL || inst2_op == OP_BREAK
                   || inst2_op == OP_TLBP    || inst2_op == OP_TLBR
                   || inst2_op == OP_TLBWI   || inst2_op == OP_TLBWR
+                  || inst2_op == OP_MOVZ    || inst2_op == OP_MOVN
                   || inst2_op == OP_TGE     || inst2_op == OP_TGEU || inst2_op == OP_TLT || inst2_op == OP_TLTU  || inst2_op == OP_TEQ || inst2_op == OP_TNE
                   || inst2_op == OP_TGEI    || inst2_op == OP_TGEIU|| inst2_op == OP_TLTI|| inst2_op == OP_TLTIU || inst2_op == OP_TEQI|| inst2_op == OP_TNEI;
 
@@ -202,6 +207,7 @@ always_comb begin
     decode_to_map_bus1.is_store_op    = inst1_is_store_op;
     decode_to_map_bus1.br_taken       = decode_inst1.br_taken;
     decode_to_map_bus1.bpu_entry      = decode_inst1.bpu_entry;
+    decode_to_map_bus1.is_move_cond_op  = inst1_is_move_cond_op;
     decode_to_map_bus1.is_privileged_op = inst1_is_privileged_op;
     decode_to_map_bus1.is_eret          = inst1_is_eret;
     decode_to_map_bus1.exception        = decode_inst1_ex;
@@ -212,6 +218,7 @@ always_comb begin
     decode_to_map_bus2.is_store_op    = inst2_is_store_op;
     decode_to_map_bus2.br_taken       = decode_inst2.br_taken;
     decode_to_map_bus2.bpu_entry      = decode_inst2.bpu_entry;
+    decode_to_map_bus2.is_move_cond_op  = inst2_is_move_cond_op;
     decode_to_map_bus2.is_privileged_op = inst2_is_privileged_op;
     decode_to_map_bus2.is_eret          = inst2_is_eret;
     decode_to_map_bus2.exception        = decode_inst2_ex;
@@ -360,8 +367,8 @@ RAT rat (
 
 
 // busy table
-logic inst1_src1_ready, inst1_src2_ready, inst1_old_dest_ready;
-logic inst2_src1_ready, inst2_src2_ready, inst2_old_dest_ready;
+logic inst1_src1_ready, inst1_src2_ready;
+logic inst2_src1_ready, inst2_src2_ready;
 
 busy_table busy_table_u (
     .clk,
@@ -371,24 +378,24 @@ busy_table busy_table_u (
 
     .inst1_src1(inst1_phy_src1),
     .inst1_src2(inst1_phy_src2),
-    .inst1_use_old_dest(map_inst1.valid && map_inst1.inst.use_old_dest),
-    .inst1_old_dest,
+    // .inst1_use_old_dest(map_inst1.valid && map_inst1.inst.use_old_dest),
+    // .inst1_old_dest,
     .inst2_src1(inst2_phy_src1),
     .inst2_src2(inst2_phy_src2),
-    .inst2_use_old_dest(map_inst2.valid && map_inst2.inst.use_old_dest),
-    .inst2_old_dest,
+    // .inst2_use_old_dest(map_inst2.valid && map_inst2.inst.use_old_dest),
+    // .inst2_old_dest,
 
     .src1_raw_hazard,
     .src2_raw_hazard,
-    .dest_waw_hazard,
+    // .dest_waw_hazard,
 
     .inst1_src1_ready,
     .inst1_src2_ready,
-    .inst1_old_dest_ready,
+    // .inst1_old_dest_ready,
 
     .inst2_src1_ready,
     .inst2_src2_ready,
-    .inst2_old_dest_ready,
+    // .inst2_old_dest_ready,
 
     // map
     .map_inst1_rf_we(map_inst1.valid && map_inst1.inst.rf_we),
@@ -428,7 +435,7 @@ inst_dispatch inst_dispatch_u (
     // inst1
     .inst1_src1_ready,
     .inst1_src2_ready,
-    .inst1_old_dest_ready,
+    // .inst1_old_dest_ready,
     .inst1_phy_src1,
     .inst1_phy_src2,
     .inst1_phy_dest,
@@ -443,7 +450,7 @@ inst_dispatch inst_dispatch_u (
     // inst2
     .inst2_src1_ready,
     .inst2_src2_ready,
-    .inst2_old_dest_ready,
+    // .inst2_old_dest_ready,
     .inst2_phy_src1,
     .inst2_phy_src2,
     .inst2_phy_dest,
@@ -457,11 +464,13 @@ inst_dispatch inst_dispatch_u (
 
     // issue to rob
     .inst1_old_dest,
+    .inst1_is_move_cond_op (map_inst1.is_move_cond_op),
     .inst1_is_privileged_op(map_inst1.is_privileged_op),
     .inst1_is_eret         (map_inst1.is_eret         ),
     .inst1_exception       (map_inst1.exception       ),
 
     .inst2_old_dest,
+    .inst2_is_move_cond_op (map_inst2.is_move_cond_op),
     .inst2_is_privileged_op(map_inst2.is_privileged_op),
     .inst2_is_eret         (map_inst2.is_eret         ),
     .inst2_exception       (map_inst2.exception       ),
