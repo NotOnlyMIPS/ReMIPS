@@ -42,6 +42,7 @@ module store_buffer #(
 );
 
 st_buffer_t  store_buffer[STORE_GROUP-1:0];
+logic store_buffer_mark[STORE_GROUP-1:0];
 
 logic [3:0] store_buffer_head, store_buffer_tail;
 logic [3:0] store_buffer_head_next, store_buffer_tail_next;
@@ -98,12 +99,13 @@ always_ff @( posedge clk ) begin : store_buffer_write
     else if( valid ) begin
         store_buffer[store_buffer_tail].valid <= 1'b1   ;
         store_buffer[store_buffer_tail].complete <= 1'b0;
-        store_buffer[store_buffer_tail].mark  <= store_buffer_tail_mark;
         store_buffer[store_buffer_tail].wstrb <= buffer_we;
         store_buffer[store_buffer_tail].size  <= buffer_size;
         store_buffer[store_buffer_tail].addr  <= data_addr;
         store_buffer[store_buffer_tail].data  <= mem_wdata;
         store_buffer[store_buffer_tail].store_num <= store_num;
+
+        store_buffer_mark[store_buffer_tail]  <= store_buffer_tail_mark;
 
         store_buffer_tail <= (store_buffer_tail + 1'b1);
         store_buffer_tail_mark <= store_buffer_tail == STORE_GROUP-1 ? !store_buffer_tail_mark : store_buffer_tail_mark;
@@ -240,8 +242,8 @@ generate
             // .sel(sel),
             .match0(addr_match[2*i]),
             .match1(addr_match[2*i+1]),
-            .mark0(store_buffer[2*i].mark),
-            .mark1(store_buffer[2*i+1].mark),
+            .mark0(store_buffer_mark[2*i]),
+            .mark1(store_buffer_mark[2*i+1]),
             .num0(2*i),
             .num1(2*i+1),
             .match(match1[i]),
