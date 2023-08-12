@@ -260,7 +260,7 @@ trap_ex:
     li k1, 0x02 # exl = 1
     bne k0, k1, ex_finish
     nop
-    lui s2, 0x9
+    LI(s2, 9)
     b ex_finish
     nop
 
