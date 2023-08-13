@@ -509,6 +509,7 @@ typedef struct packed {
 typedef struct packed {
     logic       valid;
     logic [3:0] rob_entry_num;
+    logic       rf_we;
 
     logic is_store_op;
 

@@ -102,6 +102,7 @@ assign writeback_to_rf_bus3.result = writeback_inst3.result;
 assign writeback_to_commit_bus1.valid = writeback_inst1.valid;
 assign writeback_to_commit_bus1.rob_entry_num = writeback_inst1.rob_entry_num;
 
+assign writeback_to_commit_bus1.rf_we = 1'b0;
 assign writeback_to_commit_bus1.is_store_op = writeback_inst1.is_store_op;
 
 assign writeback_to_commit_bus1.verify_result = writeback_inst1.verify_result;
@@ -111,6 +112,7 @@ assign writeback_to_commit_bus1.exception     = writeback_inst1.exception;
 assign writeback_to_commit_bus2.valid = writeback_inst2.valid;
 assign writeback_to_commit_bus2.rob_entry_num = writeback_inst2.rob_entry_num;
 
+assign writeback_to_commit_bus2.rf_we = &writeback_inst2.rf_we;
 assign writeback_to_commit_bus2.is_store_op = 1'b0;
 
 assign writeback_to_commit_bus2.verify_result = '0;
@@ -120,6 +122,7 @@ assign writeback_to_commit_bus2.exception     = writeback_inst2.exception;
 assign writeback_to_commit_bus3.valid = writeback_inst3.valid;
 assign writeback_to_commit_bus3.rob_entry_num = writeback_inst3.rob_entry_num;
 
+assign writeback_to_commit_bus3.rf_we = 1'b0;
 assign writeback_to_commit_bus3.is_store_op = writeback_inst3.is_store_op;
 
 assign writeback_to_commit_bus3.verify_result = '0;
@@ -138,6 +141,8 @@ logic [4:0] rob_num;
 logic commit_inst1_valid, commit_inst2_valid;
 logic map_to_rob_bus1_valid, map_to_rob_bus2_valid;
 
+logic  miss_rename_valid;
+virt_t miss_rename_epc;
 logic miss_rename;
 logic miss_predict;
 logic wait_1bd, wait_2bd;
@@ -198,6 +203,7 @@ always_ff @(posedge clk) begin
             // rob[writeback_to_commit_bus2.rob_entry_num].state         <= writeback_to_commit_bus2.is_store_op &&
             //                                                             !writeback_to_commit_bus2.exception.ex ? Store_Wait : Inst_Complete;
             rob[writeback_to_commit_bus2.rob_entry_num].state         <= Inst_Complete;
+            rob[writeback_to_commit_bus2.rob_entry_num].rf_we         <= writeback_to_commit_bus2.rf_we;
             // rob[writeback_to_commit_bus2.rob_entry_num].verify_result <= writeback_to_commit_bus2.verify_result;
             rob[writeback_to_commit_bus2.rob_entry_num].exception.ex        <= writeback_to_commit_bus2.exception.ex;
             rob[writeback_to_commit_bus2.rob_entry_num].exception.exccode   <= writeback_to_commit_bus2.exception.exccode;
@@ -271,9 +277,18 @@ always_ff @(posedge clk) begin
         bpu_verify_result <= rob[rob_head_bpu].verify_result;
     else
         bpu_verify_result <= 'b0;
+
+    if(reset || flush) begin
+        miss_rename_valid <= 1'b0;
+        miss_rename_epc   <= 'b0;
+    end
+    else if(miss_rename) begin
+        miss_rename_valid <= 1'b1;
+        miss_rename_epc   <= rob[rob_head_miss_predict].exception.epc;
+    end
 end
 
-assign flush = flush_r && !wait_1bd && !wait_2bd || flush_src.exception || flush_src.eret || flush_src.privileged_inst;
+assign flush = flush_r && !wait_1bd && !wait_2bd || flush_src.exception || flush_src.eret || flush_src.privileged_inst && !miss_rename;
 assign commit_flush = (wait_1bd || wait_2bd || miss_rename) && rob[rob_head_miss_predict].state == Inst_Complete;
 
 assign miss_predict = commit_inst1_valid && (!rob[rob_head_miss_predict].verify_result.predict_sucess && rob[rob_head_miss_predict].is_br_op);
@@ -282,13 +297,15 @@ assign miss_rename  = commit_inst1_valid && (rob[rob_head_miss_predict].is_move_
 assign flush_src.miss_predict    = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].is_br_op && !rob[rob_head_flush].verify_result.predict_sucess;
 assign flush_src.eret            = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].is_eret;
 assign flush_src.exception       = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].exception.ex;
-assign flush_src.privileged_inst = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].is_privileged_op;
+assign flush_src.privileged_inst = rob[rob_head_flush].state == Inst_Complete && rob[rob_head_flush].is_privileged_op || miss_rename_valid;
 
 // exception
 always_comb begin
     exception = '0;
     if(rob[rob_head_flush].state == Inst_Complete)
         exception = rob[rob_head_flush].exception;
+    else if(miss_rename_valid) 
+        exception.epc = miss_rename_epc;
 end
 
 always_comb begin
@@ -308,8 +325,8 @@ assign commit_store2_valid = commit_inst2_valid && rob[rob_head_next_commit_stor
 
 assign commit_to_rat_bus1 = { commit_inst1_valid && rob[rob_head_commit_rat].rf_we,
                               rob[rob_head_commit_rat  ].dest,
-                              rob[rob_head_commit_rat  ].phy_dest,
-                              rob[rob_head_commit_rat  ].old_dest};
+                              miss_rename ? rob[rob_head_commit_rat  ].old_dest : rob[rob_head_commit_rat  ].phy_dest,
+                              miss_rename ? rob[rob_head_commit_rat  ].phy_dest : rob[rob_head_commit_rat  ].old_dest};
 assign commit_to_rat_bus2 = { commit_inst2_valid && rob[rob_head_next_commit_rat].rf_we,
                               rob[rob_head_next_commit_rat].dest,
                               rob[rob_head_next_commit_rat].phy_dest,

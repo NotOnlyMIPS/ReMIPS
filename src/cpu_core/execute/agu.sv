@@ -532,6 +532,8 @@ reg_addr_t  resp_phy_dest;
 virt_t      resp_addr;
 logic [3:0] resp_rob_entry_num;
 exception_t addr_ex;
+
+logic       exception_valid;
 exception_t exception;
 
 logic       load_ready;
@@ -548,11 +550,13 @@ logic       resp_lwr;
 
 always_comb begin
     exception = '0;
-    if(addr_ex.ex) begin
-        exception = addr_ex;
-    end
-    else if(data_tlb_ex.ex) begin
-        exception = data_tlb_ex;
+    if(exception_valid) begin
+        if(addr_ex.ex) begin
+            exception = addr_ex;
+        end
+        else if(data_tlb_ex.ex) begin
+            exception = data_tlb_ex;
+        end
     end
 end
 
@@ -611,6 +615,16 @@ always_ff @(posedge clk) begin
         load_ready    <= 1'b1;
         load_result_r <= load_result;
         exception_r   <= exception;
+    end
+
+    if(reset || flush) begin
+        exception_valid <= 1'b0;
+    end
+    else if(agu_load_resp_allowin && agu_load_req_to_valid) begin
+        exception_valid <= 1'b1;
+    end
+    else if(agu_load_resp_valid && !agu_load_resp_allowin) begin
+        exception_valid <= 1'b0;
     end
 end
 
@@ -778,7 +792,7 @@ always_ff @(posedge clk) begin
     if(reset || data_cancel && dcache_data_ok) begin
         data_cancel <= 1'b0;
     end
-    else if(flush && (agu_load_resp_valid && !dcache_data_ok && !load_ready
+    else if(flush && (agu_load_resp_valid && !dcache_data_ok && !exception.ex
                   || dcache_addr_ok && select_load)) begin
         data_cancel <= 1'b1;
     end

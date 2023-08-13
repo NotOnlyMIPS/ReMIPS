@@ -73,7 +73,7 @@ always_comb begin
         endcase
     end
 
-    if(!exception.ex && valid && is_privileged_op) begin
+    if(!exception.ex && valid && (is_privileged_op || is_move_cond_op)) begin
         exception_d.epc = pc+4;
     end
 end
