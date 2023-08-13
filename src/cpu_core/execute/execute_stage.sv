@@ -21,6 +21,9 @@ module execute_stage(
     input  exception_t data_tlb_ex,
     input  exception_t data_tlb_ex2,
 
+    input  logic       pre_lookup_addr_uncache,
+    output virt_t      pre_lookup_addr,
+
     // DCache
     output logic       dcache_req,
     output logic       dcache_wr,
@@ -321,6 +324,9 @@ agu agu_u (
     .data_vaddr2,
     .data_tlb_ex,
     .data_tlb_ex2,
+
+    .pre_lookup_addr_uncache,
+    .pre_lookup_addr_o(pre_lookup_addr),
 
     // DBus
     .dcache_req,

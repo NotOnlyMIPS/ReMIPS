@@ -115,6 +115,9 @@ uint32_t         tlbp_entry_hi;
 uint32_t         tlbp_index;
 logic[7:0]       tlb_asid;
 
+logic            pre_lookup_addr_uncache;
+virt_t           pre_lookup_addr;
+
 /* IBus */
 logic            icache_req;
 logic            icache_addr_ok;
@@ -404,6 +407,9 @@ execute_stage u_execute_stage (
     .data_vaddr2,
     .data_tlb_ex2,
 
+    .pre_lookup_addr_uncache,
+    .pre_lookup_addr,
+
     // DCache
     .dcache_req,
     .dcache_wr,
@@ -521,6 +527,9 @@ mmu u_mmu (
     .data_valid,
     .data_vaddr,
     .data_vaddr2,
+
+    .pre_lookup_addr,
+    .pre_lookup_addr_uncache,
     
     .inst_result,
     .data_result,

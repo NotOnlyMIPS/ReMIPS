@@ -28,6 +28,9 @@ module agu (
     input  exception_t data_tlb_ex,
     input  exception_t data_tlb_ex2,
 
+    input  logic       pre_lookup_addr_uncache,
+    output virt_t      pre_lookup_addr_o,
+
     // DBus
     output logic       dcache_req,
     output logic       dcache_wr,
@@ -219,6 +222,7 @@ assign op_lwl = op == OP_LWL;
 assign op_lwr = op == OP_LWR;
 
 // assign pre_lookup_addr = rs_value + imm_value;
+assign pre_lookup_addr_o = pre_lookup_addr;
 
 assign pre_lookup_wstrb = (op_lb  || op_lbu) ? 4'h1 << pre_lookup_addr[1:0]
                         : (op_lh  || op_lhu) ? 4'h3 << pre_lookup_addr[1:0]
@@ -699,6 +703,7 @@ store_buffer store_buffer_u (
 
     .flush,
 
+    .pre_lookup_addr_uncache,
     .pre_lookup_addr,
     .pre_lookup_wstrb,
     .data_exist,

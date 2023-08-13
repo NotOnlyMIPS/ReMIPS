@@ -7,6 +7,7 @@ module store_buffer #(
     input  logic            reset,
     input  logic            flush,
 
+    input  logic            pre_lookup_addr_uncache,
     input  virt_t           pre_lookup_addr,
     input  logic [3:0]      pre_lookup_wstrb,
     output logic            data_exist,
@@ -222,7 +223,7 @@ assign pre_load_wait = addr_match[ 0] | addr_match[ 1] | addr_match[ 2] | addr_m
                      | addr_match[12] | addr_match[13] | addr_match[14] | addr_match[15]
                      | store_addr_match;
 
-assign data_exist = sel_match_out && wstrb_match[sel_num_out] && !store_addr_match || store_addr_match && store_wstrb_match;
+assign data_exist = (sel_match_out && wstrb_match[sel_num_out] && !store_addr_match || store_addr_match && store_wstrb_match) && !pre_lookup_addr_uncache;
 
 // assign sel = store_buffer_head_mark ^ store_buffer_tail_mark;
 

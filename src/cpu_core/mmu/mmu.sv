@@ -17,6 +17,9 @@ module mmu(
     input  virt_t       data_vaddr,
     input  virt_t       data_vaddr2,
 
+    input  virt_t       pre_lookup_addr,
+    output logic        pre_lookup_addr_uncache,
+
     output mmu_result_t inst_result,
     output mmu_result_t data_result,
 
@@ -52,6 +55,7 @@ function logic is_vaddr_uncached(
 	return vaddr[31:29] == 3'b101 || (kseg0_uncached && vaddr[31:29] == 3'b100);
 endfunction
 
+assign pre_lookup_addr_uncache = is_vaddr_uncached(pre_lookup_addr);
 
 mmu_result_t inst_result_r;
 mmu_result_t data_result_r;
