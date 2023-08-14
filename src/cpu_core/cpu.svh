@@ -4,8 +4,8 @@
 
 `ifndef CPU_SVH
 `define CPU_SVH
-`include "../common.svh"
 
+`include "../common.svh"
 
 //BPU
 `define B_IS_J      3'h1
@@ -67,14 +67,6 @@
 `define EXCCODE_OV    5'h0c  // overflow
 `define EXCCODE_TR    5'h0d  // trap
 `define EXCCODE_FPE   5'h0f  // floating point exception
-
-// register
-`define REG_NUM 64
-`define REG_RA  31
-`define REG_HI  32
-`define REG_LO  33
-
-typedef logic [$clog2(`REG_NUM)-1:0] reg_addr_t;
 
 // operator
 typedef enum logic [6:0] {
@@ -185,7 +177,7 @@ typedef struct packed {
 } exception_t;
 
 // BPU
-typedef enum logic [2:0] { 
+typedef enum logic [2:0] {
     Branch_None,
     Branch_Jump,
     Branch_Cond,
@@ -225,7 +217,7 @@ typedef struct packed {
 } ras_t;
 
 // ROB
-typedef enum logic [1:0] { 
+typedef enum logic [1:0] {
     Inst_Invalid,
     Inst_Wait,
     Store_Wait,
@@ -274,7 +266,7 @@ typedef struct packed {
 } bpu_to_prefetch_bus_t;
 
 // IF stage
-typedef enum logic { 
+typedef enum logic {
     Fetch_Wait,
     Fetch_Complete
 } fetch_inst_state_t;
@@ -448,7 +440,7 @@ typedef struct packed {
 typedef struct packed {
     logic         valid;
     virt_t        pc;
-    
+
     reg_addr_t     phy_dest;
     decoded_inst_t inst;
 
