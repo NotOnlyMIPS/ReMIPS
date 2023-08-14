@@ -147,7 +147,7 @@ begin: generate_mmu_enabled_code
     assign data_tlb_ex2.badvaddr      = data_vaddr2;
     assign data_tlb_ex2.ex            = (((data_mapped2 & ~data_tlb_result2.valid) | (data_mapped2 & data_tlb_result2.miss)))
                                             | (~(data_mapped2 & data_tlb_result2.miss) & ~(~data_mapped2 | data_tlb_result2.dirty) & ~(data_mapped2 & ~data_tlb_result2.valid));
-    assign data_tlb_ex2.exccode       = (~(data_mapped & data_tlb_result.miss) & ~(~data_mapped | data_tlb_result.dirty) & ~(data_mapped & ~data_tlb_result.valid)) ? `EXCCODE_MOD :
+    assign data_tlb_ex2.exccode       = (~(data_mapped2 & data_tlb_result2.miss) & ~(~data_mapped2 | data_tlb_result2.dirty) & ~(data_mapped2 & ~data_tlb_result2.valid)) ? `EXCCODE_MOD :
                                         `EXCCODE_TLBS;
     assign data_tlb_ex2.bd            = 1'b0;
 end else begin: generate_mmu_disabled_code
