@@ -12,6 +12,18 @@
 // golden trace
 `define GOLDEN_TRACE
 
+//! --- BEGIN ---
+//! some definations about cpu are moved here due to
+//! compilation dependency issues
+// register
+`define REG_NUM 64
+`define REG_RA  31
+`define REG_HI  32
+`define REG_LO  33
+
+typedef logic [$clog2(`REG_NUM)-1:0] reg_addr_t;
+//! --- END ---
+
 typedef logic [  7:0] uint8_t;
 typedef logic [ 15:0] uint16_t;
 typedef logic [ 31:0] uint32_t;
