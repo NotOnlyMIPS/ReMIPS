@@ -64,8 +64,8 @@ always_comb begin
             end
             OP_FPU: begin
                 exception_d.ex      = 1'b1;
-                exception_d.exccode = `EXCCODE_CpU;
-                // exception_d.exccode = `EXCCODE_RI;
+                // exception_d.exccode = `EXCCODE_CpU;
+                exception_d.exccode = `EXCCODE_RI;
             end
             default: begin
                 exception_d.ex = 1'b0;

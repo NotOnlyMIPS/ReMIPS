@@ -44,7 +44,7 @@ logic fs_ready_go;
 
 logic data_cancel;
 logic branch_invalid;
-logic bpu_predict_invalid;
+logic inst_fetch_wait;
 
 fetch_queue_entry_t fetch_queue[7:0];
 logic [2:0] fetch_queue_head, fetch_queue_tail;
@@ -87,7 +87,7 @@ always_ff @(posedge clk) begin
         fetch_queue_tail <= '0;
         inst_fetch_tail  <= '0;
 
-        bpu_predict_invalid <= 1'b0;
+        inst_fetch_wait <= 1'b0;
     end
     else begin
         if(fs_allowin && pfs_to_valid) begin
@@ -112,28 +112,17 @@ always_ff @(posedge clk) begin
 
             inst_fetch_tail <= inst_fetch_tail + 3'd2;
 
-            bpu_predict_invalid <= 1'b0;
+            inst_fetch_wait <= 1'b0;
         end
         else if(icache_data_ok && !data_cancel) begin
             fetch_queue[inst_fetch_tail].state      <= Fetch_Complete;
             fetch_queue[inst_fetch_tail].inst       <= icache_rdata1;
-            fetch_queue[inst_fetch_tail].br_taken   <= br_taken;
-            fetch_queue[inst_fetch_tail].bpu_entry.inst2   <= 1'b0;
-            fetch_queue[inst_fetch_tail].bpu_entry.tag     <= bpu_entry.tag;
-            fetch_queue[inst_fetch_tail].bpu_entry.br_type <= bpu_entry.br_type;
-            fetch_queue[inst_fetch_tail].bpu_entry.count   <= bpu_entry.count;
-            fetch_queue[inst_fetch_tail].bpu_entry.target  <= br_target;
 
             fetch_queue[inst_fetch_tail_next].state      <= Fetch_Complete;
             fetch_queue[inst_fetch_tail_next].inst       <= icache_rdata2;
-            fetch_queue[inst_fetch_tail_next].br_taken   <= br_taken;
-            fetch_queue[inst_fetch_tail_next].bpu_entry.inst2   <= 1'b1;
-            fetch_queue[inst_fetch_tail_next].bpu_entry.tag     <= bpu_entry.tag;
-            fetch_queue[inst_fetch_tail_next].bpu_entry.br_type <= bpu_entry.br_type;
-            fetch_queue[inst_fetch_tail_next].bpu_entry.count   <= bpu_entry.count;
-            fetch_queue[inst_fetch_tail_next].bpu_entry.target  <= br_target;
 
-            if(inst_tlb_ex) begin
+
+            if(inst_tlb_ex && !inst_fetch_wait) begin
                 fetch_queue[inst_fetch_tail].exception.ex              <= 1'b1;
                 fetch_queue[inst_fetch_tail].exception.exccode         <= inst_tlb_exccode;
                 fetch_queue[inst_fetch_tail].exception.tlb_refill      <= inst_tlb_refill;
@@ -144,10 +133,27 @@ always_ff @(posedge clk) begin
 
             inst_fetch_tail <= inst_fetch_tail + 3'd2;
 
-            bpu_predict_invalid <= 1'b0;
+            inst_fetch_wait <= 1'b0;
         end
-        else 
-            bpu_predict_invalid <= 1'b1;
+        else if(fetch_queue[inst_fetch_tail].valid && fetch_queue[inst_fetch_tail].state == Fetch_Wait
+             || fetch_queue[inst_fetch_tail_next].valid && fetch_queue[inst_fetch_tail_next].state == Fetch_Wait) begin
+            inst_fetch_wait <= 1'b1;
+        end
+
+        if(!inst_fetch_wait) begin
+            fetch_queue[inst_fetch_tail].br_taken   <= br_taken;
+            fetch_queue[inst_fetch_tail].bpu_entry.inst2   <= 1'b0;
+            fetch_queue[inst_fetch_tail].bpu_entry.tag     <= bpu_entry.tag;
+            fetch_queue[inst_fetch_tail].bpu_entry.br_type <= bpu_entry.br_type;
+            fetch_queue[inst_fetch_tail].bpu_entry.count   <= bpu_entry.count;
+            fetch_queue[inst_fetch_tail].bpu_entry.target  <= br_target;
+            fetch_queue[inst_fetch_tail_next].br_taken   <= br_taken;
+            fetch_queue[inst_fetch_tail_next].bpu_entry.inst2   <= 1'b1;
+            fetch_queue[inst_fetch_tail_next].bpu_entry.tag     <= bpu_entry.tag;
+            fetch_queue[inst_fetch_tail_next].bpu_entry.br_type <= bpu_entry.br_type;
+            fetch_queue[inst_fetch_tail_next].bpu_entry.count   <= bpu_entry.count;
+            fetch_queue[inst_fetch_tail_next].bpu_entry.target  <= br_target;
+        end
 
         if(fs_to_valid && ds_allowin) begin
             fetch_queue[fetch_queue_head].valid <= '0;
@@ -210,7 +216,8 @@ always_ff @(posedge clk) begin
 end
 
 // bpu
-assign fetch_to_bpu_bus.valid = (fetch_queue[inst_fetch_tail].valid || fetch_queue[inst_fetch_tail_next].valid) && !branch_invalid && !bpu_predict_invalid;
+assign fetch_to_bpu_bus.valid = (fetch_queue[inst_fetch_tail].valid || fetch_queue[inst_fetch_tail_next].valid) && !branch_invalid && !inst_fetch_wait;
+// assign fetch_to_bpu_bus.valid = (fetch_queue[inst_fetch_tail].valid || fetch_queue[inst_fetch_tail_next].valid) && !branch_invalid;
 assign fetch_to_bpu_bus.pc    = {fetch_queue[inst_fetch_tail].pc[31:3], 3'b0};
 
 // exception

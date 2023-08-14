@@ -221,7 +221,7 @@ assign pre_load_wait = addr_match[ 0] | addr_match[ 1] | addr_match[ 2] | addr_m
                      | addr_match[ 4] | addr_match[ 5] | addr_match[ 6] | addr_match[ 7]
                      | addr_match[ 8] | addr_match[ 9] | addr_match[10] | addr_match[11]
                      | addr_match[12] | addr_match[13] | addr_match[14] | addr_match[15]
-                     | store_addr_match | pre_lookup_addr_uncache;
+                     | store_addr_match;
 
 assign data_exist = (sel_match_out && wstrb_match[sel_num_out] && !store_addr_match || store_addr_match && store_wstrb_match) && !pre_lookup_addr_uncache;
 
