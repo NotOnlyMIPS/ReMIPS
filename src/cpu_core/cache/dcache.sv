@@ -703,7 +703,7 @@ always_comb begin : state_next_blockName
             end
         end
         MISSCLEAN:begin
-            if ( (rd_rdy && req_buffer.is_cache) || (urd_rdy && ~req_buffer.is_cache)) begin
+            if ( (rd_rdy && req_buffer.is_cache) || (urd_rdy && fifo_empty && ~req_buffer.is_cache)) begin
                 state_next = REFILL;
             end else begin
                 state_next = MISSCLEAN;

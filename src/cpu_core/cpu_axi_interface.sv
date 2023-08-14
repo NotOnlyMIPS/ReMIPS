@@ -249,74 +249,98 @@ assign dcache_axi.wvalid  = dcache_state == D_WRITE;
 assign dcache_axi.bready  = dcache_state == D_WRITE_DONE;
 
 // UnCache
-typedef enum logic [1:0] {
+typedef enum logic [2:0] {
     U_WAIT,
-    U_READ,
-    U_WRITE,
+    U_READ_REQ,
+    U_READ_RESP,
+    // U_READ_DONE,
+    U_WRITE_REQ,
+    U_WRITE_RESP,
     U_WRITE_DONE
 } uncache_state_t;
 
 axi_t    uncache_axi;
-uncache_state_t  uncache_rd_state, uncache_wr_state;
-uint32_t uncache_wr_data_r;
-logic [3:0] uncache_wr_wstrb_r;
+// uncache_state_t  uncache_rd_state, uncache_wr_state;
+uncache_state_t  uncache_state;
+logic [2:0] uncache_size_r;
+logic [3:0] uncache_wstrb_r;
+virt_t   uncache_addr_r;
+uint32_t uncache_wdata_r;
 
-assign uncache_rd_rdy    = uncache_rd_state == U_WAIT  && uncache_rd_req && uncache_axi.arready;
-assign uncache_ret_valid = uncache_rd_state == U_READ  && uncache_axi.rvalid;
+assign uncache_rd_rdy    = uncache_state == U_WAIT && uncache_rd_req;
+assign uncache_ret_valid = uncache_state == U_READ_RESP && uncache_axi.rvalid;
 assign uncache_ret_data  = uncache_axi.rdata;
-assign uncache_wr_rdy    = uncache_wr_state == U_WAIT  && uncache_wr_req && uncache_axi.awready;
-assign uncache_wr_bvalid = uncache_wr_state == U_WRITE_DONE && uncache_axi.bvalid;
+assign uncache_wr_rdy    = uncache_state == U_WAIT && uncache_wr_req;
+assign uncache_wr_bvalid = uncache_state == U_WRITE_DONE && uncache_axi.bvalid;
 
 always_ff @(posedge clk) begin
-    if(reset || uncache_ret_valid)
-        uncache_rd_state <= U_WAIT;
-    else if(uncache_rd_rdy)
-        uncache_rd_state <= U_READ;
+    if(reset) begin
+        uncache_state <= U_WAIT;
+    end
+    else begin
+        unique casez(uncache_state) 
+            U_WAIT:       uncache_state <= uncache_wr_req      ? U_WRITE_REQ : uncache_rd_req ? U_READ_REQ : U_WAIT;
+            U_READ_REQ:   uncache_state <= uncache_axi.arready ? U_READ_RESP : U_READ_REQ;
+            U_READ_RESP:  uncache_state <= uncache_axi.rvalid  ? U_WAIT      : U_READ_RESP;
+            // U_READ_DONE:  uncache_state <= U_WAIT;
+            U_WRITE_REQ:  uncache_state <= uncache_axi.awready ? U_WRITE_RESP : U_WRITE_REQ;
+            U_WRITE_RESP: uncache_state <= uncache_axi.wready  ? U_WRITE_DONE : U_WRITE_RESP;
+            U_WRITE_DONE: uncache_state <= uncache_axi.bvalid  ? U_WAIT       : U_WRITE_DONE;
+            default:      uncache_state <= U_WAIT;
+        endcase
+    end
 
-    if(reset || uncache_wr_bvalid)
-        uncache_wr_state <= U_WAIT;
-    else if(uncache_wr_state == U_WAIT && uncache_wr_rdy)
-        uncache_wr_state <= U_WRITE;
-    else if(uncache_wr_state == U_WRITE && uncache_axi.wready)
-        uncache_wr_state <= U_WRITE_DONE;
+    // if(reset || uncache_ret_valid)
+    //     uncache_rd_state <= U_WAIT;
+    // else if(uncache_rd_rdy)
+    //     uncache_rd_state <= U_READ;
 
-    if(uncache_wr_rdy) begin
-        uncache_wr_data_r <= uncache_wr_data;
-        uncache_wr_wstrb_r <= uncache_wr_wstrb;
+    // if(reset || uncache_wr_bvalid)
+    //     uncache_wr_state <= U_WAIT;
+    // else if(uncache_wr_state == U_WAIT && uncache_wr_rdy)
+    //     uncache_wr_state <= U_WRITE;
+    // else if(uncache_wr_state == U_WRITE && uncache_axi.wready)
+    //     uncache_wr_state <= U_WRITE_DONE;
+
+    if(uncache_state == U_WAIT) begin
+        uncache_size_r  <= uncache_wr_req ? uncache_wr_size : uncache_rd_size;
+        uncache_wstrb_r <= uncache_wr_req ? uncache_wr_wstrb : '0;
+        uncache_addr_r  <= uncache_wr_req ? uncache_wr_addr : uncache_rd_addr;
+        uncache_wdata_r <= uncache_wr_req ? uncache_wr_data  : '0;
     end
 end
 
 // unCache AXI
 // ar
 assign uncache_axi.arid    = 4'h2;
-assign uncache_axi.araddr  = uncache_rd_addr;
+assign uncache_axi.araddr  = uncache_addr_r;
 assign uncache_axi.arlen   = 8'b0000;
-assign uncache_axi.arsize  = uncache_rd_size;
+assign uncache_axi.arsize  = uncache_size_r;
 assign uncache_axi.arburst = 2'b00;
 assign uncache_axi.arlock  = 2'b00;
 assign uncache_axi.arcache = '1;
 assign uncache_axi.arprot  = 3'b0;
-assign uncache_axi.arvalid = uncache_rd_state == U_WAIT && uncache_rd_req;
+assign uncache_axi.arvalid = uncache_state == U_READ_REQ;
 // r
-assign uncache_axi.rready  = uncache_rd_state == U_READ;
+assign uncache_axi.rready  = uncache_state == U_READ_RESP;
 // aw
 assign uncache_axi.awid    = 4'h2;
-assign uncache_axi.awaddr  = uncache_wr_addr;
+assign uncache_axi.awaddr  = uncache_addr_r;
 assign uncache_axi.awlen   = 8'b0000;
-assign uncache_axi.awsize  = uncache_wr_size;
+assign uncache_axi.awsize  = uncache_size_r;
 assign uncache_axi.awburst = 2'b00;
 assign uncache_axi.awlock  = '0;
 assign uncache_axi.awcache = '1;
 assign uncache_axi.awprot  = '0;
-assign uncache_axi.awvalid = uncache_wr_state == U_WAIT && uncache_wr_req;
+assign uncache_axi.awvalid = uncache_state == U_WRITE_REQ;
 // w
 assign uncache_axi.wid     = 4'h2;
-assign uncache_axi.wdata   = uncache_wr_data_r;
-assign uncache_axi.wstrb   = uncache_wr_wstrb_r;
-assign uncache_axi.wlast   = uncache_wr_state == U_WRITE;
-assign uncache_axi.wvalid  = uncache_wr_state == U_WRITE;
+assign uncache_axi.wdata   = uncache_wdata_r;
+assign uncache_axi.wstrb   = uncache_wstrb_r;
+assign uncache_axi.wlast   = uncache_state == U_WRITE_RESP;
+assign uncache_axi.wvalid  = uncache_state == U_WRITE_RESP;
 // b
-assign uncache_axi.bready  = uncache_wr_state == U_WRITE_DONE;
+assign uncache_axi.bready  = uncache_state == U_WRITE_DONE;
 
 // axi_crossbar
 assign arlock = 2'b00;
