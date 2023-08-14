@@ -739,24 +739,24 @@
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
       <Filter Type="Constrs"/>
-      <File Path="$PSRCDIR/constrs_1/imports/general_constras/soc_lite.xdc">
+      <File Path="$PSRCDIR/constrs_1/soc_lite.xdc">
         <FileInfo>
-          <Attr Name="ImportPath" Val="$PSRCDIR/general_constras/soc_lite.xdc"/>
+          <Attr Name="ImportPath" Val="$PSRCDIR/constrs_1/soc_lite.xdc"/>
           <Attr Name="ImportTime" Val="1691756760"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/constrs_1/imports/vivado_xpr/soc_up.xdc">
+      <File Path="$PSRCDIR/constrs_1/soc_up.xdc">
         <FileInfo>
-          <Attr Name="ImportPath" Val="D:/nscscc2023-group-mips/soc_run_os_v0.01/soc_up/vivado_xpr/soc_up.xdc"/>
+          <Attr Name="ImportPath" Val="$PSRCDIR/constrs_1/soc_up.xdc"/>
           <Attr Name="ImportTime" Val="1685499318"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
       <Config>
-        <Option Name="TargetConstrsFile" Val="$PSRCDIR/constrs_1/imports/vivado_xpr/soc_up.xdc"/>
+        <Option Name="TargetConstrsFile" Val="$PSRCDIR/constrs_1/soc_up.xdc"/>
         <Option Name="ConstrsType" Val="XDC"/>
       </Config>
     </FileSet>
