@@ -29,6 +29,9 @@ vivado*.str
 **/ip/xilinx/*/*
 **/ip/xilinx/*/*/
 !**/ip/xilinx/*/*.xci
+**/vivado_files/**/*.runs
+**/vivado_files/**/*.sim/**/behav
+**/vivado_files/**/*.ip_user_files
 
 # testcase output files
 main.bin
