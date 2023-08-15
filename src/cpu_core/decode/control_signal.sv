@@ -81,7 +81,7 @@ end
 
 always_comb begin
     inst_d = '0;
-    inst_d.sel  = sel;
+    // inst_d.sel  = sel;
     inst_d.imm  = imm;
     inst_d.jidx = jidx;
 
@@ -89,7 +89,7 @@ always_comb begin
     
     inst_d.cache_op  = Cache_Code_EMPTY;
 
-    inst_d.cp0_addr  = {sel, rd};
+    inst_d.cp0_addr  = {sel, rd[4:0]};
 
     is_store_op      = 1'b0;
     is_move_cond_op  = 1'b0;

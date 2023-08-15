@@ -11,7 +11,7 @@ logic [ 5:0] op, func;
 logic [ 4:0] rs, rt, rd;
 logic [ 4:0] sa;
 logic [15:0] imm;
-logic [ 2:0] sel;
+// logic [ 2:0] sel;
 logic [25:0] jidx;
 
 assign op   = inst[31:26];
@@ -19,7 +19,7 @@ assign rs   = inst[25:21];
 assign rt   = inst[20:16];
 assign rd   = inst[15:11];
 assign sa   = inst[10: 6];
-assign sel  = inst[ 2: 0];
+// assign sel  = inst[ 2: 0];
 assign func = inst[ 5: 0];
 assign imm  = inst[15: 0];
 assign jidx = inst[25: 0];

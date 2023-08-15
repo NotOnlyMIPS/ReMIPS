@@ -309,7 +309,7 @@ typedef struct packed {
     reg_addr_t   src1;
     reg_addr_t   src2;
     // reg_addr_t      rd;
-    logic [2:0]  sel;
+    // logic [2:0]  sel;
 
 // EXE1
     logic       is_alu1_op;
