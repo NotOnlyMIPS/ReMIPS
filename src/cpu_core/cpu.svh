@@ -52,6 +52,7 @@
 `define CR_CONFIG0  16
 `define CR_CONFIG1  48 // sel 1
 `define CR_TAGLO    28
+`define CR_ERROREPC 30
 
 // cause register exc_code field
 `define EXCCODE_INT   5'h00  // interrupt
@@ -462,7 +463,7 @@ typedef struct packed {
 typedef struct packed {
     logic        valid;
     logic        complete;
-    logic        mark;
+    // logic        mark;
     logic [ 3:0] wstrb;
     logic [ 2:0] size;
     logic [ 3:0] store_num;

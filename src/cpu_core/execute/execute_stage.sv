@@ -45,8 +45,8 @@ module execute_stage(
     output bypass_bus_t mul_div_bypass_bus1,
     output bypass_bus_t mul_div_bypass_bus2,
 
-    input  issue_to_execute_bus_t issue_to_execute_bus1,
-    input  issue_to_execute_bus_t issue_to_execute_bus2,
+(* mark_debug = "true" *)    input  issue_to_execute_bus_t issue_to_execute_bus1,
+(* mark_debug = "true" *)    input  issue_to_execute_bus_t issue_to_execute_bus2,
 
     // busy table
     output execute_to_busytable_bus_t execute_to_busytable_bus1,

@@ -280,7 +280,7 @@ assign store_data  = op_sb  ? {4{store_value[7:0]}} :
                                               store_addr[0] ? {store_value[23: 0],  8'h0} :  store_value                :
                               store_value;
 
-assign data_vaddr2 = rs_value+imm_value;
+assign data_vaddr2 = pre_lookup_addr;
 
 always_comb begin
     store_exception = '0;

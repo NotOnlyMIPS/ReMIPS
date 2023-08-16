@@ -337,6 +337,13 @@ always_comb begin
     base = (cp0_status.exl || exception.ex) ? 32'hbfc00200 : cp0_ebase;
 end
 
+// CP0 ErrorEPC
+uint32_t cp0_errorepc;
+always_ff @(posedge clk) begin
+    if(reset)
+        cp0_errorepc <= '0;
+end
+
 // Configx
 logic [31:0] cp0_config0, cp0_config1;
 always @(posedge clk) begin
@@ -352,14 +359,14 @@ always @(posedge clk) begin
             3'b011   // K0  
         };
         cp0_config1 <= {
-            1'b1,    // M
+            1'b0,    // M
             6'd15,   // MMUSize-1
             3'd2,    // IS
             3'd4,    // IL
-            3'd3,    // IA
+            3'd1,    // IA
             3'd2,    // DS
             3'd4,    // DL
-            3'd3,    // DA
+            3'd1,    // DA
             1'd0,    // C2
             1'd0,    // CMD
             1'd0,    // PC
@@ -369,7 +376,7 @@ always @(posedge clk) begin
             1'd0     // FP
         };
     end
-    if(cp0_we && cp0_addr == `CR_CONFIG0)
+    else if(cp0_we && cp0_addr == `CR_CONFIG0)
         cp0_config0[2:0] <= cp0_wdata[2:0];
 end
 
@@ -394,7 +401,8 @@ assign cp0_rdata = ({32{cp0_addr==`CR_INDEX   }} & cp0_index      )
                  | ({32{cp0_addr==`CR_EBASE   }} & cp0_ebase      )
                  | ({32{cp0_addr==`CR_CONFIG0 }} & cp0_config0    )
                  | ({32{cp0_addr==`CR_CONFIG1 }} & cp0_config1    )
-                 | ({32{cp0_addr==`CR_TAGLO   }} & cp0_tag_lo     );
+                 | ({32{cp0_addr==`CR_TAGLO   }} & cp0_tag_lo     )
+                 | ({32{cp0_addr==`CR_ERROREPC}} & cp0_errorepc   );
 
 assign {cp0_hw, cp0_sw} = {8{~cp0_status.exl}} & {8{cp0_status.ie}} & cp0_cause.ip & cp0_status.im;
 
