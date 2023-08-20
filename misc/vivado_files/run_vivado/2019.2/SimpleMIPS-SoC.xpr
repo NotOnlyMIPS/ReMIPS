@@ -3,10 +3,10 @@
 <!--                                                         -->
 <!-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="44" Path="E:/Storage/FreeSpace/workspace/ReMIPS/misc/vivado_files/run_vivado/2019.2/ReMIPS-SoC.xpr">
+<Project Version="7" Minor="44" Path="E:/Storage/FreeSpace/workspace/ReMIPS/misc/vivado_files/run_vivado/2019.2/SimpleMIPS-SoC.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="2447b7e91ee340348f163ba053917ea9"/>
+    <Option Name="Id" Val="8adc12a9414c47b3bf49cb9154b5b5b1"/>
     <Option Name="Part" Val="xc7a200tfbg676-2"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>
@@ -29,644 +29,606 @@
     <Option Name="IPUserFilesDir" Val="$PIPUSERFILESDIR"/>
     <Option Name="IPStaticSourceDir" Val="$PIPUSERFILESDIR/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
-    <Option Name="WTXSimLaunchSim" Val="2"/>
+    <Option Name="WTXSimLaunchSim" Val="0"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="19"/>
-    <Option Name="WTModelSimExportSim" Val="19"/>
-    <Option Name="WTQuestaExportSim" Val="19"/>
-    <Option Name="WTIesExportSim" Val="19"/>
-    <Option Name="WTVcsExportSim" Val="19"/>
-    <Option Name="WTRivieraExportSim" Val="19"/>
-    <Option Name="WTActivehdlExportSim" Val="19"/>
+    <Option Name="WTXSimExportSim" Val="17"/>
+    <Option Name="WTModelSimExportSim" Val="17"/>
+    <Option Name="WTQuestaExportSim" Val="17"/>
+    <Option Name="WTIesExportSim" Val="17"/>
+    <Option Name="WTVcsExportSim" Val="17"/>
+    <Option Name="WTRivieraExportSim" Val="17"/>
+    <Option Name="WTActivehdlExportSim" Val="17"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
     <Option Name="XSimArrayDisplayLimit" Val="1024"/>
     <Option Name="XSimTraceLimit" Val="65536"/>
+    <Option Name="SimTypes" Val="rtl"/>
+    <Option Name="SimTypes" Val="bfm"/>
+    <Option Name="SimTypes" Val="tlm"/>
+    <Option Name="SimTypes" Val="tlm_dpi"/>
     <Option Name="MEMEnableMemoryMapGeneration" Val="TRUE"/>
     <Option Name="DcpsUptoDate" Val="TRUE"/>
   </Configuration>
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="D:/nscscc2023-group-mips/soc_run_os_v0.01/soc_up/vivado_xpr/project_1/xilinx_ip/mig_axi_32/mig_axi_32.xci">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/mig_axi_32/mig_axi_32.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/ip/xilinx/axi_interconnect_0/axi_interconnect_0.xci">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/axi_interconnect_0/axi_interconnect_0.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/ip/xilinx/clk_wiz_0/clk_wiz_0.xci">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/clk_wiz_0/clk_wiz_0.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/ip/xilinx/clk_pll_33/clk_pll_33.xci">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/clk_pll_33/clk_pll_33.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/ip/xilinx/dpram_512x32/dpram_512x32.xci">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/dpram_512x32/dpram_512x32.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/ip/xilinx/axi_crossbar_cache/axi_crossbar_cache.xci">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/axi_crossbar_cache/axi_crossbar_cache.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/ip/xilinx/divu/divu.xci">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/divu/divu.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/ip/xilinx/div/div.xci">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/div/div.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/ip/xilinx/multu/multu.xci">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/multu/multu.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/soc_conf.svh">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/soc_conf.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/apb_dev_top.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/apb_dev_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/apb_mux2.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/apb_mux2.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/AMBA/axi2apb.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/AMBA/axi2apb.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/AMBA/axi_mux.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/AMBA/axi_mux.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/utility.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/utility.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/bd.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/bd.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/csr.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/csr.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/DMA/dma.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/DMA/dma.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/dma.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/dma.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/ethernet_top.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/ethernet_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/SPI/godson_sbridge_spi.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/SPI/godson_sbridge_spi.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/mac.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/mac.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/mac2axi.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/mac2axi.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/mac_axi.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/mac_axi.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/mac_top.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/mac_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/maccsr2axi.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/maccsr2axi.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/macdata2axi.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/macdata2axi.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/NAND/nand.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/NAND/nand.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/nand_module.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/nand_module.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/URT/raminfr.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/URT/raminfr.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/rc.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/rc.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/rfifo.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/rfifo.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/rlsm.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/rlsm.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/rstc.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/rstc.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/CONFREG/soc_confreg.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/CONFREG/soc_confreg.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/tc.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/tc.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/tfifo.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/tfifo.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/MAC/tlsm.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/MAC/tlsm.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/URT/uart_defines.h">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/URT/uart_defines.h">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/URT/uart_receiver.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/URT/uart_receiver.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/URT/uart_regs.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/URT/uart_regs.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/URT/uart_rfifo.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/URT/uart_rfifo.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/URT/uart_sync_flops.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/URT/uart_sync_flops.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/URT/uart_tfifo.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/URT/uart_tfifo.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/URT/uart_top.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/URT/uart_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/deps/loongson/APB_DEV/URT/uart_transmitter.v">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/loongson/APB_DEV/URT/uart_transmitter.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cpu_interface.svh">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cpu_interface.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cpu.svh">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cpu.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/common.svh">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/common.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/ReMIPS.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/execute/alu.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/execute/agu.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/fectch/bpu.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/execute/alu.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/execute/branch_control.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/execute/alu2.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/control/control.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/fetch/bpu.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cpu_axi_interface.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/execute/bru.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cpu_core.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/decode/busy_table.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cache/cache.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/commit/commit_stage.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/decode/control_signal.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/execute/count_bit.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cpu_axi_interface.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cpu_core.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cache/cache.svh">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cache/dcache.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cache/dcache.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/decode/decode_stage.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/decode/decode_stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/execute/execute_stage.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/execute/execute_stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/fetch/fast_decode.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/fectch/fetch_stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/fetch/fetch_stage.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cache/fifo.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cache/fifo.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cache/icache.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cache/icache.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/decode/inst_decoder.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/decode/inst_decoder.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/memory/mem_load.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/decode/inst_dispatch.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/memory/mem_req.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/issue/issue_stage.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/memory/mem_stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/mmu/mmu.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/mmu/mmu.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/execute/mul_div_unit.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cache/plru.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cache/plru.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/fectch/pre_fetch_stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/fetch/pre_fetch_stage.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/memory/pre_mem_stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/utils/rams.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/utils/rams.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/fetch/ras.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/fectch/ras.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/decode/rat.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/cp0/reg_cp0.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/cp0/reg_cp0.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/execute/reg_hilo.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/issue/regfile.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/control/regfile.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/execute/spu.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/simple_mips.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/execute/store_buffer.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/mmu/tlb.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/test/test_write.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/mmu/tlb_lookup.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/mmu/tlb.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/utils/tools.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/mmu/tlb_lookup.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/cpu/writeback/writeback_stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/cpu_core/utils/tools.sv">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/soc_up_top.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../src/soc_up_top.sv">
+      <File Path="r:/home/zymelaii/workspace/ReMIPS/test/testcase/cpu_ex/obj/inst_ram.coe">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="d:/nscscc2023-group-mips/soc_run_os_v0.01/soc_up/vivado_xpr/project_1/xilinx_ip/mig_axi_32/mig_b.prj">
+      <File Path="$PPRDIR/../../../../src.SimpleMIPS/deps/ip/xilinx/mig_axi_32/mig_a.prj">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="ScopedToCell" Val="mig_axi_32"/>
         </FileInfo>
       </File>
       <Config>
@@ -684,92 +646,15 @@
         </FileInfo>
       </File>
       <Config>
-        <Option Name="TargetConstrsFile" Val="$PSRCDIR/constrs_1/soc_up.xdc"/>
         <Option Name="ConstrsType" Val="XDC"/>
       </Config>
     </FileSet>
     <FileSet Name="sim_1" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_1">
-      <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/MX25L6405D.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/ejtag_virtual_host.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/vmac/mac_ram.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/vmac/mac2ahb_package.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/vmac/mac_top.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/nand_sim.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/uart_dev.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/vmac/virtual_mac.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/ddr3_model_parameters.vh">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/ddr3_model.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../test/loongson/soc_up/godson_system.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="godson_system"/>
+        <Option Name="TopModule" Val="soc_up_top"/>
         <Option Name="TopLib" Val="xil_defaultlib"/>
+        <Option Name="TopAutoSet" Val="TRUE"/>
         <Option Name="TransportPathDelay" Val="0"/>
         <Option Name="TransportIntDelay" Val="0"/>
         <Option Name="SelectedSimModel" Val="rtl"/>
@@ -804,7 +689,9 @@
   <Runs Version="1" Minor="11">
     <Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7a200tfbg676-2" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2019"/>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2019">
+          <Desc>Vivado Synthesis Defaults</Desc>
+        </StratHandle>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -812,9 +699,11 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a200tfbg676-2" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" SynthRun="synth_1" IncludeInArchive="true" GenFullBitstream="true">
+    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a200tfbg676-2" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/impl_1" SynthRun="synth_1" IncludeInArchive="true" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2019"/>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2019">
+          <Desc>Default settings for Implementation.</Desc>
+        </StratHandle>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -825,6 +714,7 @@
         <Step Id="post_route_phys_opt_design"/>
         <Step Id="write_bitstream"/>
       </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2019"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
